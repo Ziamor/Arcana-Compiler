@@ -1,0 +1,54 @@
+﻿using System.Text;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+
+    internal class ProgramNode : ASTNode
+    {
+        public List<ImportDeclarationNode> Imports { get; set; } = new List<ImportDeclarationNode>();
+        public List<ASTNode> Declarations { get; set; } = new List<ASTNode>();
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is ProgramNode other)
+            {
+                return Imports.SequenceEqual(other.Imports) && Declarations.SequenceEqual(other.Declarations);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                int hash = 19;
+                foreach (var import in Imports)
+                {
+                    hash = hash * 31 + (import != null ? import.GetHashCode() : 0);
+                }
+                foreach (var declaration in Declarations)
+                {
+                    hash = hash * 31 + (declaration != null ? declaration.GetHashCode() : 0);
+                }
+                return hash;
+            }
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine("Program:");
+            builder.AppendLine("Imports:");
+            foreach (var import in Imports)
+            {
+                builder.AppendLine(import.ToString());
+            }
+            builder.AppendLine("Declarations:");
+            foreach (var declaration in Declarations)
+            {
+                builder.AppendLine(declaration.ToString());
+            }
+            return builder.ToString();
+        }
+    }
+}
