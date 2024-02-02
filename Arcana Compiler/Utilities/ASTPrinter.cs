@@ -1,38 +1,52 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
+using System;
+using System.Text;
 
-namespace Arcana_Compiler.Utilities
-{
-    public class ASTPrinter
-    {
-        public string Print(ASTNode node)
-        {
-            return Print(node, 0);
+namespace Arcana_Compiler {
+    public class ASTPrinter {
+        public string Print(ASTNode node) {
+            StringBuilder result = new StringBuilder();
+            Print(node, result, "");
+            return result.ToString();
         }
 
-        private string Print(ASTNode node, int indentLevel)
-        {
-            var indent = new string(' ', indentLevel * 4); // 4 spaces per indent level
-            var result = indent + node.ToString();
-
-            var children = GetChildren(node);
-            foreach (var child in children)
-            {
-                result += "\n" + Print(child, indentLevel + 1);
+        private void Print(ASTNode node, StringBuilder result, string indent) {
+            if (node == null) {
+                return;
             }
 
-            return result;
-        }
-
-        private IEnumerable<ASTNode> GetChildren(ASTNode node)
-        {
-            return node switch
-            {
-                ProgramNode programNode => programNode.Imports.Cast<ASTNode>().Concat(programNode.ClassDeclarations),
-                ClassDeclarationNode classNode => classNode.Fields.Cast<ASTNode>().Concat(classNode.Methods),
-                MethodDeclarationNode methodNode => methodNode.Parameters.Cast<ASTNode>(),
-                _ => new List<ASTNode>() // Return an empty list for node types without children
-            };
+            switch (node) {
+                case ProgramNode programNode:
+                    result.AppendLine(indent + "Program");
+                    foreach (var classDecl in programNode.ClassDeclarations) {
+                        Print(classDecl, result, indent + "  ");
+                    }
+                    break;
+                case ClassDeclarationNode classNode:
+                    result.AppendLine($"{indent}Class: {classNode.ClassName}");
+                    foreach (var field in classNode.Fields) {
+                        Print(field, result, indent + "  ");
+                    }
+                    foreach (var method in classNode.Methods) {
+                        Print(method, result, indent + "  ");
+                    }
+                    break;
+                case FieldDeclarationNode fieldNode:
+                    result.AppendLine($"{indent}Field: {fieldNode.FieldName} ({fieldNode.FieldType})");
+                    break;
+                case MethodDeclarationNode methodNode:
+                    result.AppendLine($"{indent}Method: {methodNode.MethodName}");
+                    foreach (var param in methodNode.Parameters) {
+                        Print(param, result, indent + "  ");
+                    }
+                    break;
+                case ParameterNode parameterNode:
+                    result.AppendLine($"{indent}Parameter: {parameterNode.ParameterName} ({parameterNode.ParameterType})");
+                    break;
+                default:
+                    result.AppendLine(indent + "Unknown Node Type");
+                    break;
+            }
         }
     }
-
 }
