@@ -1,8 +1,10 @@
 ﻿using Arcana_Compiler.ArcanaParser;
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
+using Arcana_Compiler.Utilities;
 
-namespace Arcana_Compiler {
+namespace Arcana_Compiler
+{
     public class Compiler {
         private string _filePath;
 
@@ -30,6 +32,11 @@ namespace Arcana_Compiler {
             ASTPrinter printer = new ASTPrinter();
             string astString = printer.Print(ast);
             Console.WriteLine(astString);
+
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~");
+            PrettyPrinter prettyPrinter = new PrettyPrinter();
+            string prettyString = prettyPrinter.Print(ast);
+            Console.WriteLine(prettyString);
 
             // Semantic Analysis
             /*SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
