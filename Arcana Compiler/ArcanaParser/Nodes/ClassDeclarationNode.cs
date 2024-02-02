@@ -1,14 +1,16 @@
-﻿using System.Text;
+﻿using Arcana_Compiler.Common;
+using System.Text;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     internal class ClassDeclarationNode : ASTNode {
         public string ClassName { get; private set; }
+        public QualifiedName Namespace { get; private set; }
         public List<ParentTypeNode> ParentTypes { get; private set; } = new List<ParentTypeNode>();
         public List<FieldDeclarationNode> Fields { get; private set; } = new List<FieldDeclarationNode>();
         public List<MethodDeclarationNode> Methods { get; private set; } = new List<MethodDeclarationNode>();
-
-        public ClassDeclarationNode(string className, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
+        public ClassDeclarationNode(string className, QualifiedName? namespaceName, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
             ClassName = className;
+            Namespace = namespaceName ?? QualifiedName.Default;
             ParentTypes = parentTypes;
             Fields = fields;
             Methods = methods;
@@ -16,6 +18,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
 
         public override string ToString() {
             var builder = new StringBuilder();
+            if (Namespace != null) {
+                builder.AppendLine($"Namespace: {Namespace}");
+            }
             builder.AppendLine($"Class: {ClassName}");
 
             if (ParentTypes.Any()) {
@@ -37,12 +42,16 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         public override bool Equals(object? obj) {
             return obj is ClassDeclarationNode other &&
                    ClassName == other.ClassName &&
+                   ((Namespace == null && other.Namespace == null) || (Namespace?.Equals(other.Namespace) == true)) &&
                    ParentTypes.SequenceEqual(other.ParentTypes) &&
-                   Fields.SequenceEqual(other.Fields);
+                   Fields.SequenceEqual(other.Fields) &&
+                   Methods.SequenceEqual(other.Methods);
         }
         public override int GetHashCode() {
             unchecked {
                 int hash = ClassName.GetHashCode();
+                hash = hash * 31 + (Namespace != null ? Namespace.GetHashCode() : 0);
+
                 foreach (var parentType in ParentTypes) {
                     hash = hash * 31 + parentType.GetHashCode();
                 }

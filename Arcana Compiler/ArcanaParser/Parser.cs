@@ -49,10 +49,10 @@ namespace Arcana_Compiler.ArcanaParser {
             while (_currentToken.Type != TokenType.EOF) {
                 switch (_currentToken.Type) {
                     case TokenType.NAMESPACE:
-                        rootNode.Declarations.Add(ParseNamespaceDeclaration());
+                        ParseNamespaceDeclaration(rootNode);
                         break;
                     case TokenType.CLASS:
-                        rootNode.Declarations.Add(ParseClassDeclaration());
+                        rootNode.ClassDeclarations.Add(ParseClassDeclaration(null));
                         break;
                     default:
                         throw new Exception($"Unexpected token: {_currentToken.Type}");
@@ -62,28 +62,23 @@ namespace Arcana_Compiler.ArcanaParser {
             return rootNode;
         }
 
-        private NamespaceDeclarationNode ParseNamespaceDeclaration() {
+        private void ParseNamespaceDeclaration(ProgramNode rootNode) {
             Eat(TokenType.NAMESPACE);
             QualifiedName namespaceName = ParseQualifiedName();
-
             Eat(TokenType.OPEN_BRACE);
 
-            List<ASTNode> classDeclarations = new List<ASTNode>();
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
                 if (_currentToken.Type == TokenType.CLASS) {
-                    classDeclarations.Add(ParseClassDeclaration());
+                    rootNode.ClassDeclarations.Add(ParseClassDeclaration(namespaceName));
                 } else {
                     // Handle error or unexpected token
                 }
             }
 
             Eat(TokenType.CLOSE_BRACE);
-
-            return new NamespaceDeclarationNode(namespaceName, classDeclarations);
         }
 
-
-        private ClassDeclarationNode ParseClassDeclaration() {
+        private ClassDeclarationNode ParseClassDeclaration(QualifiedName? currentNamespace) {
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
@@ -107,7 +102,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
             Eat(TokenType.CLOSE_BRACE);
 
-            return new ClassDeclarationNode(className, parentTypes, fields, methods);
+            return new ClassDeclarationNode(className, currentNamespace, parentTypes, fields, methods);
         }
 
         private bool IsMethodDeclaration() {

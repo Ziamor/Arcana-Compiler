@@ -1,5 +1,6 @@
 ﻿namespace Arcana_Compiler.Common {
     public class QualifiedName {
+        public static readonly QualifiedName Default = new QualifiedName(new List<string> { "Default" });
         public List<string> Parts { get; private set; }
 
         public QualifiedName(List<string> parts) {

@@ -1,6 +1,17 @@
 import importName
 import some.name.space
 
+// Default namespace implied
+class Person {
+	string name // default value optional
+	int age = 9 
+
+	public func Person(string name, int age) {
+	}
+
+	func Describe() : int, obj{
+	}
+}
 namespace Utilities {
 	class Person {
 		int count = 10

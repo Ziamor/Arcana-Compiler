@@ -6,13 +6,13 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
     internal class ProgramNode : ASTNode
     {
         public List<ImportDeclarationNode> Imports { get; set; } = new List<ImportDeclarationNode>();
-        public List<ASTNode> Declarations { get; set; } = new List<ASTNode>();
+        public List<ClassDeclarationNode> ClassDeclarations { get; set; } = new List<ClassDeclarationNode>();
 
         public override bool Equals(object? obj)
         {
             if (obj is ProgramNode other)
             {
-                return Imports.SequenceEqual(other.Imports) && Declarations.SequenceEqual(other.Declarations);
+                return Imports.SequenceEqual(other.Imports) && ClassDeclarations.SequenceEqual(other.ClassDeclarations);
             }
             return false;
         }
@@ -26,7 +26,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
                 {
                     hash = hash * 31 + (import != null ? import.GetHashCode() : 0);
                 }
-                foreach (var declaration in Declarations)
+                foreach (var declaration in ClassDeclarations)
                 {
                     hash = hash * 31 + (declaration != null ? declaration.GetHashCode() : 0);
                 }
@@ -44,7 +44,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
                 builder.AppendLine(import.ToString());
             }
             builder.AppendLine("Declarations:");
-            foreach (var declaration in Declarations)
+            foreach (var declaration in ClassDeclarations)
             {
                 builder.AppendLine(declaration.ToString());
             }
