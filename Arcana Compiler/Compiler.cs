@@ -2,6 +2,8 @@
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Utilities;
+using Arcana_Compiler.ArcanaSemanticAnalyzer;
+using System;
 
 namespace Arcana_Compiler
 {
@@ -26,6 +28,7 @@ namespace Arcana_Compiler
             }*/
 
             // Syntax Analysis
+            Console.WriteLine("~~~~~~~~~~Syntax Analysis~~~~~~~~~~");
             Parser parser = new Parser(lexer);
             ASTNode ast = parser.Parse();
 
@@ -33,17 +36,21 @@ namespace Arcana_Compiler
             string astString = printer.Print(ast);
             Console.WriteLine(astString);
 
-            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~");
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~");
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             string prettyString = prettyPrinter.Print(ast);
             Console.WriteLine(prettyString);
 
             // Semantic Analysis
-            /*SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
-            semanticAnalyzer.Analyze(ast);
+            Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
+            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(ast);
+            semanticAnalyzer.Analyze();
 
+            ScopeVisualizer visualizer = new ScopeVisualizer();
+            string scopeString = visualizer.Visualize(ast, semanticAnalyzer.SymbolTable);
+            Console.WriteLine(scopeString);
             // Intermediate Code Generation (e.g., to LLVM IR)
-            CodeGenerator codeGenerator = new CodeGenerator();
+            /*CodeGenerator codeGenerator = new CodeGenerator();
             string intermediateCode = codeGenerator.Generate(ast);
 
             // Output the result
