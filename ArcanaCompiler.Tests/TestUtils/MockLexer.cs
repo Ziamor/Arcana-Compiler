@@ -18,7 +18,7 @@ namespace ArcanaCompiler.Tests.TestUtils
             {
                 return _tokens.Dequeue();
             }
-            return new Token(TokenType.EOF, null, -1, -1); // Return EOF if no tokens left
+            return new Token(TokenType.EOF, null, -1, -1, ""); // Return EOF if no tokens left
         }
 
         public List<Token> Tokenize()

@@ -9,11 +9,11 @@ namespace ArcanaCompiler.Tests {
         [Test]
         public void TestParseSimpleVariableDeclaration() {
             var tokens = new List<Token> {
-                new Token(TokenType.IDENTIFIER, "int", 1, 1),
-                new Token(TokenType.IDENTIFIER, "count", 1, 5),
-                new Token(TokenType.ASSIGN, "=", 1, 11),
-                new Token(TokenType.NUMBER, "10", 1, 13),
-                new Token(TokenType.EOF, null, 1, 16)
+                new Token(TokenType.IDENTIFIER, "int", 1, 1, "int count = 10"),
+                new Token(TokenType.IDENTIFIER, "count", 1, 5, "int count = 10"),
+                new Token(TokenType.ASSIGN, "=", 1, 11, "int count = 10"),
+                new Token(TokenType.NUMBER, "10", 1, 13, "int count = 10"),
+                new Token(TokenType.EOF, null, 1, 16, "int count = 10")
             };
 
             var mockLexer = new MockLexer(tokens);
