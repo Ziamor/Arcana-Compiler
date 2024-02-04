@@ -1,4 +1,5 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
+using System;
 using System.Text;
 
 namespace Arcana_Compiler.ArcanaParser {
@@ -17,6 +18,8 @@ namespace Arcana_Compiler.ArcanaParser {
                     return literalNode.Value.ToString() ?? "EMPTY";
                 case VariableAccessNode variableNode:
                     return variableNode.QualifiedName.ToString();
+                case ChainedMethodCallNode chainedMethodCallNode:
+                    return $"{PrintExpression(chainedMethodCallNode.PreviousNode)} -> {chainedMethodCallNode.CurrentCall}";
                 default:
                     return expression.ToString() ?? "EMPTY";
             }
@@ -87,6 +90,7 @@ namespace Arcana_Compiler.ArcanaParser {
                         Print(argument, result, indent + "  ");
                     }
                     break;
+                
                 case LiteralNode literalNode:
                     result.AppendLine($"{indent}Literal: {literalNode}");
                     break;
@@ -101,7 +105,7 @@ namespace Arcana_Compiler.ArcanaParser {
                     result.AppendLine($"{indent}Variable Decl: {variableDeclarationNode.Name} ({variableDeclarationNode.Type}){initialValueOutput}");
                     break;
                 case VariableAssignmentNode variableAssignmentNode:
-                    result.AppendLine($"{indent}Variable: {variableAssignmentNode.VariableName} = {variableAssignmentNode.AssignedExpression}");
+                    result.AppendLine($"{indent}Variable: {variableAssignmentNode.VariableName} = {PrintExpression(variableAssignmentNode.AssignedExpression)}");
                     break;
                 case IfStatementNode ifStatementNode:
                     foreach (var (Condition, Statements) in ifStatementNode.ConditionsAndStatements)
@@ -122,7 +126,6 @@ namespace Arcana_Compiler.ArcanaParser {
                         }
                     }
                     break;
-
                 default:
                     result.AppendLine(indent + "Unknown Node Type");
                     break;

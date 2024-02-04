@@ -425,12 +425,55 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private ASTNode ParseIdentifierOrMethodCall() {
             QualifiedName qualifiedName = ParseQualifiedName();
+            ASTNode currentNode;
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
-                return ParseMethodCall(qualifiedName);
+                currentNode = ParseMethodCall(qualifiedName);
             } else {
-                return new VariableAccessNode(qualifiedName);
+                currentNode = new VariableAccessNode(qualifiedName);
+            }
+
+            // Handle chaining after the initial method call or variable access
+            while (_currentToken.Type == TokenType.DOT) {
+                Eat(TokenType.DOT); // Consume the dot
+                currentNode = ParseChainedCall(currentNode);
+            }
+
+            return currentNode;
+        }
+
+        private ASTNode ParseChainedCall(ASTNode previousNode) {
+            // Assuming the next token is an identifier (either a method name or a property name)
+            string nextIdentifier = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
+
+            if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
+                // Reuse the existing method to parse method calls and create a MethodCallNode
+                QualifiedName qualifiedName = new QualifiedName(new List<string> { nextIdentifier });
+                MethodCallNode methodCall = ParseMethodCall(qualifiedName);
+
+                // Create a ChainedMethodCallNode with the previous node and the parsed MethodCallNode
+                return new ChainedMethodCallNode(previousNode, methodCall);
+            } else {
+                // If it's not a method call, treat it as a property access and create a chained property access node
+                return new ChainedPropertyAccessNode(previousNode, nextIdentifier);
             }
         }
+
+
+        private List<ASTNode> ParseArguments() {
+            List<ASTNode> arguments = new List<ASTNode>();
+            Eat(TokenType.OPEN_PARENTHESIS);
+            if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                arguments.Add(ParseExpression());
+                while (_currentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                    arguments.Add(ParseExpression());
+                }
+            }
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            return arguments;
+        }
+
 
         private UnaryOperationNode ParseUnaryOperation() {
             Token operatorToken = _currentToken;

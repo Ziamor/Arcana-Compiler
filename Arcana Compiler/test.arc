@@ -1,50 +1,68 @@
-import importName
-import some.name.space
+// Test different import formats
+import single.level
+import multi.level.path
 
-// Default namespace implied
-class Person {
-	string name // default value optional
-	int age = 9 
+// Basic class with properties and constructor
+class Vehicle {
+    string make
+    int year = 2020
 
-	public func Person(string name, int age) {
-	}
+    public func Vehicle(string make, int year) {
+        // Constructor logic
+    }
 
-	func Describe() : int, obj{
-	}
+    func getDescription() : string {
+        // Method returning a string
+    }
 }
-namespace Utilities {
-	class Person {
-		int count = 10
-		string name = "John"
-		float balance = 100.50
 
-		int? nullableInt = 5
-		string? nullableString = 5
-		Person? nullableObject = null
-	}
+namespace Models {
+    // Class without default values, implementing an interface
+    class Car: IVehicle {
+        string model
+        int year
 
-	// Implement an interface
-	class Person: IPrintable {
-		
-	}
+        public func Car(string model, int year) {
+            // Constructor logic
+        }
 
-	class Person {
-		string name // default value optional
-		int age = 9 
+        func drive() : void {
+            // Method with no return value
+        }
+    }
 
-		public func Person(string name, int age) {
-			int someVar // declaration only
-			int someOtherVar = 4 // declaration + assignment
-			if(some.name.space.cond) {
-				someVar = 2  // assignment
-				someVar = 6 // assignment
-				someVar = -1
-				someVar = !(test)
-				someVar = 5 + (2 + 5)
-			}
-		}
+    // Class with nullable properties and method overloading
+    class ElectricCar: Car {
+        float? batteryLevel = null
 
-		func Describe() : int, obj{
-		}
-	}
+        func chargeBattery(float amount) : void {
+            // Overloaded method
+        }
+
+        func chargeBattery() : void {
+            // Overloaded method without parameters
+        }
+    }
+}
+
+class Calculator {
+    int result = 0
+
+    func calculate(string expression) : int {
+        // Complex conditional logic
+        if (expression.contains("+")) {
+            result = expression.split("+").map(toInt).sum()
+        } else if (expression.contains("-")) {
+            result = expression.split("-").map(toInt).reduce(subtract)
+        }
+        return result
+    }
+
+    private func toInt(string number) : int {
+        // Conversion logic
+    }
+
+    private func subtract(int a, int b) : int {
+        // Subtraction logic
+    }
 }

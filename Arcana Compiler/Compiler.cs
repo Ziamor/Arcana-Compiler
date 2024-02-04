@@ -33,13 +33,13 @@ namespace Arcana_Compiler {
             string astString = printer.Print(ast);
             Console.WriteLine(astString);
 
-            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~");
+            /*Console.WriteLine("~~~~~~~~~~~~~~~~~~~~");
             PrettyPrinter prettyPrinter = new PrettyPrinter();
             string prettyString = prettyPrinter.Print(ast);
             Console.WriteLine(prettyString);
 
             // Semantic Analysis
-            /*Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
+            Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(ast);
             semanticAnalyzer.Analyze();
 
