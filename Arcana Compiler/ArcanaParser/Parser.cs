@@ -202,10 +202,14 @@ namespace Arcana_Compiler.ArcanaParser {
             }
             // For now, we'll assume the method body is empty and just consume the curly braces
             Eat(TokenType.OPEN_BRACE);
+            List<ASTNode> methodBody = new List<ASTNode>();
+            while (_currentToken.Type != TokenType.CLOSE_BRACE) {
+                methodBody.Add(ParseStatement());
+            }
             Eat(TokenType.CLOSE_BRACE);
 
             // Return the method declaration node
-            return new MethodDeclarationNode(methodName, accessModifier, returnTypes, parameters, null);
+            return new MethodDeclarationNode(methodName, accessModifier, returnTypes, parameters, methodBody);
         }
 
         private ParameterNode ParseParameter() {
@@ -218,6 +222,100 @@ namespace Arcana_Compiler.ArcanaParser {
             return new ParameterNode(parameterType, parameterName);
         }
 
+        private ASTNode ParseStatement() {
+            if (_currentToken.Type == TokenType.IDENTIFIER) {
+                // Peek next token to decide between declaration, assignment, or method call
+                Token nextToken = PeekNextToken();
+                switch (nextToken.Type) {
+                    case TokenType.IDENTIFIER:
+                        return ParseVariableDeclaration();
+                    case TokenType.ASSIGN:
+                        return ParseVariableAssignment();
+                    case TokenType.OPEN_PARENTHESIS:
+                        return ParseMethodCall(ParseQualifiedName());
+                    default:
+                        throw new NotImplementedException("Unrecognized statement pattern.");
+                }
+            } else {
+                switch (_currentToken.Type) {
+                    case TokenType.IF:
+                        return ParseIfStatement();
+                    default:
+                        throw new NotImplementedException("Statement parsing for this token type is not implemented.");
+                }
+            }
+        }
+
+        private VariableDeclarationNode ParseVariableDeclaration() {
+            TypeNode variableType = ParseType();
+
+            string variableName = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
+
+            ASTNode? initialValue = null;
+            if (_currentToken.Type == TokenType.ASSIGN) {
+                Eat(TokenType.ASSIGN);
+                initialValue = ParseExpression();
+            }
+
+            return new VariableDeclarationNode(variableType, variableName, initialValue);
+        }
+
+        private ASTNode ParseVariableAssignment() {
+            string variableName = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
+            Eat(TokenType.ASSIGN);
+            ASTNode expression = ParseExpression();
+            return new VariableAssignmentNode(variableName, expression);
+        }
+
+        private IfStatementNode ParseIfStatement() {
+            List<(ASTNode Condition, List<ASTNode> Statements)> conditionsAndStatements = new List<(ASTNode Condition, List<ASTNode> Statements)>();
+            List<ASTNode>? elseStatements = null;
+
+            // Parse the initial 'if' condition and its block
+            Eat(TokenType.IF);
+            Eat(TokenType.OPEN_PARENTHESIS);
+            ASTNode initialCondition = ParseExpression();
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            List<ASTNode> initialThenStatements = ParseBlockOrStatement();
+
+            conditionsAndStatements.Add((initialCondition, initialThenStatements));
+
+            // Parse any 'else if' branches
+            while (_currentToken.Type == TokenType.ELSE) {
+                Eat(TokenType.ELSE);
+                if (_currentToken.Type == TokenType.IF) {
+                    Eat(TokenType.IF);
+                    Eat(TokenType.OPEN_PARENTHESIS);
+                    ASTNode elseIfCondition = ParseExpression();
+                    Eat(TokenType.CLOSE_PARENTHESIS);
+                    List<ASTNode> elseIfStatements = ParseBlockOrStatement();
+
+                    conditionsAndStatements.Add((elseIfCondition, elseIfStatements));
+                } else {
+                    elseStatements = ParseBlockOrStatement();
+                    break; // After 'else', no more 'else if' or 'else' should be parsed
+                }
+            }
+                        
+            return new IfStatementNode(conditionsAndStatements, elseStatements);
+        }
+
+        private List<ASTNode> ParseBlockOrStatement() {
+            if (_currentToken.Type == TokenType.OPEN_BRACE) {
+                Eat(TokenType.OPEN_BRACE);
+                List<ASTNode> statements = new List<ASTNode>();
+                while (_currentToken.Type != TokenType.CLOSE_BRACE) {
+                    statements.Add(ParseStatement());
+                }
+                Eat(TokenType.CLOSE_BRACE);
+                return statements;
+            } else {
+                // If not a block, parse a single statement
+                return new List<ASTNode> { ParseStatement() };
+            }
+        }
 
         private TypeNode ParseType() {
             string typeName = _currentToken.Value;
@@ -243,17 +341,55 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private ASTNode ParseExpression() {
-            if (_currentToken.Type == TokenType.NULL) {
-                Eat(TokenType.NULL);
-                return new NullLiteralNode();
+            switch (_currentToken.Type) {
+                case TokenType.NULL:
+                    Eat(TokenType.NULL);
+                    return new NullLiteralNode();
+
+                case TokenType.NUMBER:
+                case TokenType.STRING:
+                    LiteralNode literal = new LiteralNode(_currentToken.Value);
+                    Eat(_currentToken.Type);
+                    return literal;
+
+                case TokenType.IDENTIFIER:
+                    return ParseIdentifierExpression();
+
+                default:
+                    throw new NotImplementedException("Expression parsing not fully implemented.");
             }
-            if (_currentToken.Type == TokenType.NUMBER || _currentToken.Type == TokenType.STRING) {
-                LiteralNode literal = new LiteralNode(_currentToken.Value);
-                Eat(_currentToken.Type);
-                return literal;
+        }
+
+        private ASTNode ParseIdentifierExpression() {
+            QualifiedName qualifiedName = ParseQualifiedName();
+
+            // Check for method call
+            if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
+                return ParseMethodCall(qualifiedName);
+            }
+            // Otherwise, treat it as a simple variable
+            else {
+                return new VariableAccessNode(qualifiedName);
             }
 
-            throw new NotImplementedException("Expression parsing not fully implemented.");
+            throw new Exception("Malformed identifier");
+        }
+
+        private MethodCallNode ParseMethodCall(QualifiedName qualifiedName) {
+            string methodName = qualifiedName.Identifier;
+            Eat(TokenType.OPEN_PARENTHESIS);
+            List<ASTNode> arguments = new List<ASTNode>();
+
+            if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                arguments.Add(ParseExpression());
+                while (_currentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                    arguments.Add(ParseExpression());
+                }
+            }
+
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            return new MethodCallNode(methodName, arguments);
         }
 
         private QualifiedName ParseQualifiedName() {

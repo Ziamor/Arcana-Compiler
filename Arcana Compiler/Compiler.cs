@@ -42,7 +42,7 @@ namespace Arcana_Compiler
             Console.WriteLine(prettyString);
 
             // Semantic Analysis
-            Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
+            /*Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
             SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(ast);
             semanticAnalyzer.Analyze();
 
@@ -50,7 +50,7 @@ namespace Arcana_Compiler
             string scopeString = visualizer.Visualize(ast, semanticAnalyzer.SymbolTable);
             Console.WriteLine(scopeString);
             // Intermediate Code Generation (e.g., to LLVM IR)
-            /*CodeGenerator codeGenerator = new CodeGenerator();
+            CodeGenerator codeGenerator = new CodeGenerator();
             string intermediateCode = codeGenerator.Generate(ast);
 
             // Output the result

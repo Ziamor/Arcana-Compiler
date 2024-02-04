@@ -3,6 +3,9 @@
         public static readonly QualifiedName Default = new QualifiedName(new List<string> { "Default" });
         public List<string> Parts { get; private set; }
 
+        public string Identifier => Parts.Last();
+        public QualifiedName NamespacePart => new QualifiedName(Parts.Take(Parts.Count - 1).ToList());
+
         public QualifiedName(List<string> parts) {
             Parts = parts;
         }

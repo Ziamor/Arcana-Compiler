@@ -4,14 +4,14 @@
         public string AccessModifier { get; private set; }
         public List<TypeNode> ReturnTypes { get; private set; }
         public List<ParameterNode> Parameters { get; private set; }
-        public ASTNode Body { get; private set; } // Simplified representation for the method body for now
+        public List<ASTNode> Body { get; private set; }
 
-        public MethodDeclarationNode(string methodName, string accessModifier, List<TypeNode> returnTypes, List<ParameterNode> parameters, ASTNode body) {
+        public MethodDeclarationNode(string methodName, string? accessModifier, List<TypeNode> returnTypes, List<ParameterNode> parameters, List<ASTNode> body) {
             MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
             AccessModifier = accessModifier ?? "private"; // Default to private if not specified
             ReturnTypes = returnTypes;
             Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
-            //Body = body ?? throw new ArgumentNullException(nameof(body));
+            Body = body ?? throw new ArgumentNullException(nameof(body));
         }
 
         public override string ToString() {

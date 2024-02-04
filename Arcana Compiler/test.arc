@@ -33,6 +33,12 @@ namespace Utilities {
 		int age = 9 
 
 		public func Person(string name, int age) {
+			int someVar // declaration only
+			int someOtherVar = 4 // declaration + assignment
+			if(some.name.space.cond) {
+				someVar = 2  // assignment
+				someVar = 6 // assignment
+			}
 		}
 
 		func Describe() : int, obj{
