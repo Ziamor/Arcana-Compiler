@@ -4,6 +4,7 @@ using Arcana_Compiler.Common;
 namespace Arcana_Compiler.ArcanaLexer {
     public class Lexer : ILexer {
         private readonly string _input;
+        private readonly string[] _lines;
         private int _position;
         private char _currentChar;
         private int _currentLine;
@@ -12,7 +13,8 @@ namespace Arcana_Compiler.ArcanaLexer {
 
 
         public Lexer(string input) {
-            _input = input.Replace("\r\n", "\n"); // Normalize line endings, might be faster to not do this and handle appropriately
+            _input = input.Replace("\r\n", "\n");
+            _lines = _input.Split('\n');
             _position = 0;
             _currentChar = _input[_position];
             _currentLine = 1;
@@ -145,7 +147,8 @@ namespace Arcana_Compiler.ArcanaLexer {
 
         private Token CreateToken(TokenType type, string? value) {
             int tokenStartPos = _currentLinePosition - _currentTokenLength;
-            return new Token(type, value, _currentLine, tokenStartPos);
+            string lineText = _lines.Length > _currentLine - 1 ? _lines[_currentLine - 1] : string.Empty;
+            return new Token(type, value, _currentLine, tokenStartPos, lineText);
         }
 
         /// <summary>

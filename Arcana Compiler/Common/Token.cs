@@ -61,11 +61,14 @@
         public int LineNumber { get; }
         public int Position { get; } // Column number
 
-        public Token(TokenType type, string? value, int lineNumber, int position) {
+        public string LineText { get; }
+
+        public Token(TokenType type, string? value, int lineNumber, int position, string lineText) {
             Type = type;
             Value = value ?? "null";
             LineNumber = lineNumber;
             Position = position;
+            LineText = lineText;
         }
 
         public override string ToString() {
