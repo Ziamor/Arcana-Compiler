@@ -9,12 +9,14 @@
         COLON, // :
 
         /*Operators*/
-        PLUS, // '+'
-        MINUS, // '-'
-        MULTIPLY, // '*'
-        DIVIDE, // '/'
-        ASSIGN, // '='
+        NOT, // !
+        PLUS, // +
+        MINUS, // -
+        MULTIPLY, // *
+        DIVIDE, // /
+        ASSIGN, // =
         EQUALS, // ==
+        NOT_EQUALS, // !=
         LESS_THEN, // <
         LESS_THEN_OR_EQUAL, // <=
         GREATER_THAN, // >

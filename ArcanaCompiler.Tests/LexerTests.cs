@@ -1,13 +1,7 @@
 ﻿using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ArcanaCompiler.Tests
-{
+namespace ArcanaCompiler.Tests {
     [TestFixture]
     public class LexerTests
     {

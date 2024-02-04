@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Arcana_Compiler.ArcanaParser.Nodes {
+﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
     /// <summary>
     /// During the parsing stage, we can't be sure if a class is extending another base class
     /// or if it's implmenting an interface. So ParentTypeNode is a generic way to store both

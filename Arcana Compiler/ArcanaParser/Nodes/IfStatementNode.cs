@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Arcana_Compiler.ArcanaParser.Nodes {
+﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
     internal class IfStatementNode : ASTNode {
         public List<(ASTNode Condition, List<ASTNode> Statements)> ConditionsAndStatements { get; }
         public List<ASTNode>? ElseStatements { get; }

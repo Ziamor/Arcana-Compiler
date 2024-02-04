@@ -64,6 +64,12 @@ namespace Arcana_Compiler.ArcanaLexer {
                 case '+':
                     Advance();
                     return CreateToken(TokenType.PLUS, "+");
+                case '-':
+                    Advance();
+                    return CreateToken(TokenType.MINUS, "-");
+                case '*':
+                    Advance();
+                    return CreateToken(TokenType.MULTIPLY, "*");
                 case '/':
                     Advance();
                     if (_currentChar == '/') {
@@ -118,6 +124,13 @@ namespace Arcana_Compiler.ArcanaLexer {
                 case ')':
                     Advance();
                     return CreateToken(TokenType.CLOSE_PARENTHESIS, ")");
+                case '!':
+                    Advance();
+                    if (_currentChar == '=') {
+                        Advance();
+                        return CreateToken(TokenType.NOT_EQUALS, "!=");
+                    }
+                    return CreateToken(TokenType.NOT, "!");
                 case '=':
                     Advance();
                     if (_currentChar == '=') {

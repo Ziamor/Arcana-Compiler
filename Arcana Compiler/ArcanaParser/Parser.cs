@@ -3,6 +3,22 @@ using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 
 namespace Arcana_Compiler.ArcanaParser {
+    public class ParsingException : Exception {
+        public ParsingException(string message) : base(message) { }
+    }
+
+    public class UnexpectedTokenException : ParsingException {
+        public UnexpectedTokenException(Token token)
+            : base($"Unexpected token '{token.Value}' of type {token.Type} at line {token.LineNumber}, position {token.Position}.") { }
+    }
+
+    public class SyntaxErrorException : ParsingException {
+        public SyntaxErrorException(TokenType expected, Token found)
+            : base($"Expected {expected}, but found '{found.Value}' of type {found.Type} at line {found.LineNumber}, position {found.Position}.") { }
+        public SyntaxErrorException(string expected, Token found)
+           : base($"Expected {expected}, but found '{found.Value}' of type {found.Type} at line {found.LineNumber}, position {found.Position}.") { }
+    }
+
     public class Parser {
         private readonly ILexer _lexer;
         private Token _currentToken;
@@ -24,7 +40,7 @@ namespace Arcana_Compiler.ArcanaParser {
                 }
                 SkipComments();
             } else {
-                throw new Exception($"Syntax error: Expected {tokenType}, got {_currentToken.Type} at Line: {_currentToken.LineNumber} Pos: {_currentToken.Position}");
+                throw new SyntaxErrorException(tokenType, _currentToken);
             }
         }
         private Token PeekNextToken() {
@@ -55,7 +71,7 @@ namespace Arcana_Compiler.ArcanaParser {
                         rootNode.ClassDeclarations.Add(ParseClassDeclaration(null));
                         break;
                     default:
-                        throw new Exception($"Unexpected token: {_currentToken.Type}");
+                        throw new UnexpectedTokenException(_currentToken);
                 }
             }
 
@@ -298,7 +314,7 @@ namespace Arcana_Compiler.ArcanaParser {
                     break; // After 'else', no more 'else if' or 'else' should be parsed
                 }
             }
-                        
+
             return new IfStatementNode(conditionsAndStatements, elseStatements);
         }
 
@@ -340,39 +356,124 @@ namespace Arcana_Compiler.ArcanaParser {
             return imports;
         }
 
-        private ASTNode ParseExpression() {
+        private ASTNode ParseExpression(int parentPrecedence = 0) {
+            ASTNode node;
+            // Handle unary operations first
+            if (_currentToken.Type == TokenType.MINUS || _currentToken.Type == TokenType.NOT) {
+                node = ParseUnaryOperation();
+            } else {
+                node = ParsePrimaryExpression();
+            }
+
+            // Now handle binary operations
+            while (IsBinaryOperator(_currentToken) && GetPrecedence(_currentToken.Type) > parentPrecedence) {
+                Token operatorToken = _currentToken;
+                if (!IsBinaryOperator(_currentToken)) {
+                    throw new SyntaxErrorException("binary operator", _currentToken);
+                }
+
+                Eat(operatorToken.Type);
+                
+                int precedence = GetPrecedence(operatorToken.Type);
+                ASTNode right = ParseExpression(precedence);
+                node = new BinaryOperationNode(node, operatorToken, right);
+            }
+            return node;
+        }
+
+        /// <summary>
+        /// Parses a primary expression, which includes literals (numbers and strings), the 'null' keyword,
+        /// identifiers (which could be variables or method calls), and expressions enclosed in parentheses.
+        /// This function serves as the base case for the recursive descent parsing of expressions,
+        /// handling the most atomic elements that do not contain other expressions.
+        /// </summary>
+        /// <returns>An ASTNode representing the parsed primary expression.</returns>
+        /// <exception cref="UnexpectedTokenException">Thrown when an unexpected token is encountered.</exception>
+        private ASTNode ParsePrimaryExpression() {
             switch (_currentToken.Type) {
+                case TokenType.NUMBER:
+                    return ParseNumberLiteral();
+                case TokenType.STRING:
+                    return ParseStringLiteral();
                 case TokenType.NULL:
                     Eat(TokenType.NULL);
                     return new NullLiteralNode();
-
-                case TokenType.NUMBER:
-                case TokenType.STRING:
-                    LiteralNode literal = new LiteralNode(_currentToken.Value);
-                    Eat(_currentToken.Type);
-                    return literal;
-
                 case TokenType.IDENTIFIER:
-                    return ParseIdentifierExpression();
-
+                    return ParseIdentifierOrMethodCall();
+                case TokenType.OPEN_PARENTHESIS:
+                    Eat(TokenType.OPEN_PARENTHESIS);
+                    ASTNode expression = ParseExpression();
+                    Eat(TokenType.CLOSE_PARENTHESIS);
+                    return expression;
                 default:
-                    throw new NotImplementedException("Expression parsing not fully implemented.");
+                    throw new UnexpectedTokenException(_currentToken); ;
             }
         }
 
-        private ASTNode ParseIdentifierExpression() {
-            QualifiedName qualifiedName = ParseQualifiedName();
+        private LiteralNode ParseNumberLiteral() {
+            LiteralNode node = new LiteralNode(_currentToken.Value);
+            Eat(TokenType.NUMBER);
+            return node;
+        }
 
-            // Check for method call
+        private LiteralNode ParseStringLiteral() {
+            LiteralNode node = new LiteralNode(_currentToken.Value);
+            Eat(TokenType.STRING);
+            return node;
+        }
+
+        private ASTNode ParseIdentifierOrMethodCall() {
+            QualifiedName qualifiedName = ParseQualifiedName();
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
                 return ParseMethodCall(qualifiedName);
-            }
-            // Otherwise, treat it as a simple variable
-            else {
+            } else {
                 return new VariableAccessNode(qualifiedName);
             }
+        }
 
-            throw new Exception("Malformed identifier");
+        private UnaryOperationNode ParseUnaryOperation() {
+            Token operatorToken = _currentToken;
+            Eat(_currentToken.Type);
+            ASTNode operand = ParseExpression();
+            return new UnaryOperationNode(operatorToken, operand);
+        }
+
+        private ASTNode ParseBinaryExpression(int parentPrecedence = 0) {
+            ASTNode left = ParsePrimaryExpression(); // Parse the left-hand side
+
+            while (true) {
+                int precedence = GetPrecedence(_currentToken.Type);
+                if (precedence <= parentPrecedence) {
+                    break;
+                }
+
+                Token operatorToken = _currentToken;
+                Eat(_currentToken.Type);
+
+                // Parse the right-hand side with higher precedence
+                ASTNode right = ParseBinaryExpression(precedence);
+
+                left = new BinaryOperationNode(left, operatorToken, right);
+            }
+
+            return left;
+        }
+        private bool IsBinaryOperator(Token token) {
+            return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
+                   token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE;
+        }
+
+        private int GetPrecedence(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.PLUS:
+                case TokenType.MINUS:
+                    return 1;
+                case TokenType.MULTIPLY:
+                case TokenType.DIVIDE:
+                    return 2;
+                default:
+                    return 0;
+            }
         }
 
         private MethodCallNode ParseMethodCall(QualifiedName qualifiedName) {
@@ -387,7 +488,9 @@ namespace Arcana_Compiler.ArcanaParser {
                     arguments.Add(ParseExpression());
                 }
             }
-
+            if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                throw new SyntaxErrorException(TokenType.CLOSE_PARENTHESIS, _currentToken);
+            }
             Eat(TokenType.CLOSE_PARENTHESIS);
             return new MethodCallNode(methodName, arguments);
         }

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace Arcana_Compiler.ArcanaParser.Nodes {
+﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
     internal class VariableAssignmentNode : ASTNode {
         public string VariableName { get; private set; }
         public ASTNode AssignedExpression { get; private set; }

@@ -1,13 +1,9 @@
-using NUnit.Framework;
-using System.Collections.Generic;
-using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser;
 using Arcana_Compiler.Common;
 using ArcanaCompiler.Tests.TestUtils;
 using Arcana_Compiler.ArcanaParser.Nodes;
 
-namespace ArcanaCompiler.Tests
-{
+namespace ArcanaCompiler.Tests {
     [TestFixture]
     public class ParserTests {
         [Test]

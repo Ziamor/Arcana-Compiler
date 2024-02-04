@@ -38,6 +38,9 @@ namespace Utilities {
 			if(some.name.space.cond) {
 				someVar = 2  // assignment
 				someVar = 6 // assignment
+				someVar = -1
+				someVar = !(test)
+				someVar = 5 + (2 + 5)
 			}
 		}
 

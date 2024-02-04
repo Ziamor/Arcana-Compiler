@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Arcana_Compiler.ArcanaParser.Nodes {
+﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
     internal class TypeNode : ASTNode {
         public string TypeName { get; private set; }
         public bool IsNullable { get; private set; }

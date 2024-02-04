@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Arcana_Compiler.ArcanaParser.Nodes {
+﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
     internal class MethodCallNode : ASTNode {
         public string MethodName { get; private set; }
         public List<ASTNode> Arguments { get; private set; }
