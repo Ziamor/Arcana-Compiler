@@ -34,7 +34,7 @@ The file extension for Arcana source files is `.arc`.
 
 - Variables are declared with the type followed by the name, e.g., `int count`.
 - Variables can be initialized at the time of declaration, e.g., `int count = 10`.
-- Variables can be declared without initialization but must be initialized before use.
+- Variables must be definitely assigned before use, meaning they can be declared without an initial value but must be initialized in all code paths before being accessed.
 - By default, variables are non-nullable and cannot be assigned a null value.
 
 ### Types
@@ -576,6 +576,18 @@ string? nullableString = null
 int count
 string name
 float balance
+```
+### Definite Assignment
+```
+int result
+
+if (condition) {
+    result = 100
+} else {
+    result = 200
+}
+
+print(result) // This will work because 'result' is definitely assigned in all branches before use.
 ```
 
 ### Tuple Declaration and Initialization
