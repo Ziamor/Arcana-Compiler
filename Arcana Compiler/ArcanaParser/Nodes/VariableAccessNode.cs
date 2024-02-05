@@ -1,7 +1,8 @@
 ﻿using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class VariableAccessNode : ASTNode {
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class VariableAccessNode : ASTNode {
         public QualifiedName QualifiedName { get; private set; }
 
         public VariableAccessNode(QualifiedName qualifiedName) {
@@ -9,7 +10,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         }
 
         public string VariableName => QualifiedName.Identifier;
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"Variable: {QualifiedName}";
         }

@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class VariableDeclarationNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class VariableDeclarationNode : ASTNode {
         public TypeNode Type { get; private set; }
         public string Name { get; private set; }
         public ASTNode? InitialValue { get; private set; }
@@ -9,7 +12,9 @@
             Name = variableName;
             InitialValue = initialValue;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             string initialValueStr = InitialValue != null ? $" = {InitialValue}" : "";
             return $"{Type} {Name}{initialValueStr};";

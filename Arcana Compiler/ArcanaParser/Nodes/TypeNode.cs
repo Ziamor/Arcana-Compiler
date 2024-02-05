@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class TypeNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class TypeNode : ASTNode {
         public string TypeName { get; private set; }
         public bool IsNullable { get; private set; }
 
@@ -7,7 +10,9 @@
             TypeName = typeName ?? throw new ArgumentNullException(nameof(typeName));
             IsNullable = isNullable;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"{TypeName}{(IsNullable ? "?" : "")}";
         }

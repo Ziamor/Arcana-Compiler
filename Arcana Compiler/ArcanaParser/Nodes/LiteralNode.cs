@@ -1,12 +1,17 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    internal class LiteralNode : ASTNode
+    public class LiteralNode : ASTNode
     {
         public object Value { get; private set; }
 
         public LiteralNode(object value)
         {
             Value = value;
+        }
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
         }
         public override string ToString()
         {

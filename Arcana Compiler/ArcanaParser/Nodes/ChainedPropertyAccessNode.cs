@@ -1,7 +1,9 @@
 ﻿using System;
+using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class ChainedPropertyAccessNode : ASTNode {
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class ChainedPropertyAccessNode : ASTNode {
         public ASTNode PreviousNode { get; private set; }
         public string PropertyName { get; private set; }
 
@@ -9,7 +11,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
             PreviousNode = previousNode ?? throw new ArgumentNullException(nameof(previousNode));
             PropertyName = propertyName ?? throw new ArgumentNullException(nameof(propertyName));
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"{PreviousNode.ToString()}.{PropertyName}";
         }

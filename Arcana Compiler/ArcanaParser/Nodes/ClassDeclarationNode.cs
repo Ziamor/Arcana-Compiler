@@ -1,8 +1,9 @@
 ﻿using Arcana_Compiler.Common;
 using System.Text;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class ClassDeclarationNode : ASTNode {
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class ClassDeclarationNode : ASTNode {
         public string ClassName { get; private set; }
         public QualifiedName Namespace { get; private set; }
         public List<ParentTypeNode> ParentTypes { get; private set; } = new List<ParentTypeNode>();
@@ -15,7 +16,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
             Fields = fields;
             Methods = methods;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             var builder = new StringBuilder();
             if (Namespace != null) {

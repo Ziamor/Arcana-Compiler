@@ -1,7 +1,8 @@
 ﻿using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class BinaryOperationNode : ASTNode {
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class BinaryOperationNode : ASTNode {
         public ASTNode Left { get; private set; }
         public Token Operator { get; private set; }
         public ASTNode Right { get; private set; }
@@ -11,7 +12,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
             Operator = operatorToken;
             Right = right;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"Binary Operation: {Left} {Operator.Value} {Right}";
         }

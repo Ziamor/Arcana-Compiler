@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class MethodCallNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class MethodCallNode : ASTNode {
         public string MethodName { get; private set; }
         public List<ASTNode> Arguments { get; private set; }
 
@@ -7,7 +10,9 @@
             MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
             Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             var argumentsString = string.Join(", ", Arguments.Select(arg => arg.ToString()));
             return $"{MethodName}({argumentsString})";

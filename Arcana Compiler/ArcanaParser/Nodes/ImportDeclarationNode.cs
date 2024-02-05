@@ -1,7 +1,8 @@
 ﻿using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class ImportDeclarationNode : ASTNode
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class ImportDeclarationNode : ASTNode
     {
         public QualifiedName ImportedNamespace { get; private set; }
 
@@ -9,7 +10,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         {
             ImportedNamespace = importedNamespace;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString()
         {
             return $"Import: {ImportedNamespace}";

@@ -1,6 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    internal class FieldDeclarationNode : ASTNode
+    public class FieldDeclarationNode : ASTNode
     {
         public TypeNode FieldType { get; private set; }
         public string FieldName { get; private set; }
@@ -12,7 +14,9 @@
             FieldName = fieldName;
             InitialValue = initialValue;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString()
         {
             string initialValueStr = InitialValue != null ? $" = {InitialValue}" : "";

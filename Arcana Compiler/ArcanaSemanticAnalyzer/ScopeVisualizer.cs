@@ -1,7 +1,10 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
+using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
+using Arcana_Compiler.Common;
 using System.Text;
 
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
+namespace Arcana_Compiler.ArcanaSemanticAnalyzer
+{
     public class ScopeVisualizer {
         private StringBuilder _builder;
         private int _indentationLevel;

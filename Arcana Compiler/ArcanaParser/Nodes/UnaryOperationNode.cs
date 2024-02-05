@@ -1,7 +1,8 @@
 ﻿using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class UnaryOperationNode : ASTNode {
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class UnaryOperationNode : ASTNode {
         public Token Operator { get; private set; }
         public ASTNode Operand { get; private set; }
 
@@ -9,7 +10,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
             Operator = operatorToken;
             Operand = operand;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"Unary Operation: {Operator.Value} {Operand}";
         }

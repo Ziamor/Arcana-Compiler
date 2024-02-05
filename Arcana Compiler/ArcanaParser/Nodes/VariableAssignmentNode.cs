@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class VariableAssignmentNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class VariableAssignmentNode : ASTNode {
         public string VariableName { get; private set; }
         public ASTNode AssignedExpression { get; private set; }
 
@@ -7,7 +10,9 @@
             VariableName = variableName ?? throw new ArgumentNullException(nameof(variableName));
             AssignedExpression = assignedExpression ?? throw new ArgumentNullException(nameof(assignedExpression));
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"{VariableName} = {AssignedExpression.ToString()}";
         }

@@ -2,7 +2,8 @@
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 
-namespace Arcana_Compiler.ArcanaParser {
+namespace Arcana_Compiler.ArcanaParser
+{
     public class ParsingException : Exception {
         public ParsingException(string message) : base(message) { }
     }
@@ -57,7 +58,7 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
-        public ASTNode Parse() {
+        public ProgramNode Parse() {
             ProgramNode rootNode = new ProgramNode();
 
             // Parse imports first

@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class ChainedMethodCallNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class ChainedMethodCallNode : ASTNode {
         public ASTNode PreviousNode { get; private set; }
         public MethodCallNode CurrentCall { get; private set; }
 
@@ -7,7 +10,9 @@
             PreviousNode = previousNode ?? throw new ArgumentNullException(nameof(previousNode));
             CurrentCall = currentCall ?? throw new ArgumentNullException(nameof(currentCall));
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"{PreviousNode}.{CurrentCall}";
         }

@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class IfStatementNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class IfStatementNode : ASTNode {
         public List<(ASTNode Condition, List<ASTNode> Statements)> ConditionsAndStatements { get; }
         public List<ASTNode>? ElseStatements { get; }
 
@@ -11,7 +14,9 @@
             ConditionsAndStatements = conditionsAndStatements;
             ElseStatements = elseStatements;
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             var result = "IfStatementNode:\n";
             foreach (var (Condition, Statements) in ConditionsAndStatements) {

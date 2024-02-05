@@ -1,5 +1,8 @@
-﻿namespace Arcana_Compiler.ArcanaParser.Nodes {
-    internal class ParameterNode : ASTNode {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaParser.Nodes
+{
+    public class ParameterNode : ASTNode {
         public TypeNode ParameterType { get; private set; }
         public string ParameterName { get; private set; }
 
@@ -7,7 +10,9 @@
             ParameterType = parameterType ?? throw new ArgumentNullException(nameof(parameterType));
             ParameterName = parameterName ?? throw new ArgumentNullException(nameof(parameterName));
         }
-
+        public override void Accept(IVisitor visitor) {
+            visitor.Visit(this);
+        }
         public override string ToString() {
             return $"{ParameterType} {ParameterName}";
         }
