@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Arcana is an object-oriented, high-level programming language designed for clarity, conciseness and type safety, aiming to identify 
+Arcana is an object-oriented, type-safe, high-level programming language designed to strike a delicate balance between clarity, conciseness, and practicality, aiming to identify 
 and resolve as many errors as possible during compilation. It follows a modern syntax and design, taking inspiration from languages,
 such as C#, Java, Swift, Rust and Kotlin.
 
@@ -663,24 +663,24 @@ fpublic unc Sum(int a, int b) int {
 }
 
 // Functions can also return multiple values
-public func MultiReturn(int a, int b) int, bool {
+public func MultiReturn(int a, int b): int, bool {
     return a * b, int
 }
 
 // Functions can also be defined without a return type
-public func NoReturn(int a, int b) {
+public func NoReturn(int a, int b): {
 	// Implementation
 }
 
 // Functions can also take have tuple parameters and return tuple values
-public func TupleParams((int, string) tuple) (int, string) {
+public func TupleParams((int, string) tuple): (int, string) {
 	return tuple
 }
 ```
 
 ### Function with Default Parameters
 ```
-public func Sum(int a, int b = 0) int {
+public func Sum(int a, int b = 0): int {
 	return a + b
 }
 ```
@@ -707,20 +707,20 @@ bool success
 
 ### Function Overloading
 ```
-public func Sum(int a, int b) int {
+public func Sum(int a, int b): int {
 	return a + b
 }
 
-public func Sum(int a, int b, int c) int {
+public func Sum(int a, int b, int c): int {
 	return a + b + c
 }
 ```
 
 ### Variadic Functions
 ```
-public func Sum(int... numbers) int {
+public func Sum(int... numbers): int {
 	int sum = 0
-	for (int number in numbers) {
+	for (int number in numbers): {
 		sum += number
 	}
 	return sum
@@ -822,7 +822,7 @@ if(e != null) {
 ```
 ### Function with Nullable Parameters
 ```
-func ProcessInput(string? input) string? {
+func ProcessInput(string? input): string? {
 	if (input == null) return null
 	return input.Trim()
 }
@@ -1035,7 +1035,7 @@ class CreditCard: PaymentMethod {
 ### Static Class
 ```
 static class MathHelper {
-	public static func Add(int a, int b) int {
+	public static func Add(int a, int b): int {
 		return a + b
 	}
 }
@@ -1068,7 +1068,7 @@ public func FunctionScopeExample() {
 	int a = 5
 	int b = 10
 
-	func Add(int x, int y) int {
+	func Add(int x, int y): int {
 		return x + y
 	}
 
@@ -1158,7 +1158,7 @@ class Circle: Drawable, Shape {
         // implementation
     }
 
-	public func GetName() string {
+	public func GetName(): string {
         // implementation
     }
 }
@@ -1575,7 +1575,7 @@ delegate (int, float) -> (bool, string) FunctionDelegateName // Creates a delega
 ```
 ### Delegate Usage
 ```
-func MyDelegate(int a, float b) bool, string {
+func MyDelegate(int a, float b): bool, string {
     // Implementation goes here
 }
 
@@ -1621,7 +1621,7 @@ MyEvent(5, 3.14)
 
 ### Async/Await
 ```
-async func FetchData(string url) Data {
+async func FetchData(string url): Data {
     // Implementation that fetches data asynchronously
 }
 
@@ -1656,7 +1656,7 @@ FetchData("http://example.com")
 ### Integration of Promises with Generics
 ```
 // Async function that returns a promise of type Data
-async func FetchData(string url) promise<Data> {
+async func FetchData(string url): promise<Data> {
     // Implementation
 }
 
@@ -1710,7 +1710,7 @@ namespace ShapeLibrary {
 			this.radius = radius
 		}
 
-		public func GetArea() float {
+		public func GetArea(): float {
 			return MathConstants.Pi * this.radius * this.radius
 		}
 	}
@@ -1728,17 +1728,17 @@ namespace ShapeLibrary { // Namespace does not have to match the original namesp
 		}
 
 		// New method
-		public func GetCircumference() float {
+		public func GetCircumference(): float {
 			return 2 * MathConstants.Pi * this.radius
 		}
 
 		// The following line will result in a compile-time error
-		public func GetArea() float {
+		public func GetArea(): float {
 			return 2 * MathConstants.Pi * this.radius
 		}
 
 		// However, with a different signature, it will work
-		public func GetArea(float radius) float {
+		public func GetArea(float radius): float {
 			return 2 * MathConstants.Pi * radius
 		}
 	}
@@ -1755,11 +1755,11 @@ float circumference = circle.GetCircumference() // circumference = 31.4159265358
 // Hypothetical syntax for adding interfaces to existing classes
 namespace ShapeLibrary {
 	interface IShape {
-		func GetCircumference() float
+		func GetCircumference(): float
 	}
 	extension ShapeLibrary.Circle: IShape {
 		// Need to implement the interface fully, otherwise it will result in a compile-time error
-		public func GetCircumference() float {
+		public func GetCircumference(): float {
 			return 2 * MathConstants.Pi * this.radius
 		}
 	}
@@ -1820,7 +1820,7 @@ class FinancialCalculator {
     int lastResult = 0
 
     :export
-    public func Add(int a, int b) int {
+    public func Add(int a, int b): int {
         lastResult = a + b
         return lastResult
     }
