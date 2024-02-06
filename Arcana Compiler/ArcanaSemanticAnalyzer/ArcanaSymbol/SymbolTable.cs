@@ -1,4 +1,7 @@
-﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
+﻿using Arcana_Compiler.Common;
+using System.Security.AccessControl;
+
+namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
 {
 
     public class SymbolTable
@@ -22,13 +25,25 @@
             _scopes.Peek().DeclareSymbol(symbol);
         }
 
-        public Symbol? LookupSymbol(string name, Type symbolType) {
+        public Symbol? LookupSymbol(Symbol symbol, Type symbolType) {
+            string name = symbol.Name;
             foreach (var scope in _scopes) {
-                var symbol = scope.LookupSymbol(name);
-                if (symbol != null && symbol.GetType() == symbolType)
-                    return symbol;
+                var existingSymbol = scope.LookupSymbol(name, symbolType);
+                if (existingSymbol != null && existingSymbol.GetType() == symbolType)
+                    return existingSymbol;
             }
             return null;
+        }
+
+        public IType ResolveTypeName(string typeName) {
+            switch (typeName) {
+                case "int":
+                    return BuiltInType.Int;
+                case "float":
+                    return BuiltInType.Float;
+                default:
+                    return new UserType(typeName);
+            }
         }
     }
 }

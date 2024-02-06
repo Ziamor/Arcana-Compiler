@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
-    internal class FieldSymbol : Symbol {
+    public class FieldSymbol : Symbol {
         public FieldSymbol(string name) : base(name) {
         }
         public override bool Equals(object? obj) {

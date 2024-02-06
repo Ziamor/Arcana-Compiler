@@ -10,7 +10,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
             QualifiedName = qualifiedName;
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object? obj) {
             return obj is ClassSymbol other &&
                    base.Equals(other) &&
                    EqualityComparer<QualifiedName>.Default.Equals(QualifiedName, other.QualifiedName);

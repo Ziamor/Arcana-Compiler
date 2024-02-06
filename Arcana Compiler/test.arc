@@ -26,7 +26,7 @@ namespace Models {
             // Constructor logic
         }
 
-        func drive() : void {
+        func drive() {
             // Method with no return value
         }
     }
@@ -35,11 +35,15 @@ namespace Models {
     class ElectricCar: Car {
         float? batteryLevel = null
 
-        func chargeBattery(float amount) : void {
+        func chargeBattery(float amount) {
             // Overloaded method
         }
 
-        func chargeBattery() : void {
+        func chargeBattery(float amount) : int {
+            // Overloaded method
+        }
+
+        func chargeBattery() {
             // Overloaded method without parameters
         }
     }

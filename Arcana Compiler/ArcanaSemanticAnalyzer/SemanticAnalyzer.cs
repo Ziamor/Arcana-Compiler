@@ -2,8 +2,7 @@
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.Common;
 
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer
-{
+namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class SemanticAnalyzer : IVisitor {
         public SymbolTable SymbolTable { get; private set; }
         public ProgramNode AstRoot { get; private set; }
@@ -28,11 +27,12 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer
         }
 
         public void Visit(ClassDeclarationNode node) {
-            if (SymbolTable.LookupSymbol(node.ClassName, typeof(ClassSymbol)) != null) {
-                throw new SemanticException($"Class {node.ClassName} is already declared in this scope.");
+            ClassSymbol classSymbol = new ClassSymbol(node.ClassName, node.Namespace);
+            if (SymbolTable.LookupSymbol(classSymbol, typeof(ClassSymbol)) != null) {
+                throw new SemanticException($"Class {node.ClassName} in namespace {node.Namespace} is already declared in this scope.");
             }
 
-            SymbolTable.DeclareSymbol(new ClassSymbol(node.ClassName, node.Namespace));
+            SymbolTable.DeclareSymbol(classSymbol);
 
             SymbolTable.EnterScope();
 
@@ -45,7 +45,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer
 
             SymbolTable.ExitScope();
         }
-                
+
         void IVisitor.Visit(ProgramNode node) {
             throw new NotImplementedException();
         }
@@ -55,11 +55,12 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer
         }
 
         void IVisitor.Visit(FieldDeclarationNode node) {
-            if (SymbolTable.LookupSymbol(node.FieldName, typeof(FieldSymbol)) != null) {
+            FieldSymbol fieldSymbol = new FieldSymbol(node.FieldName);
+            if (SymbolTable.LookupSymbol(fieldSymbol, typeof(FieldSymbol)) != null) {
                 throw new SemanticException($"Field {node.FieldName} is already declared in this scope.");
             }
 
-            SymbolTable.DeclareSymbol(new FieldSymbol(node.FieldName));
+            SymbolTable.DeclareSymbol(fieldSymbol);
         }
 
         void IVisitor.Visit(TypeNode node) {
@@ -95,11 +96,20 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer
         }
 
         void IVisitor.Visit(MethodDeclarationNode node) {
-            if (SymbolTable.LookupSymbol(node.MethodName, typeof(MethodSymbol)) != null) {
+            List<Parameter> parameters = node.Parameters.Select(
+                p => new Parameter(p.ParameterName, SymbolTable.ResolveTypeName(p.ParameterType.TypeName))
+            ).ToList();
+            List<ReturnType> returnTypes = node.ReturnTypes.Select(
+                rt => new ReturnType(new UserType(rt.TypeName))
+            ).ToList();
+
+            MethodSymbol methodSymbol = new MethodSymbol(node.MethodName, parameters, returnTypes);
+
+            if (SymbolTable.LookupSymbol(methodSymbol, typeof(MethodSymbol)) != null) {
                 throw new SemanticException($"Method {node.MethodName} is already declared in this scope.");
             }
 
-            SymbolTable.DeclareSymbol(new MethodSymbol(node.MethodName));
+            SymbolTable.DeclareSymbol(methodSymbol);
 
             SymbolTable.EnterScope();
             // TODO BODY
