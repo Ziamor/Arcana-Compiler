@@ -594,14 +594,14 @@ print(result) // This will work because 'result' is definitely assigned in all b
 ### Using Tuples
 ```
 // Named tuple
-(int id, string name) = (1, "Alice")
+(int id, string name) tuple = (1, "Alice")
 int id = tuple.id
 string name = tuple.name
 ```
 
 // Unnamed tuple
 ```
-(int, string) = (1, "Alice")
+(int, string) tuple = (1, "Alice")
 int id = tuple.0
 ```
 
@@ -621,7 +621,7 @@ string name = tuple.0.1
 bool areEqual = tuple1 == tuple2 // true
 bool areEqual = tuple1 == tuple3 // false
 ```
-### Tuple Type Signatures
+### Tuple Type Signatures(Might remove this, may as well be an anonymous struct)
 ```
 tupleType PersonInfo = (int id, string name)
 
@@ -1228,8 +1228,8 @@ print("Received " + messageType + ": " + messageContent)
 
 ### Tuple Destructuring
 ```
-(int a, int b) = (1, 2)
-(int id, string name) = SomeFunction()
+(int a, int b) tuple1 = (1, 2)
+(int id, string name) tuple2 = SomeFunction()
 ```
 
 ### Function Arguments Destructuring
