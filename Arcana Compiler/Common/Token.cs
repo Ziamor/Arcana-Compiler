@@ -22,6 +22,7 @@
         GREATER_THAN, // >
         GREATER_THAN_OR_EQUAL, // >=
         NULL_COALESCING, // ??
+        TYPE_CASTING, // ::
 
         STRING, // "String data"
         OPEN_PARENTHESIS, // (

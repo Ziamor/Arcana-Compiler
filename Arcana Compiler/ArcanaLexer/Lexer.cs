@@ -113,6 +113,10 @@ namespace Arcana_Compiler.ArcanaLexer {
                     return CreateToken(TokenType.COMMA, ",");
                 case ':':
                     Advance();
+                    if (_currentChar == ':') {
+                        Advance();
+                        return CreateToken(TokenType.TYPE_CASTING, "::");
+                    }
                     return CreateToken(TokenType.COLON, ":");
                 case '{':
                     Advance();
