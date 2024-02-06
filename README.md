@@ -65,7 +65,10 @@ The file extension for Arcana source files is `.arc`.
 
 ### Tuples
 
-- Tuples group multiple values into a single unit, useful for multiple return values and temporary data grouping. 
+- Tuples group multiple values into a single unit, useful for multiple return values and temporary data grouping.
+- Tuples can contain elements of different types, enhancing their versatility for grouping diverse data.
+- Tuples are lightweight and have a minimal memory footprint, making them efficient for temporary data storage.
+- Tuples allow assignment between each other when their type signatures match, ensuring type consistency. Unlike structs, where identical structures are considered distinct types and are not directly assignable.
 - Tuples are declared with the `()` syntax, e.g., `(int, string)`.
 - They can be unnamed, or named for clarity.
 - Elements in named tuples are accessed by name, and unnamed tuples are accessed by index using .0, .1, etc.
