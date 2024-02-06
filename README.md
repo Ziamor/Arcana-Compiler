@@ -2,14 +2,9 @@
 
 ## Introduction
 
-Arcana is an object-oriented, type-safe, high-level programming language designed to strike a delicate balance between clarity, conciseness, and practicality, aiming to identify 
-and resolve as many errors as possible during compilation. It follows a modern syntax and design, taking inspiration from languages,
-such as C#, Java, Swift, Rust and Kotlin.
+Arcana is an object-oriented, high-level programming language crafted with a focus on clarity, conciseness, and practicality. Acknowledging that these attributes often conflict, Arcana strives to strike a balanced harmony among them. It aims to minimize errors by catching them during compilation, leveraging a modern syntax influenced by languages like C#, Java, Swift, Rust, and Kotlin.
 
-Arcana is designed to be a general-purpose language, suitable for a wide range of applications. 
-Arcana adheres to the principle of least surprise, favouring simplicity and consistency over complexity and cleverness. That isnt to say 
-that Arcana is a simple language, but rather that it is designed to be clear on the expected behavior and reduces the chance of programmer 
-error.
+Designed for general-purpose use, Arcana is adaptable to a broad array of applications. It upholds the principle of least surprise, prioritizing straightforwardness and consistency to mitigate complexity and reduce the likelihood of programming errors. This focus does not make Arcana a simplistic language; rather, it aims to make its behavior predictable and its usage intuitive, successfully managing the challenges that arise from its goals of clarity, conciseness, and practical utility.
 
 ## Compiler
 For now the front end will be written with C#, with the backend using LLVM IR. Eventully it would be nice to have the langauge to bootstrap itself.
