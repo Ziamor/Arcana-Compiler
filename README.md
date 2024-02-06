@@ -2,14 +2,9 @@
 
 ## Introduction
 
-Arcana is an object-oriented, type-safe, high-level programming language designed to strike a delicate balance between clarity, conciseness, and practicality, aiming to identify 
-and resolve as many errors as possible during compilation. It follows a modern syntax and design, taking inspiration from languages,
-such as C#, Java, Swift, Rust and Kotlin.
+Arcana is an object-oriented, high-level programming language crafted with a focus on clarity, conciseness, and practicality. Acknowledging that these attributes often conflict, Arcana strives to strike a balanced harmony among them. It aims to minimize errors by catching them during compilation, leveraging a modern syntax influenced by languages like C#, Java, Swift, Rust, and Kotlin.
 
-Arcana is designed to be a general-purpose language, suitable for a wide range of applications. 
-Arcana adheres to the principle of least surprise, favouring simplicity and consistency over complexity and cleverness. That isnt to say 
-that Arcana is a simple language, but rather that it is designed to be clear on the expected behavior and reduces the chance of programmer 
-error.
+Designed for general-purpose use, Arcana is adaptable to a broad array of applications. It upholds the principle of least surprise, prioritizing straightforwardness and consistency to mitigate complexity and reduce the likelihood of programming errors. This focus does not make Arcana a simplistic language; rather, it aims to make its behavior predictable and its usage intuitive, successfully managing the challenges that arise from its goals of clarity, conciseness, and practical utility.
 
 ## Compiler
 For now the front end will be written with C#, with the backend using LLVM IR. Eventully it would be nice to have the langauge to bootstrap itself.
@@ -70,7 +65,10 @@ The file extension for Arcana source files is `.arc`.
 
 ### Tuples
 
-- Tuples group multiple values into a single unit, useful for multiple return values and temporary data grouping. 
+- Tuples group multiple values into a single unit, useful for multiple return values and temporary data grouping.
+- Tuples can contain elements of different types, enhancing their versatility for grouping diverse data.
+- Tuples are lightweight and have a minimal memory footprint, making them efficient for temporary data storage.
+- Tuples allow assignment between each other when their type signatures match, ensuring type consistency. Unlike structs, where identical structures are considered distinct types and are not directly assignable.
 - Tuples are declared with the `()` syntax, e.g., `(int, string)`.
 - They can be unnamed, or named for clarity.
 - Elements in named tuples are accessed by name, and unnamed tuples are accessed by index using .0, .1, etc.
@@ -599,14 +597,14 @@ print(result) // This will work because 'result' is definitely assigned in all b
 ### Using Tuples
 ```
 // Named tuple
-(int id, string name) = (1, "Alice")
+(int id, string name) tuple = (1, "Alice")
 int id = tuple.id
 string name = tuple.name
 ```
 
 // Unnamed tuple
 ```
-(int, string) = (1, "Alice")
+(int, string) tuple = (1, "Alice")
 int id = tuple.0
 ```
 
@@ -626,7 +624,7 @@ string name = tuple.0.1
 bool areEqual = tuple1 == tuple2 // true
 bool areEqual = tuple1 == tuple3 // false
 ```
-### Tuple Type Signatures
+### Tuple Type Signatures(Might remove this, may as well be an anonymous struct)
 ```
 tupleType PersonInfo = (int id, string name)
 
@@ -1233,8 +1231,8 @@ print("Received " + messageType + ": " + messageContent)
 
 ### Tuple Destructuring
 ```
-(int a, int b) = (1, 2)
-(int id, string name) = SomeFunction()
+(int a, int b) tuple1 = (1, 2)
+(int id, string name) tuple2 = SomeFunction()
 ```
 
 ### Function Arguments Destructuring
