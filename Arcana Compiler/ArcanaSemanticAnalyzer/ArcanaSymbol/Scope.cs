@@ -8,7 +8,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
             Signature? signature = null;
             QualifiedName? qualifiedName = null;
             if (symbol is MethodSymbol methodSymbol) {
-                signature = new Signature(methodSymbol.Parameters, methodSymbol.ReturnTypes);
+                signature = methodSymbol.Signature;
             }
             if (symbol is ClassSymbol classSymbol) {
                 qualifiedName = classSymbol.QualifiedName;

@@ -1,23 +1,20 @@
 ﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public class MethodSymbol : Symbol {
-        public List<Parameter> Parameters { get; }
-        public List<ReturnType> ReturnTypes { get; }
+        public Signature Signature { get; }
 
-        public MethodSymbol(string name, List<Parameter> parameters, List<ReturnType> returnTypes)
+        public MethodSymbol(string name, Signature signature)
             : base(name) {
-            Parameters = parameters;
-            ReturnTypes = returnTypes;
+            Signature = signature;
         }
 
         public override bool Equals(object? obj) {
             return obj is MethodSymbol other &&
                    base.Equals(other) &&
-                   Enumerable.SequenceEqual(Parameters, other.Parameters) &&
-                   Enumerable.SequenceEqual(ReturnTypes, other.ReturnTypes);
+                   Signature.Equals(other.Signature);
         }
 
         public override int GetHashCode() {
-            return HashCode.Combine(base.GetHashCode(), Parameters, ReturnTypes);
+            return HashCode.Combine(base.GetHashCode(), Signature.GetHashCode());
         }
     }
 }

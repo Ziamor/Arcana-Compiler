@@ -103,7 +103,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                 rt => new ReturnType(new UserType(rt.TypeName))
             ).ToList();
 
-            MethodSymbol methodSymbol = new MethodSymbol(node.MethodName, parameters, returnTypes);
+            Signature signature = new Signature(parameters, returnTypes);
+            MethodSymbol methodSymbol = new MethodSymbol(node.MethodName, signature);
 
             if (SymbolTable.LookupSymbol(methodSymbol, typeof(MethodSymbol)) != null) {
                 throw new SemanticException($"Method {node.MethodName} is already declared in this scope.");
