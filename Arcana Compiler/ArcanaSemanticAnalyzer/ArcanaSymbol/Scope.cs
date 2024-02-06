@@ -1,6 +1,4 @@
 ﻿using Arcana_Compiler.Common;
-using System;
-using System.Collections.Generic;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public class Scope {

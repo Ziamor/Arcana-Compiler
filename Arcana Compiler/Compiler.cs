@@ -1,12 +1,9 @@
 ﻿using Arcana_Compiler.ArcanaParser;
 using Arcana_Compiler.ArcanaLexer;
-using Arcana_Compiler.Utilities;
-using Arcana_Compiler.Common;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer;
 
-namespace Arcana_Compiler
-{
+namespace Arcana_Compiler {
     public class Compiler {
         private string _filePath;
 

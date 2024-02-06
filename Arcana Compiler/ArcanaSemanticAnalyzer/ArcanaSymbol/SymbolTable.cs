@@ -1,8 +1,4 @@
-﻿using Arcana_Compiler.Common;
-using System.Security.AccessControl;
-
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
-{
+﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
 
     public class SymbolTable
     {

@@ -1,9 +1,7 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
-using Arcana_Compiler.Common;
 using System.Text;
 
-namespace Arcana_Compiler.Utilities
-{
+namespace Arcana_Compiler.Utilities {
     public class PrettyPrinter {
         private StringBuilder _builder;
         private int _indentLevel;

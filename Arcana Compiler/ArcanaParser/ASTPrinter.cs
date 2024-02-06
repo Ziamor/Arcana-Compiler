@@ -1,10 +1,7 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
-using Arcana_Compiler.Common;
-using System;
 using System.Text;
 
-namespace Arcana_Compiler.ArcanaParser
-{
+namespace Arcana_Compiler.ArcanaParser {
     public class ASTPrinter
     {
         public string Print(ASTNode node)

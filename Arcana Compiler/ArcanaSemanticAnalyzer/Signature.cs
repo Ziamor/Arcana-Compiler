@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
+﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class Signature {
         public IReadOnlyList<Parameter> Parameters { get; }
         public IReadOnlyList<ReturnType> ReturnTypes { get; }
