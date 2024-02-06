@@ -13,15 +13,16 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             Name = name;
             Type = type;
         }
-    }
 
-    class ParameterTypeComparer : IEqualityComparer<Parameter> {
-        public bool Equals(Parameter? x, Parameter? y) {
-            return x?.Type == y?.Type;
+        public override bool Equals(object? obj) {
+            if (obj is Parameter other) {
+                return Type.Equals(other.Type);
+            }
+            return false;
         }
 
-        public int GetHashCode(Parameter obj) {
-            return obj.Type.GetHashCode();
+        public override int GetHashCode() {
+            return HashCode.Combine(Type.GetHashCode());
         }
     }
 }
