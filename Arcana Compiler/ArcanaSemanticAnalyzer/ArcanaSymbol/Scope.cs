@@ -1,8 +1,8 @@
 ﻿using Arcana_Compiler.Common;
 using System.Security.AccessControl;
+using System.Text;
 
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
-{
+namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public class Scope {
         private readonly Dictionary<SymbolKey, Symbol> _symbols = new Dictionary<SymbolKey, Symbol>();
 
@@ -33,7 +33,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
         }
 
         private string GenerateSignature(MethodSymbol methodSymbol) {
-            return string.Join(",", methodSymbol.Parameters.Select(p => p.Type.Name));
+            return 
+                string.Join(",", methodSymbol.Parameters.Select(p => p.Type.Name)) 
+                + ":" 
+                + string.Join(",", methodSymbol.ReturnTypes.Select(p => p.Type.Name));
         }
 
         public IEnumerable<Symbol> GetSymbols() {
