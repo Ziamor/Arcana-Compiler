@@ -18,7 +18,7 @@ namespace ArcanaCompilerTests {
             var signature2 = new Signature(parameters, returnTypes);
 
             // Act & Assert
-            Assert.AreEqual(signature1, signature2, "Signatures with the same parameters and return types should be equal.");
+            Assert.That(signature2, Is.EqualTo(signature1), "Signatures with the same parameters and return types should be equal.");
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace ArcanaCompilerTests {
             var signature2 = new Signature(parameters2, returnTypes2);
 
             // Act & Assert
-            Assert.AreNotEqual(signature1, signature2, "Signatures with different parameters or return types should not be equal.");
+            Assert.That(signature2, Is.Not.EqualTo(signature1), "Signatures with different parameters or return types should not be equal.");
         }
 
         // Mock IType implementation for testing purposes
