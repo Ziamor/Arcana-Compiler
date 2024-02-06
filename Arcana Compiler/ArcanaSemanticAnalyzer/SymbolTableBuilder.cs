@@ -3,11 +3,11 @@ using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
-    public class SemanticAnalyzer : IVisitor {
+    public class SymbolTableBuilder : IVisitor {
         public SymbolTable SymbolTable { get; private set; }
         public ProgramNode AstRoot { get; private set; }
 
-        public SemanticAnalyzer(ProgramNode astRoot) {
+        public SymbolTableBuilder(ProgramNode astRoot) {
             AstRoot = astRoot;
             SymbolTable = new SymbolTable();
         }

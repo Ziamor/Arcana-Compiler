@@ -40,11 +40,12 @@ namespace Arcana_Compiler {
 
             // Semantic Analysis
             Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
-            SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer(ast);
-            semanticAnalyzer.Analyze();
+            Console.WriteLine("Building symbol table...");
+            SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast);
+            symbolTableBuilder.Analyze();
 
             ScopeVisualizer visualizer = new ScopeVisualizer();
-            string scopeString = visualizer.Visualize(ast, semanticAnalyzer.SymbolTable);
+            string scopeString = visualizer.Visualize(ast, symbolTableBuilder.SymbolTable);
             Console.WriteLine(scopeString);
             // Intermediate Code Generation (e.g., to LLVM IR)
             /*CodeGenerator codeGenerator = new CodeGenerator();
