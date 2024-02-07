@@ -10,6 +10,11 @@
             Parts = parts;
         }
 
+        public static QualifiedName operator +(QualifiedName qn, string addition) {
+            var newParts = new List<string>(qn.Parts) { addition };
+            return new QualifiedName(newParts);
+        }
+
         public override string ToString() {
             return string.Join(".", Parts);
         }
