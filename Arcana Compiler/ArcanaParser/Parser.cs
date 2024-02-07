@@ -407,6 +407,16 @@ namespace Arcana_Compiler.ArcanaParser
                     ASTNode expression = ParseExpression();
                     Eat(TokenType.CLOSE_PARENTHESIS);
                     return expression;
+                case TokenType.NEW:
+                    Eat(TokenType.NEW);
+                    QualifiedName className = ParseQualifiedName();
+                    List<ASTNode> constructorArguments = new List<ASTNode>();
+                    Eat(TokenType.OPEN_PARENTHESIS);
+                    if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                        constructorArguments = ParseArguments();
+                    }
+                    Eat(TokenType.CLOSE_PARENTHESIS);
+                    return new ObjectInstantiationNode(className, constructorArguments);
                 default:
                     throw new UnexpectedTokenException(_currentToken); ;
             }

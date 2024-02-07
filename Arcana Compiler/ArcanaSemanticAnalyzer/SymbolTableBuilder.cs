@@ -17,13 +17,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         private void Visit(ProgramNode node) {
-            SymbolTable.EnterScope();
-
             foreach (var classDeclaration in node.ClassDeclarations) {
                 classDeclaration.Accept(this);
             }
-
-            SymbolTable.ExitScope();
         }
 
         public void Visit(ClassDeclarationNode node) {
@@ -134,6 +130,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         void IVisitor.Visit(IfStatementNode node) {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(ObjectInstantiationNode node) {
             throw new NotImplementedException();
         }
     }

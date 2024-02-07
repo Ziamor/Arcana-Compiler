@@ -115,6 +115,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                     return EvaluateVariableAccessType(variableAccessNode);
                 case BinaryOperationNode binaryOperationNode:
                     return EvaluateBinaryOperationType(binaryOperationNode);
+                case ObjectInstantiationNode objectInstantiationNode:
+                    return EvaluateObjectInstantiationType(objectInstantiationNode);
                 default:
                     throw new NotImplementedException($"Type evaluation not implemented for node type {node.GetType().Name}");
             }
@@ -159,6 +161,15 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
 
             throw new SemanticException($"Unsupported binary operation {node.Operator.Value} between types {leftType.TypeName} and {rightType.TypeName}.");
         }
+        private TypeNode EvaluateObjectInstantiationType(ObjectInstantiationNode node) {
+            var classSymbol = _symbolTable.LookupSymbol(node.ClassName.ToString(), typeof(ClassSymbol)) as ClassSymbol;
+
+            if (classSymbol == null) {
+                throw new SemanticException($"Class {node.ClassName} not found.");
+            }
+
+            return new TypeNode(node.ClassName.ToString(), false);
+        }
 
         public bool IsTypeCompatible(TypeNode expected, TypeNode actual) {
             if (expected == actual) return true;
@@ -183,6 +194,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             }
 
             return false;
+        }
+
+        public void Visit(ObjectInstantiationNode node) {
+            throw new NotImplementedException();
         }
     }
 }

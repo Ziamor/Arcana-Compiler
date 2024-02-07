@@ -22,8 +22,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
             _symbols[key] = symbol;
         }
 
-        public Symbol? LookupSymbol(string name, Type symbolType, Signature? signature = null) {
-            var key = new SymbolKey(name, symbolType, signature);
+        public Symbol? LookupSymbol(string name, Type symbolType, Signature? signature = null, QualifiedName? qualifiedName = null) {
+            var key = new SymbolKey(name, symbolType, signature, qualifiedName);
             if (_symbols.TryGetValue(key, out var symbol))
                 return symbol;
 

@@ -4,14 +4,21 @@
     {
         private readonly Stack<Scope> _scopes = new Stack<Scope>();
 
+        public SymbolTable() {
+            // Initialize with a global scope.
+            _scopes.Push(new Scope());
+        }
+
         public void EnterScope()
         {
             _scopes.Push(new Scope());
         }
 
-        public void ExitScope()
-        {
-            _scopes.Pop();
+        public void ExitScope() {
+            // Prevent removing the global scope. Ensure there's more than one scope before popping.
+            if (_scopes.Count > 1)
+                _scopes.Pop();
+            // TODO perhaps throw an exception/warning
         }
 
         public void DeclareSymbol(Symbol symbol)
