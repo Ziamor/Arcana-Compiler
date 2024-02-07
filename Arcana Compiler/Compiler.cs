@@ -47,6 +47,10 @@ namespace Arcana_Compiler {
             ScopeVisualizer visualizer = new ScopeVisualizer();
             string scopeString = visualizer.Visualize(ast, symbolTableBuilder.SymbolTable);
             Console.WriteLine(scopeString);
+
+            TypeChecker typeChecker = new TypeChecker(symbolTableBuilder.SymbolTable);
+            typeChecker.Check(ast);
+
             // Intermediate Code Generation (e.g., to LLVM IR)
             /*CodeGenerator codeGenerator = new CodeGenerator();
             string intermediateCode = codeGenerator.Generate(ast);

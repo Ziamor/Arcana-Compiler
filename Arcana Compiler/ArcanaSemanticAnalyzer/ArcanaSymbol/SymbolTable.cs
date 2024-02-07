@@ -22,7 +22,10 @@
         }
 
         public Symbol? LookupSymbol(Symbol symbol, Type symbolType) {
-            string name = symbol.Name;
+            return LookupSymbol(symbol.Name, symbolType);
+        }
+
+        public Symbol? LookupSymbol(string name, Type symbolType) {
             foreach (var scope in _scopes) {
                 var existingSymbol = scope.LookupSymbol(name, symbolType);
                 if (existingSymbol != null && existingSymbol.GetType() == symbolType)

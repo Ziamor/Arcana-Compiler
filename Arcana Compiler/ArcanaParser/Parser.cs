@@ -413,10 +413,30 @@ namespace Arcana_Compiler.ArcanaParser
         }
 
         private LiteralNode ParseNumberLiteral() {
-            LiteralNode node = new LiteralNode(_currentToken.Value);
+            string tokenValue = _currentToken.Value;
+            object value;
+
+            if (tokenValue.Contains(".")) {
+                // If the value contains a decimal point, treat it as a float
+                if (float.TryParse(tokenValue, out float floatValue)) {
+                    value = floatValue;
+                } else {
+                    throw new ParsingException($"Invalid float literal '{tokenValue}' at line {_currentToken.LineNumber}, position {_currentToken.Position}.");
+                }
+            } else {
+                // If there's no decimal point, treat it as an integer
+                if (int.TryParse(tokenValue, out int intValue)) {
+                    value = intValue;
+                } else {
+                    throw new ParsingException($"Invalid integer literal '{tokenValue}' at line {_currentToken.LineNumber}, position {_currentToken.Position}.");
+                }
+            }
+
+            LiteralNode node = new LiteralNode(value);
             Eat(TokenType.NUMBER);
             return node;
         }
+
 
         private LiteralNode ParseStringLiteral() {
             LiteralNode node = new LiteralNode(_currentToken.Value);
