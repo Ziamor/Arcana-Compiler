@@ -7,9 +7,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public SymbolTable SymbolTable { get; private set; }
         public ProgramNode AstRoot { get; private set; }
 
-        public SymbolTableBuilder(ProgramNode astRoot) {
+        public SymbolTableBuilder(ProgramNode astRoot, SymbolTable? existingSymbolTable = null) {
             AstRoot = astRoot;
-            SymbolTable = new SymbolTable();
+            SymbolTable = existingSymbolTable ?? new SymbolTable();
         }
 
         public void Analyze() {

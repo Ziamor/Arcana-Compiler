@@ -37,8 +37,8 @@ namespace Arcana_Compiler {
             Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
             Console.WriteLine("Building global symbol table...");
             foreach (var ast in astCache.Values) {
-                //SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast, globalSymbolTable);
-               // symbolTableBuilder.Analyze();
+                SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast, globalSymbolTable);
+                symbolTableBuilder.Analyze();
             }
 
             Console.WriteLine("Type checking...");
