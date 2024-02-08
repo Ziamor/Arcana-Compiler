@@ -2,54 +2,50 @@
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer;
+using Arcana_Compiler.ArcanaModule;
+using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 
 namespace Arcana_Compiler {
     public class Compiler {
-        private string _filePath;
+        private Module _module;
 
-        public Compiler(string filePath) {
-            _filePath = filePath;
+        public Compiler(Module module) {
+            _module = module;
         }
 
         public void Compile() {
-            // Load source code from file
-            string sourceCode = File.ReadAllText(_filePath);
+            // A dictionary to cache ASTs for each source file
+            Dictionary<string, ProgramNode> astCache = new Dictionary<string, ProgramNode>();
+            SymbolTable globalSymbolTable = new SymbolTable();
 
-            // Lexical Analysis
-            Lexer lexer = new Lexer(sourceCode);
-
-            // For testing only
-            /*List<Token> tokens = lexer.Tokenize();
-            foreach(Token token in tokens) {
-                Console.WriteLine(token);
-            }*/
-
-            // Syntax Analysis
             Console.WriteLine("~~~~~~~~~~Syntax Analysis~~~~~~~~~~");
-            Parser parser = new Parser(lexer);
-            ProgramNode ast = parser.Parse();
+            foreach (var filePath in _module.SourceFiles) {
+                Console.WriteLine($"Parsing: {filePath}");
+                string sourceCode = File.ReadAllText(filePath);
 
-            ASTPrinter printer = new ASTPrinter();
-            string astString = printer.Print(ast);
-            Console.WriteLine(astString);
+                Lexer lexer = new Lexer(sourceCode);
+                Parser parser = new Parser(lexer);
+                ProgramNode ast = parser.Parse();
 
-            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~");
-            /*PrettyPrinter prettyPrinter = new PrettyPrinter();
-            string prettyString = prettyPrinter.Print(ast);
-            Console.WriteLine(prettyString);*/
+                astCache[filePath] = ast;
 
-            // Semantic Analysis
+                ASTPrinter printer = new ASTPrinter();
+                string astString = printer.Print(ast);
+                Console.WriteLine(astString);
+            }
+
             Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
-            Console.WriteLine("Building symbol table...");
-            SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast);
-            symbolTableBuilder.Analyze();
+            Console.WriteLine("Building global symbol table...");
+            foreach (var ast in astCache.Values) {
+                //SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast, globalSymbolTable);
+               // symbolTableBuilder.Analyze();
+            }
 
-            ScopeVisualizer visualizer = new ScopeVisualizer();
-            string scopeString = visualizer.Visualize(ast, symbolTableBuilder.SymbolTable);
-            Console.WriteLine(scopeString);
-
-            TypeChecker typeChecker = new TypeChecker(symbolTableBuilder.SymbolTable);
-            typeChecker.Check(ast);
+            Console.WriteLine("Type checking...");
+            foreach (var ast in astCache.Values) {
+                TypeChecker typeChecker = new TypeChecker(globalSymbolTable);
+                typeChecker.Check(ast);
+            }
 
             // Intermediate Code Generation (e.g., to LLVM IR)
             /*CodeGenerator codeGenerator = new CodeGenerator();

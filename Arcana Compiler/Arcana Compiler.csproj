@@ -9,13 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="test.arc" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="test.arc">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+	<Content Include="Arcana test scripts\**">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</Content>
   </ItemGroup>
 
 </Project>
