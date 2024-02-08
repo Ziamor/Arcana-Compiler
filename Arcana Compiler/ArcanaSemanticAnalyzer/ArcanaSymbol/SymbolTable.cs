@@ -1,4 +1,6 @@
-﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
+﻿using Arcana_Compiler.Common;
+
+namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
 
     public class SymbolTable
     {
@@ -32,10 +34,10 @@
             return LookupSymbol(symbol.Name, symbolType);
         }
 
-        public Symbol? LookupSymbol(string name, Type symbolType) {
+        public Symbol? LookupSymbol(string name, Type symbolType, Signature? signature = null, QualifiedName? qualifiedName = null) {
             foreach (var scope in _scopes) {
-                var existingSymbol = scope.LookupSymbol(name, symbolType);
-                if (existingSymbol != null && existingSymbol.GetType() == symbolType)
+                var existingSymbol = scope.LookupSymbol(name, symbolType, signature, qualifiedName);
+                if (existingSymbol != null)
                     return existingSymbol;
             }
             return null;

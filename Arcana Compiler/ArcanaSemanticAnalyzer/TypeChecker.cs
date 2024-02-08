@@ -1,6 +1,7 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.Common;
+using System.Xml.Linq;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class TypeChecker : IVisitor {
@@ -146,7 +147,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             return new TypeNode(node.type, symbol.IsNullable);*/
         }
 
-        private TypeNode EvaluateBinaryOperationType(BinaryOperationNode node) {            
+        private TypeNode EvaluateBinaryOperationType(BinaryOperationNode node) {
             var leftType = EvaluateType(node.Left);
             var rightType = EvaluateType(node.Right);
 
@@ -162,13 +163,22 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             throw new SemanticException($"Unsupported binary operation {node.Operator.Value} between types {leftType.TypeName} and {rightType.TypeName}.");
         }
         private TypeNode EvaluateObjectInstantiationType(ObjectInstantiationNode node) {
-            var classSymbol = _symbolTable.LookupSymbol(node.ClassName.ToString(), typeof(ClassSymbol)) as ClassSymbol;
+            QualifiedName namespacePart = node.QualifiedClassName.NamespacePart;
 
-            if (classSymbol == null) {
-                throw new SemanticException($"Class {node.ClassName} not found.");
+            // If no namespace was provided, first assume the default namespace
+            if(namespacePart.Parts.Count == 0) {
+                namespacePart = QualifiedName.Default;
             }
 
-            return new TypeNode(node.ClassName.ToString(), false);
+            var classSymbol = _symbolTable.LookupSymbol(node.QualifiedClassName.Identifier, typeof(ClassSymbol), null, namespacePart) as ClassSymbol;
+
+            if (classSymbol == null) {
+                // TODO search imports?
+                if (classSymbol == null) {
+                    throw new SemanticException($"Class {node.QualifiedClassName} not found.");
+                }
+            }
+            return new TypeNode(node.QualifiedClassName.ToString(), false);
         }
 
         public bool IsTypeCompatible(TypeNode expected, TypeNode actual) {

@@ -120,7 +120,13 @@ namespace Arcana_Compiler.ArcanaParser
 
             Eat(TokenType.CLOSE_BRACE);
 
-            return new ClassDeclarationNode(className, currentNamespace, parentTypes, fields, methods);
+            if(currentNamespace == null) {
+                currentNamespace = QualifiedName.Default;
+            }
+
+            // Concatenate the class name to the namespace
+            currentNamespace += className;
+            return new ClassDeclarationNode(currentNamespace, parentTypes, fields, methods);
         }
 
         private bool IsMethodDeclaration() {
