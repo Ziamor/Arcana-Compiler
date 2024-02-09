@@ -163,22 +163,21 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             throw new SemanticException($"Unsupported binary operation {node.Operator.Value} between types {leftType.TypeName} and {rightType.TypeName}.");
         }
         private TypeNode EvaluateObjectInstantiationType(ObjectInstantiationNode node) {
-            IdentifierName namespacePart = node.QualifiedClassName.Qualifiers;
-
-            // If no namespace was provided, first assume the default namespace
-            if(namespacePart.Parts.Count == 0) {
-                namespacePart = IdentifierName.DefaultNameSpace;
+            ClassSymbol? classSymbol;
+            if (node.ClassName.IsFullyQualified) {
+                IdentifierName namespacePart = node.ClassName.Qualifiers;
+                classSymbol = _symbolTable.LookupSymbol(node.ClassName.Identifier, typeof(ClassSymbol), null, namespacePart) as ClassSymbol;
+            } else {
+                classSymbol = _symbolTable.LookupSymbol(node.ClassName.Identifier, typeof(ClassSymbol), null, IdentifierName.DefaultNameSpace) as ClassSymbol;
             }
-
-            var classSymbol = _symbolTable.LookupSymbol(node.QualifiedClassName.Identifier, typeof(ClassSymbol), null, namespacePart) as ClassSymbol;
 
             if (classSymbol == null) {
-                // TODO search imports?
+                // TODO search if another namespace has a class with that name
                 if (classSymbol == null) {
-                    throw new SemanticException($"Class {node.QualifiedClassName} not found.");
+                    throw new SemanticException($"Class {node.ClassName} not found.");
                 }
             }
-            return new TypeNode(node.QualifiedClassName.ToString(), false);
+            return new TypeNode(node.ClassName.ToString(), false);
         }
 
         public bool IsTypeCompatible(TypeNode expected, TypeNode actual) {

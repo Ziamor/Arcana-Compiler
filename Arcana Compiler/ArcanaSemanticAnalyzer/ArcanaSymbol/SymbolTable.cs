@@ -7,7 +7,6 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
         private readonly Stack<Scope> _scopes = new Stack<Scope>();
 
         public SymbolTable() {
-            // Initialize with a global scope.
             _scopes.Push(new Scope());
         }
 

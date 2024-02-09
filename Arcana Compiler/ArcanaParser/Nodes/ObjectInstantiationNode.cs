@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ObjectInstantiationNode : ASTNode {
-        public IdentifierName QualifiedClassName { get; private set; }
+        public IdentifierName ClassName { get; private set; }
         public List<ASTNode> ConstructorArguments { get; private set; }
 
         public ObjectInstantiationNode(IdentifierName className, List<ASTNode> constructorArguments) {
-            QualifiedClassName = className ?? throw new ArgumentNullException(nameof(className));
+            ClassName = className ?? throw new ArgumentNullException(nameof(className));
             ConstructorArguments = constructorArguments ?? throw new ArgumentNullException(nameof(constructorArguments));
         }
 
@@ -19,12 +19,12 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
 
         public override string ToString() {
             var argumentsString = string.Join(", ", ConstructorArguments.Select(arg => arg.ToString()));
-            return $"new {QualifiedClassName}({argumentsString})";
+            return $"new {ClassName}({argumentsString})";
         }
 
         public override bool Equals(object? obj) {
             if (obj is ObjectInstantiationNode other) {
-                return QualifiedClassName.Equals(other.QualifiedClassName) &&
+                return ClassName.Equals(other.ClassName) &&
                        ConstructorArguments.SequenceEqual(other.ConstructorArguments);
             }
             return false;
@@ -32,7 +32,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
 
         public override int GetHashCode() {
             unchecked {
-                int hash = QualifiedClassName.GetHashCode();
+                int hash = ClassName.GetHashCode();
                 foreach (var arg in ConstructorArguments) {
                     hash = hash * 31 + arg.GetHashCode();
                 }

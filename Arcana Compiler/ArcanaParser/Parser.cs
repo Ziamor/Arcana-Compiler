@@ -82,7 +82,7 @@ namespace Arcana_Compiler.ArcanaParser
 
         private void ParseNamespaceDeclaration(ProgramNode rootNode) {
             Eat(TokenType.NAMESPACE);
-            IdentifierName namespaceName = ParseQualifiedName();
+            IdentifierName namespaceName = ParseIdentifierName();
             Eat(TokenType.OPEN_BRACE);
 
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
@@ -256,7 +256,7 @@ namespace Arcana_Compiler.ArcanaParser
                     case TokenType.ASSIGN:
                         return ParseVariableAssignment();
                     case TokenType.OPEN_PARENTHESIS:
-                        return ParseMethodCall(ParseQualifiedName());
+                        return ParseMethodCall(ParseIdentifierName());
                     default:
                         throw new NotImplementedException("Unrecognized statement pattern.");
                 }
@@ -358,7 +358,7 @@ namespace Arcana_Compiler.ArcanaParser
             List<ImportDeclarationNode> imports = new List<ImportDeclarationNode>();
             while (_currentToken.Type != TokenType.EOF && _currentToken.Type == TokenType.IMPORT) {
                 Eat(TokenType.IMPORT);
-                IdentifierName qualifiedName = ParseQualifiedName();
+                IdentifierName qualifiedName = ParseIdentifierName();
                 imports.Add(new ImportDeclarationNode(qualifiedName));
             }
             return imports;
@@ -415,7 +415,7 @@ namespace Arcana_Compiler.ArcanaParser
                     return expression;
                 case TokenType.NEW:
                     Eat(TokenType.NEW);
-                    IdentifierName className = ParseQualifiedName();
+                    IdentifierName className = ParseIdentifierName();
                     List<ASTNode> constructorArguments = new List<ASTNode>();
                     Eat(TokenType.OPEN_PARENTHESIS);
                     if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
@@ -461,7 +461,7 @@ namespace Arcana_Compiler.ArcanaParser
         }
 
         private ASTNode ParseIdentifierOrMethodCall() {
-            IdentifierName qualifiedName = ParseQualifiedName();
+            IdentifierName qualifiedName = ParseIdentifierName();
             ASTNode currentNode;
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
                 currentNode = ParseMethodCall(qualifiedName);
@@ -576,7 +576,7 @@ namespace Arcana_Compiler.ArcanaParser
             return new MethodCallNode(methodName, arguments);
         }
 
-        private IdentifierName ParseQualifiedName() {
+        private IdentifierName ParseIdentifierName() {
             List<string> parts = new List<string>();
             parts.Add(_currentToken.Value);
             Eat(TokenType.IDENTIFIER);
