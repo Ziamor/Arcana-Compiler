@@ -3,9 +3,9 @@
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class VariableAccessNode : ASTNode {
-        public QualifiedName QualifiedName { get; private set; }
+        public IdentifierName QualifiedName { get; private set; }
 
-        public VariableAccessNode(QualifiedName qualifiedName) {
+        public VariableAccessNode(IdentifierName qualifiedName) {
             this.QualifiedName = qualifiedName ?? throw new ArgumentNullException(nameof(qualifiedName));
         }
 

@@ -4,13 +4,13 @@ using System.Text;
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class ClassDeclarationNode : ASTNode {
-        public QualifiedName QualifiedClassName { get; private set; }
+        public IdentifierName QualifiedClassName { get; private set; }
         public string ClassName { get { return QualifiedClassName.Identifier; } }
-        public QualifiedName Namespace { get { return QualifiedClassName.NamespacePart; } }
+        public IdentifierName Namespace { get { return QualifiedClassName.Qualifiers; } }
         public List<ParentTypeNode> ParentTypes { get; private set; } = new List<ParentTypeNode>();
         public List<FieldDeclarationNode> Fields { get; private set; } = new List<FieldDeclarationNode>();
         public List<MethodDeclarationNode> Methods { get; private set; } = new List<MethodDeclarationNode>();
-        public ClassDeclarationNode(QualifiedName qualifiedClassName, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
+        public ClassDeclarationNode(IdentifierName qualifiedClassName, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
             QualifiedClassName = qualifiedClassName;
             ParentTypes = parentTypes;
             Fields = fields;

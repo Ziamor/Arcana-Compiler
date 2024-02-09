@@ -5,10 +5,10 @@ using System.Linq;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ObjectInstantiationNode : ASTNode {
-        public QualifiedName QualifiedClassName { get; private set; }
+        public IdentifierName QualifiedClassName { get; private set; }
         public List<ASTNode> ConstructorArguments { get; private set; }
 
-        public ObjectInstantiationNode(QualifiedName className, List<ASTNode> constructorArguments) {
+        public ObjectInstantiationNode(IdentifierName className, List<ASTNode> constructorArguments) {
             QualifiedClassName = className ?? throw new ArgumentNullException(nameof(className));
             ConstructorArguments = constructorArguments ?? throw new ArgumentNullException(nameof(constructorArguments));
         }

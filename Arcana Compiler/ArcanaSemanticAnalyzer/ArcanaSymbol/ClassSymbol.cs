@@ -4,8 +4,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
 {
     public class ClassSymbol : Symbol
     {
-        public QualifiedName QualifiedName { get; }
-        public ClassSymbol(string name, QualifiedName qualifiedName) : base(name)
+        public IdentifierName QualifiedName { get; }
+        public ClassSymbol(string name, IdentifierName qualifiedName) : base(name)
         {
             QualifiedName = qualifiedName;
         }
@@ -13,7 +13,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol
         public override bool Equals(object? obj) {
             return obj is ClassSymbol other &&
                    base.Equals(other) &&
-                   EqualityComparer<QualifiedName>.Default.Equals(QualifiedName, other.QualifiedName);
+                   EqualityComparer<IdentifierName>.Default.Equals(QualifiedName, other.QualifiedName);
         }
 
         public override int GetHashCode() {

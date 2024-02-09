@@ -34,7 +34,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
             return LookupSymbol(symbol.Name, symbolType);
         }
 
-        public Symbol? LookupSymbol(string name, Type symbolType, Signature? signature = null, QualifiedName? qualifiedName = null) {
+        public Symbol? LookupSymbol(string name, Type symbolType, Signature? signature = null, IdentifierName? qualifiedName = null) {
             foreach (var scope in _scopes) {
                 var existingSymbol = scope.LookupSymbol(name, symbolType, signature, qualifiedName);
                 if (existingSymbol != null)

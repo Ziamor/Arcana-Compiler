@@ -163,11 +163,11 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             throw new SemanticException($"Unsupported binary operation {node.Operator.Value} between types {leftType.TypeName} and {rightType.TypeName}.");
         }
         private TypeNode EvaluateObjectInstantiationType(ObjectInstantiationNode node) {
-            QualifiedName namespacePart = node.QualifiedClassName.NamespacePart;
+            IdentifierName namespacePart = node.QualifiedClassName.Qualifiers;
 
             // If no namespace was provided, first assume the default namespace
             if(namespacePart.Parts.Count == 0) {
-                namespacePart = QualifiedName.Default;
+                namespacePart = IdentifierName.DefaultNameSpace;
             }
 
             var classSymbol = _symbolTable.LookupSymbol(node.QualifiedClassName.Identifier, typeof(ClassSymbol), null, namespacePart) as ClassSymbol;

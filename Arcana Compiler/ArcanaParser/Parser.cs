@@ -82,7 +82,7 @@ namespace Arcana_Compiler.ArcanaParser
 
         private void ParseNamespaceDeclaration(ProgramNode rootNode) {
             Eat(TokenType.NAMESPACE);
-            QualifiedName namespaceName = ParseQualifiedName();
+            IdentifierName namespaceName = ParseQualifiedName();
             Eat(TokenType.OPEN_BRACE);
 
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
@@ -96,7 +96,7 @@ namespace Arcana_Compiler.ArcanaParser
             Eat(TokenType.CLOSE_BRACE);
         }
 
-        private ClassDeclarationNode ParseClassDeclaration(QualifiedName? currentNamespace) {
+        private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace) {
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
@@ -121,7 +121,7 @@ namespace Arcana_Compiler.ArcanaParser
             Eat(TokenType.CLOSE_BRACE);
 
             if(currentNamespace == null) {
-                currentNamespace = QualifiedName.Default;
+                currentNamespace = IdentifierName.DefaultNameSpace;
             }
 
             // Concatenate the class name to the namespace
@@ -358,7 +358,7 @@ namespace Arcana_Compiler.ArcanaParser
             List<ImportDeclarationNode> imports = new List<ImportDeclarationNode>();
             while (_currentToken.Type != TokenType.EOF && _currentToken.Type == TokenType.IMPORT) {
                 Eat(TokenType.IMPORT);
-                QualifiedName qualifiedName = ParseQualifiedName();
+                IdentifierName qualifiedName = ParseQualifiedName();
                 imports.Add(new ImportDeclarationNode(qualifiedName));
             }
             return imports;
@@ -415,7 +415,7 @@ namespace Arcana_Compiler.ArcanaParser
                     return expression;
                 case TokenType.NEW:
                     Eat(TokenType.NEW);
-                    QualifiedName className = ParseQualifiedName();
+                    IdentifierName className = ParseQualifiedName();
                     List<ASTNode> constructorArguments = new List<ASTNode>();
                     Eat(TokenType.OPEN_PARENTHESIS);
                     if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
@@ -461,7 +461,7 @@ namespace Arcana_Compiler.ArcanaParser
         }
 
         private ASTNode ParseIdentifierOrMethodCall() {
-            QualifiedName qualifiedName = ParseQualifiedName();
+            IdentifierName qualifiedName = ParseQualifiedName();
             ASTNode currentNode;
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
                 currentNode = ParseMethodCall(qualifiedName);
@@ -485,7 +485,7 @@ namespace Arcana_Compiler.ArcanaParser
 
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
                 // Reuse the existing method to parse method calls and create a MethodCallNode
-                QualifiedName qualifiedName = new QualifiedName(new List<string> { nextIdentifier });
+                IdentifierName qualifiedName = new IdentifierName(new List<string> { nextIdentifier });
                 MethodCallNode methodCall = ParseMethodCall(qualifiedName);
 
                 // Create a ChainedMethodCallNode with the previous node and the parsed MethodCallNode
@@ -557,7 +557,7 @@ namespace Arcana_Compiler.ArcanaParser
             }
         }
 
-        private MethodCallNode ParseMethodCall(QualifiedName qualifiedName) {
+        private MethodCallNode ParseMethodCall(IdentifierName qualifiedName) {
             string methodName = qualifiedName.Identifier;
             Eat(TokenType.OPEN_PARENTHESIS);
             List<ASTNode> arguments = new List<ASTNode>();
@@ -576,7 +576,7 @@ namespace Arcana_Compiler.ArcanaParser
             return new MethodCallNode(methodName, arguments);
         }
 
-        private QualifiedName ParseQualifiedName() {
+        private IdentifierName ParseQualifiedName() {
             List<string> parts = new List<string>();
             parts.Add(_currentToken.Value);
             Eat(TokenType.IDENTIFIER);
@@ -587,7 +587,7 @@ namespace Arcana_Compiler.ArcanaParser
                 Eat(TokenType.IDENTIFIER);
             }
 
-            return new QualifiedName(parts);
+            return new IdentifierName(parts);
         }
     }
 }

@@ -4,9 +4,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class ImportDeclarationNode : ASTNode
     {
-        public QualifiedName ImportedNamespace { get; private set; }
+        public IdentifierName ImportedNamespace { get; private set; }
 
-        public ImportDeclarationNode(QualifiedName importedNamespace)
+        public ImportDeclarationNode(IdentifierName importedNamespace)
         {
             ImportedNamespace = importedNamespace;
         }

@@ -1,18 +1,20 @@
 ﻿namespace Arcana_Compiler.Common {
-    public class QualifiedName {
-        public static readonly QualifiedName Default = new QualifiedName(new List<string> { "Default" });
+    public class IdentifierName {
+        public static readonly IdentifierName DefaultNameSpace = new IdentifierName(new List<string> { "Default" });
         public List<string> Parts { get; private set; }
 
         public string Identifier => Parts.Last();
-        public QualifiedName NamespacePart => new QualifiedName(Parts.Take(Parts.Count - 1).ToList());
+        public IdentifierName Qualifiers => new IdentifierName(Parts.Take(Parts.Count - 1).ToList());
 
-        public QualifiedName(List<string> parts) {
+        public bool IsFullyQualified => Parts.Count > 1;
+
+        public IdentifierName(List<string> parts) {
             Parts = parts;
         }
 
-        public static QualifiedName operator +(QualifiedName qn, string addition) {
-            var newParts = new List<string>(qn.Parts) { addition };
-            return new QualifiedName(newParts);
+        public static IdentifierName operator +(IdentifierName identifierName, string addition) {
+            List<string> newParts = new List<string>(identifierName.Parts) { addition };
+            return new IdentifierName(newParts);
         }
 
         public override string ToString() {
@@ -20,7 +22,7 @@
         }
 
         public override bool Equals(object? obj) {
-            return obj is QualifiedName other &&
+            return obj is IdentifierName other &&
                    Parts.SequenceEqual(other.Parts);
         }
 
