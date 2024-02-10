@@ -86,10 +86,10 @@ namespace Arcana_Compiler.ArcanaParser
             Eat(TokenType.OPEN_BRACE);
 
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
-                if (_currentToken.Type == TokenType.CLASS) {
+                if (_currentToken.Type == TokenType.CLASS || IsAccessModifier(_currentToken.Type)) {
                     rootNode.ClassDeclarations.Add(ParseClassDeclaration(namespaceName));
                 } else {
-                    // Handle error or unexpected token
+                    throw new UnexpectedTokenException(_currentToken);
                 }
             }
 
@@ -97,6 +97,7 @@ namespace Arcana_Compiler.ArcanaParser
         }
 
         private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace) {
+            string? classAccessModifier = TryParseAccessModifier();
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
@@ -109,7 +110,7 @@ namespace Arcana_Compiler.ArcanaParser
             List<MethodDeclarationNode> methods = new List<MethodDeclarationNode>();
 
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
-                string? accessModifier = ParseAccessModifier();
+                string? accessModifier = TryParseAccessModifier();
 
                 if (IsMethodDeclaration()) {
                     methods.Add(ParseMethodDeclaration(accessModifier));
@@ -126,7 +127,7 @@ namespace Arcana_Compiler.ArcanaParser
 
             // Concatenate the class name to the namespace
             currentNamespace += className;
-            return new ClassDeclarationNode(currentNamespace, parentTypes, fields, methods);
+            return new ClassDeclarationNode(currentNamespace, classAccessModifier, parentTypes, fields, methods);
         }
 
         private bool IsMethodDeclaration() {
@@ -144,8 +145,17 @@ namespace Arcana_Compiler.ArcanaParser
             return false;
         }
 
-        private string? ParseAccessModifier() {
-            if (_currentToken.Type == TokenType.PUBLIC || _currentToken.Type == TokenType.PRIVATE) {
+        private bool IsAccessModifier(TokenType tokenType) {
+            return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE;
+        }
+
+
+        /// <summary>
+        /// Try to parse an access modifer, will return null if none is found.
+        /// </summary>
+        /// <returns>A string if an access modifer is found, null otherwise.</returns>
+        private string? TryParseAccessModifier() {
+            if (IsAccessModifier(_currentToken.Type)) {
                 string modifier = _currentToken.Value;
                 Eat(_currentToken.Type);
                 return modifier;

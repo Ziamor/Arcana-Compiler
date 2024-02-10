@@ -1,5 +1,5 @@
 namespace common.utilities {
-    class Utility {
+    public class Utility {
         func Utility() {
         }
 

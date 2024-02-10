@@ -1,7 +1,7 @@
 import common.utilities.Utility
 
 namespace vehicle.management {
-    class Vehicle {
+    public class Vehicle {
         int manufactureYear
         Utility utility = new Utility()
 

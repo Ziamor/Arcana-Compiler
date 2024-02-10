@@ -7,11 +7,13 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
         public IdentifierName QualifiedClassName { get; private set; }
         public string ClassName { get { return QualifiedClassName.Identifier; } }
         public IdentifierName Namespace { get { return QualifiedClassName.Qualifiers; } }
+        public string AccessModifier { get; private set; }
         public List<ParentTypeNode> ParentTypes { get; private set; } = new List<ParentTypeNode>();
         public List<FieldDeclarationNode> Fields { get; private set; } = new List<FieldDeclarationNode>();
         public List<MethodDeclarationNode> Methods { get; private set; } = new List<MethodDeclarationNode>();
-        public ClassDeclarationNode(IdentifierName qualifiedClassName, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
+        public ClassDeclarationNode(IdentifierName qualifiedClassName, string? accessModifier, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
             QualifiedClassName = qualifiedClassName;
+            AccessModifier = accessModifier ?? "private";
             ParentTypes = parentTypes;
             Fields = fields;
             Methods = methods;
