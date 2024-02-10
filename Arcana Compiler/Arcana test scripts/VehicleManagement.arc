@@ -6,7 +6,7 @@ namespace vehicle.management {
         Utility utility = new Utility()
 
         func Vehicle(int year) {
-            manufactureYear = year
+            this.manufactureYear = year
         }
 
         func getManufactureYear(): int {

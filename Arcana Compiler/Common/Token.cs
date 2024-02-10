@@ -42,6 +42,7 @@
         PUBLIC,
         PRIVATE,
         NULL,
+        THIS,
     }
 
     public struct Token {
@@ -56,6 +57,7 @@
             { "public", TokenType.PUBLIC },
             { "private", TokenType.PRIVATE },
             { "null", TokenType.NULL },
+            { "this", TokenType.THIS },
         };
         public TokenType Type { get; }
         public string Value { get; }
