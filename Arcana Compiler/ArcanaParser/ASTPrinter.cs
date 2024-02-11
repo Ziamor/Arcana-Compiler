@@ -34,6 +34,7 @@ namespace Arcana_Compiler.ArcanaParser {
                         Print(import, result, indent + "  ");
                     }
                     foreach (var namespaceDeclarations in programNode.NamespaceDeclarations) {
+                        result.AppendLine($"{indent}Namespace: {namespaceDeclarations.Name}");
                         foreach (var classDecl in namespaceDeclarations.ClassDeclarations) {
                             Print(classDecl, result, indent + "  ");
                         }
@@ -43,7 +44,7 @@ namespace Arcana_Compiler.ArcanaParser {
                     result.AppendLine($"{indent}Import: {importDeclarationNode.ImportedNamespace}");
                     break;
                 case ClassDeclarationNode classNode:
-                    result.AppendLine($"{indent}Class: {classNode.ClassName} Namespace: {classNode.Namespace}");
+                    result.AppendLine($"{indent}Class: {classNode.ClassName}");
                     foreach (var field in classNode.Fields) {
                         Print(field, result, indent + "  ");
                     }

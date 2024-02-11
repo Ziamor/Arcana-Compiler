@@ -69,7 +69,10 @@ namespace Arcana_Compiler.ArcanaParser
                         ParseNamespaceDeclaration(rootNode);
                         break;
                     case TokenType.CLASS:
-                        defaultNamespaceClasses.Add(ParseClassDeclaration(null));
+                        defaultNamespaceClasses.Add(ParseClassDeclaration());
+                        break;
+                    case TokenType type when IsAccessModifier(type):
+                        defaultNamespaceClasses.Add(ParseClassDeclaration());
                         break;
                     default:
                         throw new UnexpectedTokenException(_currentToken);
@@ -101,7 +104,7 @@ namespace Arcana_Compiler.ArcanaParser
             rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(namespaceName, classDeclarations));
         }
 
-        private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace) {
+        private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace = null) {
             string? classAccessModifier = TryParseAccessModifier();
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
