@@ -3,10 +3,10 @@
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class MethodCallNode : ASTNode {
-        public string MethodName { get; private set; }
+        public IdentifierName MethodName { get; private set; }
         public List<ASTNode> Arguments { get; private set; }
 
-        public MethodCallNode(string methodName, List<ASTNode> arguments) {
+        public MethodCallNode(IdentifierName methodName, List<ASTNode> arguments) {
             MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
             Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
         }

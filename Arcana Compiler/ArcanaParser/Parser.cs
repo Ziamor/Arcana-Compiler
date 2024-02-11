@@ -2,8 +2,7 @@
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 
-namespace Arcana_Compiler.ArcanaParser
-{
+namespace Arcana_Compiler.ArcanaParser {
     public class ParsingException : Exception {
         public ParsingException(string message) : base(message) { }
     }
@@ -129,7 +128,7 @@ namespace Arcana_Compiler.ArcanaParser
 
             Eat(TokenType.CLOSE_BRACE);
 
-            if(currentNamespace == null) {
+            if (currentNamespace == null) {
                 currentNamespace = IdentifierName.DefaultNameSpace;
             }
 
@@ -271,12 +270,14 @@ namespace Arcana_Compiler.ArcanaParser
                 switch (nextToken.Type) {
                     case TokenType.IDENTIFIER:
                         return ParseVariableDeclaration();
+                    case TokenType.DOT:
+                        return ParseIdentifierOrMethodCall();
                     case TokenType.ASSIGN:
                         return ParseVariableAssignment();
                     case TokenType.OPEN_PARENTHESIS:
                         return ParseMethodCall(ParseIdentifierName());
                     default:
-                        throw new NotImplementedException("Unrecognized statement pattern.");
+                        throw new UnexpectedTokenException(nextToken);
                 }
             } else {
                 switch (_currentToken.Type) {
@@ -399,7 +400,7 @@ namespace Arcana_Compiler.ArcanaParser
                 }
 
                 Eat(operatorToken.Type);
-                
+
                 int precedence = GetPrecedence(operatorToken.Type);
                 ASTNode right = ParseExpression(precedence);
                 node = new BinaryOperationNode(node, operatorToken, right);
@@ -592,8 +593,7 @@ namespace Arcana_Compiler.ArcanaParser
             }
         }
 
-        private MethodCallNode ParseMethodCall(IdentifierName qualifiedName) {
-            string methodName = qualifiedName.Identifier;
+        private MethodCallNode ParseMethodCall(IdentifierName identifierName) {
             Eat(TokenType.OPEN_PARENTHESIS);
             List<ASTNode> arguments = new List<ASTNode>();
 
@@ -608,7 +608,7 @@ namespace Arcana_Compiler.ArcanaParser
                 throw new SyntaxErrorException(TokenType.CLOSE_PARENTHESIS, _currentToken);
             }
             Eat(TokenType.CLOSE_PARENTHESIS);
-            return new MethodCallNode(methodName, arguments);
+            return new MethodCallNode(identifierName, arguments);
         }
 
         private IdentifierName ParseIdentifierName() {
@@ -618,8 +618,10 @@ namespace Arcana_Compiler.ArcanaParser
 
             while (_currentToken.Type == TokenType.DOT) {
                 Eat(TokenType.DOT);
-                parts.Add(_currentToken.Value);
-                Eat(TokenType.IDENTIFIER);
+                if (_currentToken.Type == TokenType.IDENTIFIER || _currentToken.Type == TokenType.MULTIPLY) {
+                    parts.Add(_currentToken.Value);
+                    Eat(_currentToken.Type);
+                }
             }
 
             return new IdentifierName(parts);
