@@ -4,12 +4,14 @@ namespace Arcana_Compiler.Common {
     public interface IVisitor {
         void Visit(ProgramNode node);
         void Visit(ImportDeclarationNode node);
+        void Visit(NamespaceDeclarationNode node);
         void Visit(ClassDeclarationNode node);
         void Visit(FieldDeclarationNode node);
         void Visit(TypeNode node);
         void Visit(LiteralNode node);
         void Visit(NullLiteralNode node);
         void Visit(ObjectInstantiationNode node);
+        void Visit(ThisExpressionNode node);
         void Visit(VariableAccessNode node);
         void Visit(VariableDeclarationNode node);
         void Visit(VariableAssignmentNode node);

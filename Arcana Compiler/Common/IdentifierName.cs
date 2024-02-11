@@ -1,4 +1,6 @@
-﻿namespace Arcana_Compiler.Common {
+﻿using System.IO;
+
+namespace Arcana_Compiler.Common {
     public class IdentifierName {
         public static readonly IdentifierName DefaultNameSpace = new IdentifierName(new List<string> { "Default" });
         public List<string> Parts { get; private set; }
@@ -7,6 +9,10 @@
         public IdentifierName Qualifiers => new IdentifierName(Parts.Take(Parts.Count - 1).ToList());
 
         public bool IsFullyQualified => Parts.Count > 1;
+
+        public IdentifierName(string name) {
+            Parts = [name];
+        }
 
         public IdentifierName(List<string> parts) {
             Parts = parts;

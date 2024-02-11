@@ -2,10 +2,8 @@
 using System.Text;
 
 namespace Arcana_Compiler.ArcanaParser {
-    public class ASTPrinter
-    {
-        public string Print(ASTNode node)
-        {
+    public class ASTPrinter {
+        public string Print(ASTNode node) {
             StringBuilder result = new StringBuilder();
             Print(node, result, "");
             return result.ToString();
@@ -24,23 +22,21 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
-        private void Print(ASTNode node, StringBuilder result, string indent)
-        {
-            if (node == null)
-            {
+        private void Print(ASTNode node, StringBuilder result, string indent) {
+            if (node == null) {
                 return;
             }
 
-            switch (node)
-            {
+            switch (node) {
                 case ProgramNode programNode:
                     result.AppendLine(indent + "Program");
                     foreach (var import in programNode.Imports) {
                         Print(import, result, indent + "  ");
                     }
-                    foreach (var classDecl in programNode.ClassDeclarations)
-                    {
-                        Print(classDecl, result, indent + "  ");
+                    foreach (var namespaceDeclarations in programNode.NamespaceDeclarations) {
+                        foreach (var classDecl in namespaceDeclarations.ClassDeclarations) {
+                            Print(classDecl, result, indent + "  ");
+                        }
                     }
                     break;
                 case ImportDeclarationNode importDeclarationNode:
@@ -48,12 +44,10 @@ namespace Arcana_Compiler.ArcanaParser {
                     break;
                 case ClassDeclarationNode classNode:
                     result.AppendLine($"{indent}Class: {classNode.ClassName} Namespace: {classNode.Namespace}");
-                    foreach (var field in classNode.Fields)
-                    {
+                    foreach (var field in classNode.Fields) {
                         Print(field, result, indent + "  ");
                     }
-                    foreach (var method in classNode.Methods)
-                    {
+                    foreach (var method in classNode.Methods) {
                         Print(method, result, indent + "  ");
                     }
                     break;
@@ -62,20 +56,15 @@ namespace Arcana_Compiler.ArcanaParser {
                     break;
                 case MethodDeclarationNode methodNode:
                     result.AppendLine($"{indent}Method: {methodNode.MethodName}");
-                    foreach (var param in methodNode.Parameters)
-                    {
+                    foreach (var param in methodNode.Parameters) {
                         Print(param, result, indent + "  ");
                     }
 
-                    if (methodNode.Body.Count > 0)
-                    {
-                        foreach (var param in methodNode.Body)
-                        {
+                    if (methodNode.Body.Count > 0) {
+                        foreach (var param in methodNode.Body) {
                             Print(param, result, indent + "  ");
                         }
-                    }
-                    else
-                    {
+                    } else {
                         result.AppendLine(indent + indent + "Empty");
                     }
                     break;
@@ -84,12 +73,11 @@ namespace Arcana_Compiler.ArcanaParser {
                     break;
                 case MethodCallNode methodCallNode:
                     result.AppendLine($"{indent}Method Call: {methodCallNode.MethodName}");
-                    foreach (var argument in methodCallNode.Arguments)
-                    {
+                    foreach (var argument in methodCallNode.Arguments) {
                         Print(argument, result, indent + "  ");
                     }
                     break;
-                
+
                 case LiteralNode literalNode:
                     result.AppendLine($"{indent}Literal: {literalNode}");
                     break;
@@ -107,20 +95,16 @@ namespace Arcana_Compiler.ArcanaParser {
                     result.AppendLine($"{indent}Variable: {variableAssignmentNode.VariableName} = {PrintExpression(variableAssignmentNode.AssignedExpression)}");
                     break;
                 case IfStatementNode ifStatementNode:
-                    foreach (var (Condition, Statements) in ifStatementNode.ConditionsAndStatements)
-                    {
+                    foreach (var (Condition, Statements) in ifStatementNode.ConditionsAndStatements) {
                         result.AppendLine(indent + "If Condition:");
                         Print(Condition, result, indent + "  ");
-                        foreach (var statement in Statements)
-                        {
+                        foreach (var statement in Statements) {
                             Print(statement, result, indent + "    ");
                         }
                     }
-                    if (ifStatementNode.ElseStatements != null)
-                    {
+                    if (ifStatementNode.ElseStatements != null) {
                         result.AppendLine(indent + "Else:");
-                        foreach (var elseStatement in ifStatementNode.ElseStatements)
-                        {
+                        foreach (var elseStatement in ifStatementNode.ElseStatements) {
                             Print(elseStatement, result, indent + "  ");
                         }
                     }

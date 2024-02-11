@@ -33,9 +33,11 @@ namespace Arcana_Compiler.Utilities {
         private void Visit(ASTNode node) {
             switch (node) {
                 case ProgramNode programNode:
-                    foreach (ClassDeclarationNode child in programNode.ClassDeclarations) {
-                        Visit(child);
-                        AppendLine();
+                    foreach (NamespaceDeclarationNode namespaceDeclaration in programNode.NamespaceDeclarations) {
+                        foreach (ClassDeclarationNode child in namespaceDeclaration.ClassDeclarations) {
+                            Visit(child);
+                            AppendLine();
+                        }
                     }
                     break;
                 case ClassDeclarationNode classNode:

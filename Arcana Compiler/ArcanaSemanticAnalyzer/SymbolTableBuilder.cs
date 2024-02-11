@@ -17,8 +17,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         private void Visit(ProgramNode node) {
-            foreach (var classDeclaration in node.ClassDeclarations) {
-                classDeclaration.Accept(this);
+            foreach (var namespaceDeclarations in node.NamespaceDeclarations) {
+                foreach (var classDeclaration in namespaceDeclarations.ClassDeclarations) {
+                    classDeclaration.Accept(this);
+                }
             }
         }
 
@@ -134,6 +136,14 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         public void Visit(ObjectInstantiationNode node) {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(NamespaceDeclarationNode node) {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(ThisExpressionNode node) {
             throw new NotImplementedException();
         }
     }

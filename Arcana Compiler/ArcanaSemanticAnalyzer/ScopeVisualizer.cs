@@ -31,8 +31,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         private void VisitProgram(ProgramNode node, SymbolTable symbolTable) {
             _builder.AppendLine("Global Scope");
             IncreaseIndentation();
-            foreach (var classDeclaration in node.ClassDeclarations) {
-                Visit(classDeclaration, symbolTable);
+            foreach (var namespaceDeclarations in node.NamespaceDeclarations) {
+                foreach (var classDeclaration in namespaceDeclarations.ClassDeclarations) {
+                    Visit(classDeclaration, symbolTable);
+                }
             }
             DecreaseIndentation();
         }

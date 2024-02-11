@@ -4,13 +4,13 @@ using Arcana_Compiler.Common;
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ProgramNode : ASTNode {
         public List<ImportDeclarationNode> Imports { get; set; } = new List<ImportDeclarationNode>();
-        public List<ClassDeclarationNode> ClassDeclarations { get; set; } = new List<ClassDeclarationNode>();
+        public List<NamespaceDeclarationNode> NamespaceDeclarations { get; set; } = new List<NamespaceDeclarationNode>();
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }
         public override bool Equals(object? obj) {
             if (obj is ProgramNode other) {
-                return Imports.SequenceEqual(other.Imports) && ClassDeclarations.SequenceEqual(other.ClassDeclarations);
+                return Imports.SequenceEqual(other.Imports) && NamespaceDeclarations.SequenceEqual(other.NamespaceDeclarations);
             }
             return false;
         }
@@ -21,7 +21,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
                 foreach (var import in Imports) {
                     hash = hash * 31 + (import != null ? import.GetHashCode() : 0);
                 }
-                foreach (var declaration in ClassDeclarations) {
+                foreach (var declaration in NamespaceDeclarations) {
                     hash = hash * 31 + (declaration != null ? declaration.GetHashCode() : 0);
                 }
                 return hash;
@@ -35,8 +35,8 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
             foreach (var import in Imports) {
                 builder.AppendLine(import.ToString());
             }
-            builder.AppendLine("Declarations:");
-            foreach (var declaration in ClassDeclarations) {
+            builder.AppendLine("Namespaces:");
+            foreach (var declaration in NamespaceDeclarations) {
                 builder.AppendLine(declaration.ToString());
             }
             return builder.ToString();

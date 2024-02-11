@@ -60,21 +60,24 @@ namespace Arcana_Compiler.ArcanaParser
 
         public ProgramNode Parse() {
             ProgramNode rootNode = new ProgramNode();
-
-            // Parse imports first
             rootNode.Imports = ParseImportDeclarations();
 
+            List<ClassDeclarationNode> defaultNamespaceClasses = new List<ClassDeclarationNode>();
             while (_currentToken.Type != TokenType.EOF) {
                 switch (_currentToken.Type) {
                     case TokenType.NAMESPACE:
                         ParseNamespaceDeclaration(rootNode);
                         break;
                     case TokenType.CLASS:
-                        rootNode.ClassDeclarations.Add(ParseClassDeclaration(null));
+                        defaultNamespaceClasses.Add(ParseClassDeclaration(null));
                         break;
                     default:
                         throw new UnexpectedTokenException(_currentToken);
                 }
+            }
+
+            if (defaultNamespaceClasses.Any()) {
+                rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(new IdentifierName("default"), defaultNamespaceClasses));
             }
 
             return rootNode;
@@ -85,15 +88,17 @@ namespace Arcana_Compiler.ArcanaParser
             IdentifierName namespaceName = ParseIdentifierName();
             Eat(TokenType.OPEN_BRACE);
 
+            List<ClassDeclarationNode> classDeclarations = new List<ClassDeclarationNode>();
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
                 if (_currentToken.Type == TokenType.CLASS || IsAccessModifier(_currentToken.Type)) {
-                    rootNode.ClassDeclarations.Add(ParseClassDeclaration(namespaceName));
+                    classDeclarations.Add(ParseClassDeclaration(namespaceName));
                 } else {
                     throw new UnexpectedTokenException(_currentToken);
                 }
             }
 
             Eat(TokenType.CLOSE_BRACE);
+            rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(namespaceName, classDeclarations));
         }
 
         private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace) {
@@ -416,6 +421,8 @@ namespace Arcana_Compiler.ArcanaParser
                 case TokenType.NULL:
                     Eat(TokenType.NULL);
                     return new NullLiteralNode();
+                case TokenType.THIS:
+                    return ParseThisExpression();
                 case TokenType.IDENTIFIER:
                     return ParseIdentifierOrMethodCall();
                 case TokenType.OPEN_PARENTHESIS:
@@ -549,6 +556,21 @@ namespace Arcana_Compiler.ArcanaParser
 
             return left;
         }
+
+        private ASTNode ParseThisExpression() {
+            Eat(TokenType.THIS);
+            ThisExpressionNode thisNode = new ThisExpressionNode();
+
+            // Handle property or method access after 'this', similar to how you handle chained calls.
+            while (_currentToken.Type == TokenType.DOT) {
+                Eat(TokenType.DOT); // Consume the dot
+                Console.WriteLine("TODO");
+                //thisNode = ParseChainedCall(thisNode);
+            }
+
+            return thisNode;
+        }
+
         private bool IsBinaryOperator(Token token) {
             return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
                    token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE;
