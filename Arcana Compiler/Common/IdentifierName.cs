@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace Arcana_Compiler.Common {
+﻿namespace Arcana_Compiler.Common {
     public class IdentifierName {
         public static readonly IdentifierName DefaultNameSpace = new IdentifierName(new List<string> { "Default" });
         public List<string> Parts { get; private set; }

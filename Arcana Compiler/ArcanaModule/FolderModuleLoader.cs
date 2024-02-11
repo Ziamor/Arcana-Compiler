@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Arcana_Compiler.ArcanaModule {
+﻿namespace Arcana_Compiler.ArcanaModule {
     public class FolderModuleLoader : IModuleLoader {
         public Module LoadModule(string rootPath) {
             var module = new Module(rootPath);

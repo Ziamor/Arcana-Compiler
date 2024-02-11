@@ -1,7 +1,6 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.Common;
-using System.Xml.Linq;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class TypeChecker : IVisitor {

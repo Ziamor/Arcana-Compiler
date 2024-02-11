@@ -1,5 +1,4 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using Arcana_Compiler;
 using Arcana_Compiler.ArcanaModule;
 
 Console.WriteLine("Starting compiler...");
