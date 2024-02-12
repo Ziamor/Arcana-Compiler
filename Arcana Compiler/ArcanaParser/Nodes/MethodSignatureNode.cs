@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class MethodSignatureNode : ASTNode {
-        public string ReturnType { get; }
+        public List<TypeNode> ReturnTypes { get; }
         public string Name { get; }
         public List<ParameterNode> Parameters { get; }
 
-        public MethodSignatureNode(string returnType, string name, List<ParameterNode> parameters) {
-            ReturnType = returnType;
+        public MethodSignatureNode(string name, List<ParameterNode> parameters, List<TypeNode> returnTypes) {
+            ReturnTypes = returnTypes;
             Name = name;
             Parameters = parameters;
         }
@@ -22,25 +22,28 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         }
 
         public override string ToString() {
-            var parameters = string.Join(", ", Parameters.Select(p => p.ToString()));
-            return $"{ReturnType} {Name}({parameters})";
+            var parameterTypes = string.Join(", ", Parameters.Select(p => p.ParameterType.ToString()));
+            var returnTypes = string.Join(", ", ReturnTypes.Select(rt => rt.ToString()));
+            return $"Method: {Name}({parameterTypes}) => {returnTypes}";
         }
 
         public override bool Equals(object? obj) {
-            if (obj is MethodSignatureNode otherNode)
-                return ReturnType == otherNode.ReturnType && Name == otherNode.Name && Parameters.SequenceEqual(otherNode.Parameters);
-            return false;
+            if (obj == null || GetType() != obj.GetType())
+                return false;
+
+            var other = (MethodSignatureNode)obj;
+            return Name == other.Name &&
+                   Enumerable.SequenceEqual(Parameters, other.Parameters) &&
+                   Enumerable.SequenceEqual(ReturnTypes, other.ReturnTypes);
         }
 
         public override int GetHashCode() {
             unchecked // Overflow is fine, just wrap
             {
                 int hash = 17;
-                hash = hash * 23 + ReturnType.GetHashCode();
                 hash = hash * 23 + Name.GetHashCode();
-                foreach (var parameter in Parameters) {
-                    hash = hash * 23 + parameter.GetHashCode();
-                }
+                hash = Parameters.Aggregate(hash, (current, param) => current * 23 + param.GetHashCode());
+                hash = ReturnTypes.Aggregate(hash, (current, returnType) => current * 23 + returnType.GetHashCode());
                 return hash;
             }
         }

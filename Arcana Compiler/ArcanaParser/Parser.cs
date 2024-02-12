@@ -203,17 +203,28 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private MethodSignatureNode ParseMethodSignature() {
-            string returnType = _currentToken.Value; // Handle void or other types
-            Eat(_currentToken.Type); // Might need to adjust based on actual return types handling
-
+            string? accessModifier = TryParseAccessModifier();
+            Eat(TokenType.FUNC);
             string methodName = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
 
-            Eat(TokenType.OPEN_PARENTHESIS);
             List<ParameterNode> parameters = ParseParameters();
-            Eat(TokenType.CLOSE_PARENTHESIS);
 
-            return new MethodSignatureNode(returnType, methodName, parameters);
+            List<TypeNode> returnTypes = new List<TypeNode>();
+            if (_currentToken.Type == TokenType.COLON) {
+                Eat(TokenType.COLON);
+                returnTypes.Add(ParseType());
+                while (_currentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                    if (_currentToken.Type == TokenType.FUNC || IsAccessModifier(_currentToken.Type)) {
+                        break;
+                    }
+
+                    returnTypes.Add(ParseType());
+                }
+            }
+
+            return new MethodSignatureNode(methodName, parameters, returnTypes);
         }
         private List<ParentTypeNode> ParseParentTypes() {
             List<ParentTypeNode> parentTypes = new List<ParentTypeNode>();
