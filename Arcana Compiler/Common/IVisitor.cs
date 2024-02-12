@@ -14,6 +14,7 @@ namespace Arcana_Compiler.Common {
         void Visit(NullLiteralNode node);
         void Visit(ObjectInstantiationNode node);
         void Visit(ThisExpressionNode node);
+        void Visit(ThisAssignmentNode node);
         void Visit(VariableAccessNode node);
         void Visit(VariableDeclarationNode node);
         void Visit(VariableAssignmentNode node);

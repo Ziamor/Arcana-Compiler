@@ -343,12 +343,27 @@ namespace Arcana_Compiler.ArcanaParser {
                 switch (_currentToken.Type) {
                     case TokenType.IF:
                         return ParseIfStatement();
+                    case TokenType.THIS:
+                        return ParseThisAssignment();
                     default:
                         throw new UnexpectedTokenException(_currentToken);
                 }
             }
         }
+        private ASTNode ParseThisAssignment() {
+            Eat(TokenType.THIS);
+            Eat(TokenType.DOT);
+            IdentifierName identifierName = ParseIdentifierName();
 
+            // Expect an assignment operator next
+            if (_currentToken.Type == TokenType.ASSIGN) {
+                Eat(TokenType.ASSIGN);
+                ASTNode valueExpression = ParseExpression();
+                return new ThisAssignmentNode(identifierName, valueExpression);
+            } else {
+                throw new UnexpectedTokenException(_currentToken);
+            }
+        }
         private VariableDeclarationNode ParseVariableDeclaration() {
             TypeNode variableType = ParseType();
 
