@@ -17,8 +17,8 @@
         ASSIGN, // =
         EQUALS, // ==
         NOT_EQUALS, // !=
-        LESS_THEN, // <
-        LESS_THEN_OR_EQUAL, // <=
+        LESS_THAN, // <
+        LESS_THAN_OR_EQUAL, // <=
         GREATER_THAN, // >
         GREATER_THAN_OR_EQUAL, // >=
         NULL_COALESCING, // ??
@@ -35,6 +35,8 @@
         IMPORT,
         NAMESPACE,
         CLASS,
+        INTERFACE,
+        STRUCT,
         NEW,
         FUNC,
         IF,
@@ -58,6 +60,8 @@
             { "private", TokenType.PRIVATE },
             { "null", TokenType.NULL },
             { "this", TokenType.THIS },
+            { "interface", TokenType.INTERFACE },
+            { "struct", TokenType.STRUCT }
         };
         public TokenType Type { get; }
         public string Value { get; }

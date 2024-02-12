@@ -4,10 +4,12 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class NamespaceDeclarationNode : ASTNode {
         public IdentifierName Name { get; private set; }
         public List<ClassDeclarationNode> ClassDeclarations { get; private set; }
+        public List<InterfaceDeclarationNode> InerfaceDeclarations { get; private set; }
 
-        public NamespaceDeclarationNode(IdentifierName name, List<ClassDeclarationNode> classDeclarations) {
+        public NamespaceDeclarationNode(IdentifierName name, List<ClassDeclarationNode> classDeclarations, List<InterfaceDeclarationNode> inerfaceDeclarations) {
             Name = name ?? throw new ArgumentNullException(nameof(name));
             ClassDeclarations = classDeclarations ?? new List<ClassDeclarationNode>();
+            InerfaceDeclarations = inerfaceDeclarations;
         }
 
         public override void Accept(IVisitor visitor) {
@@ -15,7 +17,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         }
 
         public override string ToString() {
-            return $"namespace {Name} {{...}}"; // Simplified representation
+            return $"namespace {Name} {{...}}";
         }
 
         public override bool Equals(object? obj) {

@@ -19,7 +19,6 @@ namespace Arcana_Compiler.ArcanaParser {
            : base($"Expected {expected}, but found '{found.Value}' of type {found.Type} at line {found.LineNumber}, position {found.Position}. Line: '{found.LineText.Trim()}'.") { }
     }
 
-
     public class Parser {
         private readonly ILexer _lexer;
         private Token _currentToken;
@@ -62,6 +61,8 @@ namespace Arcana_Compiler.ArcanaParser {
             rootNode.Imports = ParseImportDeclarations();
 
             List<ClassDeclarationNode> defaultNamespaceClasses = new List<ClassDeclarationNode>();
+            List<InterfaceDeclarationNode> defaultNamespaceInterfaces = new List<InterfaceDeclarationNode>();
+
             while (_currentToken.Type != TokenType.EOF) {
                 switch (_currentToken.Type) {
                     case TokenType.NAMESPACE:
@@ -69,6 +70,9 @@ namespace Arcana_Compiler.ArcanaParser {
                         break;
                     case TokenType.CLASS:
                         defaultNamespaceClasses.Add(ParseClassDeclaration());
+                        break;
+                    case TokenType.INTERFACE:
+                        defaultNamespaceInterfaces.Add(ParseInterfaceDeclaration());
                         break;
                     case TokenType type when IsAccessModifier(type):
                         defaultNamespaceClasses.Add(ParseClassDeclaration());
@@ -79,7 +83,7 @@ namespace Arcana_Compiler.ArcanaParser {
             }
 
             if (defaultNamespaceClasses.Any()) {
-                rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(new IdentifierName("default"), defaultNamespaceClasses));
+                rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(new IdentifierName("default"), defaultNamespaceClasses, defaultNamespaceInterfaces));
             }
 
             return rootNode;
@@ -91,17 +95,27 @@ namespace Arcana_Compiler.ArcanaParser {
             Eat(TokenType.OPEN_BRACE);
 
             List<ClassDeclarationNode> classDeclarations = new List<ClassDeclarationNode>();
+            List<InterfaceDeclarationNode> interfaceDeclarations = new List<InterfaceDeclarationNode>(); // Added for interfaces
+
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
-                if (_currentToken.Type == TokenType.CLASS || IsAccessModifier(_currentToken.Type)) {
-                    classDeclarations.Add(ParseClassDeclaration(namespaceName));
-                } else {
-                    throw new UnexpectedTokenException(_currentToken);
+                switch (_currentToken.Type) {
+                    case TokenType.CLASS:
+                    case TokenType type when IsAccessModifier(type):
+                        classDeclarations.Add(ParseClassDeclaration(namespaceName));
+                        break;
+                    case TokenType.INTERFACE:
+                        interfaceDeclarations.Add(ParseInterfaceDeclaration());
+                        break;
+                    default:
+                        throw new UnexpectedTokenException(_currentToken);
                 }
             }
 
             Eat(TokenType.CLOSE_BRACE);
-            rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(namespaceName, classDeclarations));
+
+            rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(namespaceName, classDeclarations, interfaceDeclarations));
         }
+
 
         private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace = null) {
             string? classAccessModifier = TryParseAccessModifier();
@@ -122,8 +136,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
                 if (_currentToken.Type == TokenType.CLASS) {
                     nestedClasses.Add(ParseClassDeclaration(currentNamespace)); // Recursively parse nested class
-                }
-                else if(IsMethodDeclaration()) {
+                } else if (IsMethodDeclaration()) {
                     methods.Add(ParseMethodDeclaration(accessModifier));
                 } else {
                     fields.Add(ParseFieldDeclaration(accessModifier));
@@ -173,7 +186,35 @@ namespace Arcana_Compiler.ArcanaParser {
             }
             return null; // No access modifier present
         }
+        private InterfaceDeclarationNode ParseInterfaceDeclaration() {
+            Eat(TokenType.INTERFACE);
+            string interfaceName = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
 
+            List<MethodSignatureNode> methods = new List<MethodSignatureNode>();
+
+            Eat(TokenType.OPEN_BRACE);
+            while (_currentToken.Type != TokenType.CLOSE_BRACE) {
+                methods.Add(ParseMethodSignature());
+            }
+            Eat(TokenType.CLOSE_BRACE);
+
+            return new InterfaceDeclarationNode(new IdentifierName(interfaceName), methods);
+        }
+
+        private MethodSignatureNode ParseMethodSignature() {
+            string returnType = _currentToken.Value; // Handle void or other types
+            Eat(_currentToken.Type); // Might need to adjust based on actual return types handling
+
+            string methodName = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
+
+            Eat(TokenType.OPEN_PARENTHESIS);
+            List<ParameterNode> parameters = ParseParameters();
+            Eat(TokenType.CLOSE_PARENTHESIS);
+
+            return new MethodSignatureNode(returnType, methodName, parameters);
+        }
         private List<ParentTypeNode> ParseParentTypes() {
             List<ParentTypeNode> parentTypes = new List<ParentTypeNode>();
             if (_currentToken.Type == TokenType.COLON) {
@@ -217,15 +258,7 @@ namespace Arcana_Compiler.ArcanaParser {
             Eat(TokenType.IDENTIFIER);
 
             // Parse the parameter list
-            Eat(TokenType.OPEN_PARENTHESIS);
-            List<ParameterNode> parameters = new List<ParameterNode>();
-            while (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
-                parameters.Add(ParseParameter());
-                if (_currentToken.Type == TokenType.COMMA) {
-                    Eat(TokenType.COMMA);
-                }
-            }
-            Eat(TokenType.CLOSE_PARENTHESIS);
+            List<ParameterNode> parameters = ParseParameters();
 
             // Parse the return types
             List<TypeNode> returnTypes = new List<TypeNode>();
@@ -257,6 +290,18 @@ namespace Arcana_Compiler.ArcanaParser {
             return new MethodDeclarationNode(methodName, accessModifier, returnTypes, parameters, methodBody);
         }
 
+        private List<ParameterNode> ParseParameters() {
+            Eat(TokenType.OPEN_PARENTHESIS);
+            List<ParameterNode> parameters = new List<ParameterNode>();
+            while (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                parameters.Add(ParseParameter());
+                if (_currentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                }
+            }
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            return parameters;
+        }
         private ParameterNode ParseParameter() {
             // Assuming a parameter is declared as 'type name'
             TypeNode parameterType = ParseType();

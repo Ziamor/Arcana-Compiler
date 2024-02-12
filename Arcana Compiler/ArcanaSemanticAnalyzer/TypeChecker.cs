@@ -217,5 +217,13 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(ThisExpressionNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(InterfaceDeclarationNode node) {
+            throw new NotImplementedException();
+        }
+
+        public void Visit(MethodSignatureNode node) {
+            throw new NotImplementedException();
+        }
     }
 }

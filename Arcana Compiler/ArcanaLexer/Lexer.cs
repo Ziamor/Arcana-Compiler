@@ -88,9 +88,9 @@ namespace Arcana_Compiler.ArcanaLexer {
                     Advance();
                     if (_currentChar == '=') {
                         Advance();
-                        return CreateToken(TokenType.LESS_THEN_OR_EQUAL, "<=");
+                        return CreateToken(TokenType.LESS_THAN_OR_EQUAL, "<=");
                     }
-                    return CreateToken(TokenType.LESS_THEN, "<");
+                    return CreateToken(TokenType.LESS_THAN, "<");
                 case '>':
                     Advance();
                     if (_currentChar == '=') {
