@@ -115,11 +115,15 @@ namespace Arcana_Compiler.ArcanaParser {
 
             List<FieldDeclarationNode> fields = new List<FieldDeclarationNode>();
             List<MethodDeclarationNode> methods = new List<MethodDeclarationNode>();
+            List<ClassDeclarationNode> nestedClasses = new List<ClassDeclarationNode>();
 
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
                 string? accessModifier = TryParseAccessModifier();
 
-                if (IsMethodDeclaration()) {
+                if (_currentToken.Type == TokenType.CLASS) {
+                    nestedClasses.Add(ParseClassDeclaration(currentNamespace)); // Recursively parse nested class
+                }
+                else if(IsMethodDeclaration()) {
                     methods.Add(ParseMethodDeclaration(accessModifier));
                 } else {
                     fields.Add(ParseFieldDeclaration(accessModifier));
@@ -438,11 +442,9 @@ namespace Arcana_Compiler.ArcanaParser {
                     Eat(TokenType.NEW);
                     IdentifierName className = ParseIdentifierName();
                     List<ASTNode> constructorArguments = new List<ASTNode>();
-                    Eat(TokenType.OPEN_PARENTHESIS);
                     if (_currentToken.Type != TokenType.CLOSE_PARENTHESIS) {
                         constructorArguments = ParseArguments();
                     }
-                    Eat(TokenType.CLOSE_PARENTHESIS);
                     return new ObjectInstantiationNode(className, constructorArguments);
                 default:
                     throw new UnexpectedTokenException(_currentToken); ;
