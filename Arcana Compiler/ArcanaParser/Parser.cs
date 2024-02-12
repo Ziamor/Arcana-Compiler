@@ -293,6 +293,10 @@ namespace Arcana_Compiler.ArcanaParser {
             Eat(TokenType.OPEN_BRACE);
             List<ASTNode> methodBody = new List<ASTNode>();
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
+                if(_currentToken.Type == TokenType.RETURN) {
+                    methodBody.Add(ParseReturnStatement());
+                    break;
+                }
                 methodBody.Add(ParseStatement());
             }
             Eat(TokenType.CLOSE_BRACE);
@@ -322,7 +326,18 @@ namespace Arcana_Compiler.ArcanaParser {
 
             return new ParameterNode(parameterType, parameterName);
         }
+        private ReturnStatementNode ParseReturnStatement() {
+            Eat(TokenType.RETURN);
+            List<ASTNode> returnExpressions = new List<ASTNode>();
 
+            returnExpressions.Add(ParseExpression()); // Parse the first expression
+            while (_currentToken.Type == TokenType.COMMA) {
+                Eat(TokenType.COMMA); // Eat the comma to move to the next expression
+                returnExpressions.Add(ParseExpression()); // Parse subsequent expressions
+            }
+
+            return new ReturnStatementNode(returnExpressions);
+        }
         private ASTNode ParseStatement() {
             if (_currentToken.Type == TokenType.IDENTIFIER) {
                 // Peek next token to decide between declaration, assignment, or method call

@@ -26,5 +26,6 @@ namespace Arcana_Compiler.Common {
         void Visit(ChainedMethodCallNode node);
         void Visit(ChainedPropertyAccessNode node);
         void Visit(IfStatementNode node);
+        void Visit(ReturnStatementNode node);
     }
 }

@@ -45,6 +45,7 @@
         PRIVATE,
         NULL,
         THIS,
+        RETURN
     }
 
     public struct Token {
@@ -52,6 +53,8 @@
             { "import", TokenType.IMPORT },
             { "namespace", TokenType.NAMESPACE },
             { "class", TokenType.CLASS },
+            { "interface", TokenType.INTERFACE },
+            { "struct", TokenType.STRUCT },
             { "new", TokenType.NEW },
             { "func", TokenType.FUNC },
             { "if", TokenType.IF },
@@ -60,8 +63,7 @@
             { "private", TokenType.PRIVATE },
             { "null", TokenType.NULL },
             { "this", TokenType.THIS },
-            { "interface", TokenType.INTERFACE },
-            { "struct", TokenType.STRUCT }
+            { "return", TokenType.RETURN },
         };
         public TokenType Type { get; }
         public string Value { get; }

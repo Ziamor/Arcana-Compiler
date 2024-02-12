@@ -229,5 +229,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(ThisAssignmentNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(ReturnStatementNode node) {
+            throw new NotImplementedException();
+        }
     }
 }
