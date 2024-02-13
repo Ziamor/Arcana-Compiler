@@ -9,6 +9,7 @@ namespace Arcana_Compiler.Common {
         void Visit(ClassModifierNode node);
         void Visit(InterfaceDeclarationNode node);
         void Visit(FieldDeclarationNode node);
+        void Visit(FieldModifierNode node);
         void Visit(TypeNode node);
         void Visit(MethodSignatureNode node);
         void Visit(LiteralNode node);
@@ -22,6 +23,7 @@ namespace Arcana_Compiler.Common {
         void Visit(UnaryOperationNode node);
         void Visit(BinaryOperationNode node);
         void Visit(MethodDeclarationNode node);
+        void Visit(MethodModifierNode node);
         void Visit(MethodCallNode node);
         void Visit(ParameterNode node);
         void Visit(ChainedMethodCallNode node);
@@ -29,6 +31,6 @@ namespace Arcana_Compiler.Common {
         void Visit(IfStatementNode node);
         void Visit(ReturnStatementNode node);
         void Visit(DestructuringAssignmentNode node);
-        void Visit(FieldModifierNode node);
+
     }
 }
