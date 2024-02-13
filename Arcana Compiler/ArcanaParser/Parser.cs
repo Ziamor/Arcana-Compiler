@@ -22,7 +22,6 @@ namespace Arcana_Compiler.ArcanaParser {
     public class Parser {
         private readonly ILexer _lexer;
         private Token _currentToken;
-        private Token? _peekedToken = null;
 
         public Parser(ILexer lexer) {
             _lexer = lexer;
@@ -32,22 +31,14 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private void Eat(TokenType tokenType) {
             if (_currentToken.Type == tokenType) {
-                if (_peekedToken != null) {
-                    _currentToken = _peekedToken.Value;
-                    _peekedToken = null;
-                } else {
-                    _currentToken = _lexer.GetNextToken();
-                }
+                _currentToken = _lexer.GetNextToken();
                 SkipComments();
             } else {
                 throw new SyntaxErrorException(tokenType, _currentToken);
             }
         }
-        private Token PeekNextToken() {
-            if (_peekedToken == null) {
-                _peekedToken = _lexer.GetNextToken();
-            }
-            return _peekedToken.Value;
+        private Token PeekNextToken(int depth = 1) {
+            return _lexer.PeekToken(depth);
         }
 
         private void SkipComments() {
@@ -177,18 +168,27 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private bool IsMethodDeclaration() {
-            // Peek at the next token without consuming it.
-            var nextToken = PeekNextToken();
-
-            // Check if the current token indicates a method.
-            if (_currentToken.Type == TokenType.FUNC ||
-                (_currentToken.Type == TokenType.IDENTIFIER && nextToken.Type == TokenType.FUNC)) {
+            // Check if the current token is 'func'.
+            if (_currentToken.Type == TokenType.FUNC) {
                 return true;
             }
 
-            // Otherwise, it's likely a field (or a syntax error, which will be caught later).
-            return false;
+            // Check up to the next 3 tokens ahead for a 'func' keyword, allowing for modifiers before it.
+            for (int i = 1; i <= 3; i++) {
+                Token nextToken = PeekNextToken(i);
+                if (nextToken.Type == TokenType.FUNC) {
+                    return true;
+                }
+                // If the token is neither an access modifier nor a method modifier, stop checking further.
+                if (!IsAccessModifier(nextToken.Type) && !IsMethodModifier(nextToken.Type)) {
+                    break;
+                }
+            }
+
+            return false; // If 'func' is not found within the allowed range, it's not a method declaration.
         }
+
+
 
         private bool IsMethodModifier(TokenType tokenType) {
             switch (tokenType) {
