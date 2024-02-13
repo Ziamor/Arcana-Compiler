@@ -11,6 +11,7 @@ namespace Arcana_Compiler.ArcanaLexer {
         private int _currentLinePosition;
         private int _currentTokenLength;
 
+        private readonly Queue<Token> _tokenCache = new Queue<Token>();
 
         public Lexer(string input) {
             _input = input.Replace("\r\n", "\n");
@@ -40,7 +41,20 @@ namespace Arcana_Compiler.ArcanaLexer {
             }
         }
 
-        public Token GetNextToken() {
+        public Token PeekToken(int depth = 1) {
+            // Ensure there are enough tokens in the cache
+            while (_tokenCache.Count < depth && _currentChar != '\0') {
+                _tokenCache.Enqueue(ParseNextToken());
+            }
+
+            if (_tokenCache.Count < depth) {
+                return CreateToken(TokenType.EOF, null); // Not enough tokens available (EOF reached)
+            }
+
+            return _tokenCache.ElementAt(depth - 1); // Return the peeked token without removing it
+        }
+
+        private Token ParseNextToken() {
             _currentTokenLength = 0; // Reset token length for new token
 
             while (_currentChar != '\0') {
@@ -59,6 +73,15 @@ namespace Arcana_Compiler.ArcanaLexer {
             }
 
             return CreateToken(TokenType.EOF, null);
+        }
+
+
+        public Token GetNextToken() {
+            if (_tokenCache.Count > 0) {
+                return _tokenCache.Dequeue();
+            }
+
+            return ParseNextToken();
         }
 
         private Token GetComplexToken() {
