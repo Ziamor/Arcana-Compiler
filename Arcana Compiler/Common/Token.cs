@@ -48,7 +48,9 @@
         RETURN,
         STATIC,
         ABSTRACT,
-        FINAL
+        FINAL,
+        CONST,
+        OVERRIDE,
     }
 
     public struct Token {
@@ -70,7 +72,10 @@
             { "static", TokenType.STATIC },
             { "abstract", TokenType.ABSTRACT },
             { "final", TokenType.FINAL },
+            { "const", TokenType.CONST },
+            { "override", TokenType.OVERRIDE },
         };
+
         public TokenType Type { get; }
         public string Value { get; }
         public int LineNumber { get; }

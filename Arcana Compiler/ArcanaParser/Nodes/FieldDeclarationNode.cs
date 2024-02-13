@@ -4,15 +4,17 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class FieldDeclarationNode : ASTNode
     {
+        public List<FieldModifierNode> Modifiers { get; set; }
         public TypeNode FieldType { get; private set; }
         public string FieldName { get; private set; }
         public ASTNode? InitialValue { get; private set; } // Optional initial value
 
-        public FieldDeclarationNode(TypeNode fieldType, string fieldName, ASTNode? initialValue = null)
+        public FieldDeclarationNode(TypeNode fieldType, string fieldName, List<FieldModifierNode> modifiers, ASTNode? initialValue = null)
         {
             FieldType = fieldType;
             FieldName = fieldName;
             InitialValue = initialValue;
+            Modifiers = modifiers ?? new List<FieldModifierNode>();
         }
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);

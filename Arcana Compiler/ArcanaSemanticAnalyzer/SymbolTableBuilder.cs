@@ -170,6 +170,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(ClassModifierNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(FieldModifierNode node) {
+            throw new NotImplementedException();
+        }
     }
 
     public class SemanticException : Exception {

@@ -268,8 +268,9 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private FieldDeclarationNode ParseFieldDeclaration(string? accessModifier) {
-            TypeNode fieldType = ParseType();
+            List<FieldModifierNode> fieldModifiers = ParseFieldModifiers(); // Implement this method
 
+            TypeNode fieldType = ParseType();
             string fieldName = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
 
@@ -279,7 +280,26 @@ namespace Arcana_Compiler.ArcanaParser {
                 initialValue = ParseExpression();
             }
 
-            return new FieldDeclarationNode(fieldType, fieldName, initialValue);
+            return new FieldDeclarationNode(fieldType, fieldName, fieldModifiers, initialValue);
+        }
+
+        private List<FieldModifierNode> ParseFieldModifiers() {
+            List<FieldModifierNode> modifiers = new List<FieldModifierNode>();
+            while (IsFieldModifier(_currentToken.Type)) {
+                modifiers.Add(new FieldModifierNode(_currentToken.Value));
+                Eat(_currentToken.Type);
+            }
+            return modifiers;
+        }
+
+        private bool IsFieldModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.CONST:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private MethodDeclarationNode ParseMethodDeclaration(string? accessModifier) {
