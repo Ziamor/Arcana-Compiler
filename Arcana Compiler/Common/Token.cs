@@ -45,7 +45,10 @@
         PRIVATE,
         NULL,
         THIS,
-        RETURN
+        RETURN,
+        STATIC,
+        ABSTRACT,
+        FINAL
     }
 
     public struct Token {
@@ -64,6 +67,9 @@
             { "null", TokenType.NULL },
             { "this", TokenType.THIS },
             { "return", TokenType.RETURN },
+            { "static", TokenType.STATIC },
+            { "abstract", TokenType.ABSTRACT },
+            { "final", TokenType.FINAL },
         };
         public TokenType Type { get; }
         public string Value { get; }

@@ -119,6 +119,8 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace = null) {
             string? classAccessModifier = TryParseAccessModifier();
+            List<ClassModifierNode> classModifiers = ParseModifiers();
+
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
@@ -151,7 +153,27 @@ namespace Arcana_Compiler.ArcanaParser {
 
             // Concatenate the class name to the namespace
             currentNamespace += className;
-            return new ClassDeclarationNode(currentNamespace, classAccessModifier, parentTypes, fields, methods);
+            return new ClassDeclarationNode(currentNamespace, classAccessModifier, classModifiers, parentTypes, fields, methods);
+        }
+
+        private List<ClassModifierNode> ParseModifiers() {
+            List<ClassModifierNode> modifiers = new List<ClassModifierNode>();
+            while (IsModifier(_currentToken.Type)) {
+                modifiers.Add(new ClassModifierNode(_currentToken.Value));
+                Eat(_currentToken.Type);
+            }
+            return modifiers;
+        }
+
+        private bool IsModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.ABSTRACT:
+                case TokenType.FINAL:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         private bool IsMethodDeclaration() {
@@ -628,7 +650,6 @@ namespace Arcana_Compiler.ArcanaParser {
                 return new ChainedPropertyAccessNode(previousNode, nextIdentifier);
             }
         }
-
 
         private List<ASTNode> ParseArguments() {
             List<ASTNode> arguments = new List<ASTNode>();

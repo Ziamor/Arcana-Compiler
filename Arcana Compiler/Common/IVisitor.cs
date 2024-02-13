@@ -6,6 +6,7 @@ namespace Arcana_Compiler.Common {
         void Visit(ImportDeclarationNode node);
         void Visit(NamespaceDeclarationNode node);
         void Visit(ClassDeclarationNode node);
+        void Visit(ClassModifierNode node);
         void Visit(InterfaceDeclarationNode node);
         void Visit(FieldDeclarationNode node);
         void Visit(TypeNode node);
