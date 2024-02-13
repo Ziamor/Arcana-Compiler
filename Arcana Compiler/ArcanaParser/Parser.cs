@@ -119,7 +119,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private ClassDeclarationNode ParseClassDeclaration(IdentifierName? currentNamespace = null) {
             string? classAccessModifier = TryParseAccessModifier();
-            List<ClassModifierNode> classModifiers = ParseModifiers();
+            List<ClassModifierNode> classModifiers = ParseClassModifiers();
 
             Eat(TokenType.CLASS);
             string className = _currentToken.Value;
@@ -156,7 +156,7 @@ namespace Arcana_Compiler.ArcanaParser {
             return new ClassDeclarationNode(currentNamespace, classAccessModifier, classModifiers, parentTypes, fields, methods);
         }
 
-        private List<ClassModifierNode> ParseModifiers() {
+        private List<ClassModifierNode> ParseClassModifiers() {
             List<ClassModifierNode> modifiers = new List<ClassModifierNode>();
             while (IsModifier(_currentToken.Type)) {
                 modifiers.Add(new ClassModifierNode(_currentToken.Value));
