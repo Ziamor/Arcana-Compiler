@@ -205,7 +205,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
 
         private bool IsAccessModifier(TokenType tokenType) {
-            return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE;
+            return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE || tokenType == TokenType.PROTECTED;
         }
 
 
