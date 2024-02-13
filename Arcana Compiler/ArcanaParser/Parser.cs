@@ -158,14 +158,14 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private List<ClassModifierNode> ParseClassModifiers() {
             List<ClassModifierNode> modifiers = new List<ClassModifierNode>();
-            while (IsModifier(_currentToken.Type)) {
+            while (IsClassModifier(_currentToken.Type)) {
                 modifiers.Add(new ClassModifierNode(_currentToken.Value));
                 Eat(_currentToken.Type);
             }
             return modifiers;
         }
 
-        private bool IsModifier(TokenType tokenType) {
+        private bool IsClassModifier(TokenType tokenType) {
             switch (tokenType) {
                 case TokenType.STATIC:
                 case TokenType.ABSTRACT:
