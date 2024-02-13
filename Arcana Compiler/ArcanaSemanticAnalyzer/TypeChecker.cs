@@ -245,5 +245,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(FieldModifierNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(MethodModifierNode node) {
+            throw new NotImplementedException();
+        }
     }
 }

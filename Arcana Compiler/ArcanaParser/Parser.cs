@@ -181,7 +181,6 @@ namespace Arcana_Compiler.ArcanaParser {
             var nextToken = PeekNextToken();
 
             // Check if the current token indicates a method.
-            // Assuming 'func' keyword is used to indicate a method.
             if (_currentToken.Type == TokenType.FUNC ||
                 (_currentToken.Type == TokenType.IDENTIFIER && nextToken.Type == TokenType.FUNC)) {
                 return true;
@@ -190,6 +189,20 @@ namespace Arcana_Compiler.ArcanaParser {
             // Otherwise, it's likely a field (or a syntax error, which will be caught later).
             return false;
         }
+
+        private bool IsMethodModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.ABSTRACT:
+                case TokenType.VIRTUAL:
+                case TokenType.OVERRIDE:
+                case TokenType.FINAL:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
 
         private bool IsAccessModifier(TokenType tokenType) {
             return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE;
@@ -248,6 +261,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
             return new MethodSignatureNode(methodName, parameters, returnTypes);
         }
+
         private List<ParentTypeNode> ParseParentTypes() {
             List<ParentTypeNode> parentTypes = new List<ParentTypeNode>();
             if (_currentToken.Type == TokenType.COLON) {
@@ -303,7 +317,8 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private MethodDeclarationNode ParseMethodDeclaration(string? accessModifier) {
-            // Assuming the next token is 'func'
+            List<MethodModifierNode> methodModifiers = ParseMethodModifiers();
+
             Eat(TokenType.FUNC);
 
             // Parse the method name
@@ -335,7 +350,7 @@ namespace Arcana_Compiler.ArcanaParser {
             Eat(TokenType.OPEN_BRACE);
             List<ASTNode> methodBody = new List<ASTNode>();
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {
-                if(_currentToken.Type == TokenType.RETURN) {
+                if (_currentToken.Type == TokenType.RETURN) {
                     methodBody.Add(ParseReturnStatement());
                     break;
                 }
@@ -344,7 +359,16 @@ namespace Arcana_Compiler.ArcanaParser {
             Eat(TokenType.CLOSE_BRACE);
 
             // Return the method declaration node
-            return new MethodDeclarationNode(methodName, accessModifier, returnTypes, parameters, methodBody);
+            return new MethodDeclarationNode(methodName, accessModifier, methodModifiers, returnTypes, parameters, methodBody);
+        }
+
+        private List<MethodModifierNode> ParseMethodModifiers() {
+            List<MethodModifierNode> modifiers = new List<MethodModifierNode>();
+            while (IsMethodModifier(_currentToken.Type)) {
+                modifiers.Add(new MethodModifierNode(_currentToken.Value));
+                Eat(_currentToken.Type);
+            }
+            return modifiers;
         }
 
         private List<ParameterNode> ParseParameters() {
@@ -360,7 +384,6 @@ namespace Arcana_Compiler.ArcanaParser {
             return parameters;
         }
         private ParameterNode ParseParameter() {
-            // Assuming a parameter is declared as 'type name'
             TypeNode parameterType = ParseType();
 
             string parameterName = _currentToken.Value;
@@ -654,7 +677,6 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         private ASTNode ParseChainedCall(ASTNode previousNode) {
-            // Assuming the next token is an identifier (either a method name or a property name)
             string nextIdentifier = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
 

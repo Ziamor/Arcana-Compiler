@@ -5,13 +5,15 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
     public class MethodDeclarationNode : ASTNode {
         public string MethodName { get; private set; }
         public string AccessModifier { get; private set; }
+        public List<MethodModifierNode> Modifiers { get; private set; }
         public List<TypeNode> ReturnTypes { get; private set; }
         public List<ParameterNode> Parameters { get; private set; }
         public List<ASTNode> Body { get; private set; }
 
-        public MethodDeclarationNode(string methodName, string? accessModifier, List<TypeNode> returnTypes, List<ParameterNode> parameters, List<ASTNode> body) {
+        public MethodDeclarationNode(string methodName, string? accessModifier, List<MethodModifierNode> modifiers, List<TypeNode> returnTypes, List<ParameterNode> parameters, List<ASTNode> body) {
             MethodName = methodName ?? throw new ArgumentNullException(nameof(methodName));
             AccessModifier = accessModifier ?? "private"; // Default to private if not specified
+            Modifiers = modifiers;
             ReturnTypes = returnTypes;
             Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
             Body = body ?? throw new ArgumentNullException(nameof(body));
