@@ -379,20 +379,44 @@ namespace Arcana_Compiler.ArcanaParser {
                 throw new UnexpectedTokenException(_currentToken);
             }
         }
-        private VariableDeclarationNode ParseVariableDeclaration() {
-            TypeNode variableType = ParseType();
+        private ASTNode ParseVariableDeclaration() {
+            List<(TypeNode Type, string Name)> tempDeclarations = new List<(TypeNode, string)>();
+            bool expectComma;
 
-            string variableName = _currentToken.Value;
-            Eat(TokenType.IDENTIFIER);
+            // First, parse the types and names of the variables to be declared
+            do {
+                TypeNode variableType = ParseType();
+                string variableName = _currentToken.Value;
+                Eat(TokenType.IDENTIFIER);
+                tempDeclarations.Add((variableType, variableName));
+
+                expectComma = _currentToken.Type == TokenType.COMMA;
+                if (expectComma) {
+                    Eat(TokenType.COMMA);
+                }
+            } while (expectComma);
 
             ASTNode? initialValue = null;
             if (_currentToken.Type == TokenType.ASSIGN) {
                 Eat(TokenType.ASSIGN);
-                initialValue = ParseExpression();
+                initialValue = ParseExpression(); // This parses the right-hand side, which could be a function call or another expression
             }
 
-            return new VariableDeclarationNode(variableType, variableName, initialValue);
+            // Now, create the variable declaration nodes with the initial value
+            if (tempDeclarations.Count == 1) {
+                // If there's only one variable, create a single VariableDeclarationNode
+                var declaration = tempDeclarations[0];
+                return new VariableDeclarationNode(declaration.Type, declaration.Name, initialValue);
+            } else {
+                // For multiple variables, prepare for a destructuring assignment
+                List<VariableDeclarationNode> variableDeclarations = tempDeclarations
+                    .Select(declaration => new VariableDeclarationNode(declaration.Type, declaration.Name, null))
+                    .ToList();
+
+                return new DestructuringAssignmentNode(variableDeclarations, initialValue);
+            }
         }
+
 
         private ASTNode ParseVariableAssignment() {
             string variableName = _currentToken.Value;
