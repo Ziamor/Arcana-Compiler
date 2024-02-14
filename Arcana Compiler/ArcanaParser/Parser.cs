@@ -188,8 +188,6 @@ namespace Arcana_Compiler.ArcanaParser {
             return false; // If 'func' is not found within the allowed range, it's not a method declaration.
         }
 
-
-
         private bool IsMethodModifier(TokenType tokenType) {
             switch (tokenType) {
                 case TokenType.STATIC:
@@ -202,7 +200,6 @@ namespace Arcana_Compiler.ArcanaParser {
                     return false;
             }
         }
-
 
         private bool IsAccessModifier(TokenType tokenType) {
             return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE || tokenType == TokenType.PROTECTED;

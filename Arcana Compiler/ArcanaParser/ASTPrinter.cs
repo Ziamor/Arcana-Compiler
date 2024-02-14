@@ -1,119 +1,203 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
+using Arcana_Compiler.Common;
 using System.Text;
 
-namespace Arcana_Compiler.ArcanaParser {
-    public class ASTPrinter {
-        public string Print(ASTNode node) {
-            StringBuilder result = new StringBuilder();
-            Print(node, result, "");
-            return result.ToString();
+public class ASTPrinter : IVisitor {
+    private StringBuilder result = new StringBuilder();
+    private string indent = "";
+
+    public string Print(ASTNode node) {
+        node.Accept(this);
+        return result.ToString();
+    }
+
+    private void IncreaseIndent() => indent += "  ";
+    private void DecreaseIndent() => indent = indent.Substring(0, indent.Length - 2);
+
+    private string PrintExpression(ASTNode expression) {
+        switch (expression) {
+            case LiteralNode literalNode:
+                return literalNode.Value.ToString() ?? "EMPTY";
+            case VariableAccessNode variableNode:
+                return variableNode.QualifiedName.ToString();
+            case ChainedMethodCallNode chainedMethodCallNode:
+                return $"{PrintExpression(chainedMethodCallNode.PreviousNode)} -> {chainedMethodCallNode.CurrentCall}";
+            default:
+                return expression.ToString() ?? "EMPTY";
         }
+    }
 
-        private string PrintExpression(ASTNode expression) {
-            switch (expression) {
-                case LiteralNode literalNode:
-                    return literalNode.Value.ToString() ?? "EMPTY";
-                case VariableAccessNode variableNode:
-                    return variableNode.QualifiedName.ToString();
-                case ChainedMethodCallNode chainedMethodCallNode:
-                    return $"{PrintExpression(chainedMethodCallNode.PreviousNode)} -> {chainedMethodCallNode.CurrentCall}";
-                default:
-                    return expression.ToString() ?? "EMPTY";
-            }
+    public void Visit(ProgramNode node) {
+        result.AppendLine(indent + "Program");
+        IncreaseIndent();
+        foreach (var import in node.Imports) {
+            import.Accept(this);
         }
-
-        private void Print(ASTNode node, StringBuilder result, string indent) {
-            if (node == null) {
-                return;
-            }
-
-            switch (node) {
-                case ProgramNode programNode:
-                    result.AppendLine(indent + "Program");
-                    foreach (var import in programNode.Imports) {
-                        Print(import, result, indent + "  ");
-                    }
-                    foreach (var namespaceDeclarations in programNode.NamespaceDeclarations) {
-                        result.AppendLine($"{indent}Namespace: {namespaceDeclarations.Name}");
-                        foreach (var classDecl in namespaceDeclarations.ClassDeclarations) {
-                            Print(classDecl, result, indent + "  ");
-                        }
-                    }
-                    break;
-                case ImportDeclarationNode importDeclarationNode:
-                    result.AppendLine($"{indent}Import: {importDeclarationNode.ImportedNamespace}");
-                    break;
-                case ClassDeclarationNode classNode:
-                    result.AppendLine($"{indent}Class: {classNode.ClassName}");
-                    foreach (var field in classNode.Fields) {
-                        Print(field, result, indent + "  ");
-                    }
-                    foreach (var method in classNode.Methods) {
-                        Print(method, result, indent + "  ");
-                    }
-                    break;
-                case FieldDeclarationNode fieldNode:
-                    result.AppendLine($"{indent}Field Decl: {fieldNode.FieldName} ({fieldNode.FieldType})");
-                    break;
-                case MethodDeclarationNode methodNode:
-                    result.AppendLine($"{indent}Method: {methodNode.MethodName}");
-                    foreach (var param in methodNode.Parameters) {
-                        Print(param, result, indent + "  ");
-                    }
-
-                    if (methodNode.Body.Count > 0) {
-                        foreach (var param in methodNode.Body) {
-                            Print(param, result, indent + "  ");
-                        }
-                    } else {
-                        result.AppendLine(indent + indent + "Empty");
-                    }
-                    break;
-                case ParameterNode parameterNode:
-                    result.AppendLine($"{indent}Parameter: {parameterNode.ParameterName} ({parameterNode.ParameterType})");
-                    break;
-                case MethodCallNode methodCallNode:
-                    result.AppendLine($"{indent}Method Call: {methodCallNode.MethodName}");
-                    foreach (var argument in methodCallNode.Arguments) {
-                        Print(argument, result, indent + "  ");
-                    }
-                    break;
-
-                case LiteralNode literalNode:
-                    result.AppendLine($"{indent}Literal: {literalNode}");
-                    break;
-                case VariableAccessNode variableAccessNode:
-                    result.AppendLine($"{indent}Variable: {variableAccessNode.QualifiedName}");
-                    break;
-                case VariableDeclarationNode variableDeclarationNode:
-                    string initialValueOutput = variableDeclarationNode.InitialValue != null
-                        ? $" = {PrintExpression(variableDeclarationNode.InitialValue)}"
-                        : string.Empty;
-
-                    result.AppendLine($"{indent}Variable Decl: {variableDeclarationNode.Name} ({variableDeclarationNode.Type}){initialValueOutput}");
-                    break;
-                case VariableAssignmentNode variableAssignmentNode:
-                    result.AppendLine($"{indent}Variable: {variableAssignmentNode.VariableName} = {PrintExpression(variableAssignmentNode.AssignedExpression)}");
-                    break;
-                case IfStatementNode ifStatementNode:
-                    foreach (var (Condition, Statements) in ifStatementNode.ConditionsAndStatements) {
-                        result.AppendLine(indent + "If Condition:");
-                        Print(Condition, result, indent + "  ");
-                        foreach (var statement in Statements) {
-                            Print(statement, result, indent + "    ");
-                        }
-                    }
-                    if (ifStatementNode.ElseStatements != null) {
-                        result.AppendLine(indent + "Else:");
-                        foreach (var elseStatement in ifStatementNode.ElseStatements) {
-                            Print(elseStatement, result, indent + "  ");
-                        }
-                    }
-                    break;
-                default:
-                    result.AppendLine(indent + "Unknown Node Type");
-                    break;
-            }
+        foreach (var namespaceDeclarations in node.NamespaceDeclarations) {
+            Visit(namespaceDeclarations);
         }
+        DecreaseIndent();
+    }
+
+    public void Visit(NamespaceDeclarationNode node) {
+        result.AppendLine($"{indent}Namespace: {node.Name}");
+        IncreaseIndent();
+        foreach (var classDecl in node.ClassDeclarations) {
+            classDecl.Accept(this);
+        }
+        DecreaseIndent();
+    }
+
+    public void Visit(ImportDeclarationNode node) {
+        result.AppendLine($"{indent}Import: {node.ImportedNamespace}");
+    }
+    public void Visit(ClassDeclarationNode node) {
+        result.AppendLine($"{indent}Class: {node.ClassName}");
+        IncreaseIndent();
+        foreach (var field in node.Fields) {
+            field.Accept(this);
+        }
+        foreach (var method in node.Methods) {
+            method.Accept(this);
+        }
+        DecreaseIndent();
+    }
+
+    public void Visit(FieldDeclarationNode node) {
+        result.AppendLine($"{indent}Field Decl: {node.FieldName} ({node.FieldType})");
+    }
+    public void Visit(LiteralNode node) {
+        result.AppendLine($"{indent}Literal: {node.Value}");
+    }
+
+    public void Visit(MethodDeclarationNode node) {
+        result.AppendLine($"{indent}Method: {node.MethodName}");
+        IncreaseIndent();
+        foreach (var param in node.Parameters) {
+            param.Accept(this);
+        }
+        foreach (var statement in node.Body) {
+            statement.Accept(this); // Assuming statements are ASTNode and Accept method is implemented
+        }
+        if (node.Body.Count == 0) {
+            result.AppendLine(indent + "Empty");
+        }
+        DecreaseIndent();
+    }
+
+    public void Visit(ParameterNode node) {
+        result.AppendLine($"{indent}Parameter: {node.ParameterName} ({node.ParameterType})");
+    }
+
+    public void Visit(MethodCallNode node) {
+        result.AppendLine($"{indent}Method Call: {node.MethodName}");
+        IncreaseIndent();
+        foreach (var argument in node.Arguments) {
+            argument.Accept(this);
+        }
+        DecreaseIndent();
+    }
+
+    public void Visit(VariableDeclarationNode node) {
+        string initialValueOutput = node.InitialValue != null ? $" = {PrintExpression(node.InitialValue)}" : "";
+        result.AppendLine($"{indent}Variable Decl: {node.Name} ({node.Type}){initialValueOutput}");
+    }
+
+    public void Visit(VariableAssignmentNode node) {
+        result.AppendLine($"{indent}Variable: {node.VariableName} = {PrintExpression(node.AssignedExpression)}");
+    }
+
+    public void Visit(IfStatementNode node) {
+        foreach (var (Condition, Statements) in node.ConditionsAndStatements) {
+            result.AppendLine(indent + "If Condition:");
+            IncreaseIndent();
+            Condition.Accept(this);
+            foreach (var statement in Statements) {
+                statement.Accept(this);
+            }
+            DecreaseIndent();
+        }
+        if (node.ElseStatements != null) {
+            result.AppendLine(indent + "Else:");
+            IncreaseIndent();
+            foreach (var elseStatement in node.ElseStatements) {
+                elseStatement.Accept(this);
+            }
+            DecreaseIndent();
+        }
+    }
+
+    public void Visit(ClassModifierNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(InterfaceDeclarationNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(FieldModifierNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(TypeNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(MethodSignatureNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(NullLiteralNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ObjectInstantiationNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ThisExpressionNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ThisAssignmentNode node) {
+        // Assuming ThisAssignmentNode has properties like VariableName and AssignedExpression
+        result.AppendLine($"{indent}This Assignment: {node.IdentifierName} = {PrintExpression(node.ValueExpression)}");
+    }
+
+    public void Visit(VariableAccessNode node) {
+        result.AppendLine($"{indent}Variable Access: {node.QualifiedName}");
+    }
+
+    public void Visit(UnaryOperationNode node) {
+        string operand = PrintExpression(node.Operand);
+        result.AppendLine($"{indent}Unary Operation: {node.Operator}{operand}");
+    }
+
+    public void Visit(BinaryOperationNode node) {
+        string left = PrintExpression(node.Left);
+        string right = PrintExpression(node.Right);
+        result.AppendLine($"{indent}Binary Operation: {left} {node.Operator} {right}");
+    }
+
+
+    public void Visit(MethodModifierNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ChainedMethodCallNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ChainedPropertyAccessNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(ReturnStatementNode node) {
+        result.AppendLine($"{indent}{node}");
+    }
+
+
+    public void Visit(DestructuringAssignmentNode node) {
+        result.AppendLine($"{indent}{node}");
     }
 }
