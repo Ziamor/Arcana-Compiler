@@ -62,7 +62,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
 
         public void Visit(FieldDeclarationNode node) {
             // Assuming FieldSymbol is a type of Symbol for fields.
-            var fieldSymbol = new FieldSymbol(node.FieldName);
+            var fieldSymbol = new FieldSymbol(node.FieldName, node.FieldType.TypeName);
             _symbolTable.AddSymbol(fieldSymbol); // Add the field symbol within the current class scope
         }
 

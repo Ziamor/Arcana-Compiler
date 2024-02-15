@@ -1,7 +1,7 @@
 ﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public abstract class Symbol {
         public string Name { get; }
-        public Scope? OwnedScope { get; internal set; } 
+        public Scope? OwnedScope { get; internal set; }
 
         protected Symbol(string name) {
             Name = name;
@@ -13,6 +13,12 @@
         }
     }
 
+    public abstract class TypeSymbol : Symbol {
+        protected TypeSymbol(string name) : base(name) { }
+
+        public override string ToString() => Name;
+    }
+
     public class NamespaceSymbol : Symbol {
         public NamespaceSymbol(string name) : base(name) { }
 
@@ -22,7 +28,7 @@
     }
 
 
-    public class ClassSymbol : Symbol {
+    public class ClassSymbol : TypeSymbol {
         public ClassSymbol(string name) : base(name) { }
 
         public override string ToString() {
@@ -30,7 +36,7 @@
         }
     }
 
-    public class InterfaceSymbol : Symbol {
+    public class InterfaceSymbol : TypeSymbol {
         public InterfaceSymbol(string name) : base(name) { }
 
         public override string ToString() {
@@ -39,12 +45,23 @@
     }
 
     public class FieldSymbol : Symbol {
-        public FieldSymbol(string name) : base(name) { }
+        public TypeSymbol? Type { get; private set; }
+        public string TypeName { get; } // Temporary storage for type name, will be resolved later
+
+        public FieldSymbol(string name, string typeName) : base(name) {
+            TypeName = typeName;
+            Type = null;
+        }
+
+        public void ResolveType(TypeSymbol typeSymbol) {
+            Type = typeSymbol;
+        }
 
         public override string ToString() {
-            return $"FieldSymbol: {Name}";
+            return $"FieldSymbol: {Name}, Type: {Type?.Name ?? TypeName}";
         }
     }
+
 
     public class MethodSymbol : Symbol {
         public MethodSignature Signature { get; }
@@ -53,13 +70,20 @@
             Signature = signature;
         }
 
+        public void ResolveSignatureTypes(SymbolTable symbolTable) {
+            Signature.ResolveTypes(symbolTable);
+        }
+
         public override string ToString() {
-            return $"MethodSymbol: {Name}";
+            return $"MethodSymbol: {Name}, Parameters: [{string.Join(", ", Signature.ParameterTypesNames)}], Returns: [{string.Join(", ", Signature.ReturnTypesNames)}]";
         }
     }
 
     public class VariableSymbol : Symbol {
-        public VariableSymbol(string name) : base(name) { }
+        public TypeSymbol Type { get; }
+        public VariableSymbol(string name, TypeSymbol typeSymbol) : base(name) {
+            Type = typeSymbol;
+        }
 
         public override string ToString() {
             return $"VariableSymbol: {Name}";
