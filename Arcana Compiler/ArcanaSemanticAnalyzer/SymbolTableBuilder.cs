@@ -1,6 +1,5 @@
 ﻿using Arcana_Compiler.Common;
 using Arcana_Compiler.ArcanaParser.Nodes;
-using Arcana_Compiler.ArcanaSemanticAnalyzer;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
@@ -12,7 +11,6 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         public void Visit(ProgramNode node) {
-            // The ProgramNode doesn't directly correspond to a symbol but serves as the root for the AST.
             foreach (var import in node.Imports) {
                 import.Accept(this);
             }
@@ -23,11 +21,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         public void Visit(ImportDeclarationNode node) {
-            // Handle imports if necessary for symbol resolution, but not directly related to symbol table population.
+            Console.WriteLine("TODO, implement visit import node");
         }
 
         public void Visit(NamespaceDeclarationNode node) {
-            // Assuming NamespaceSymbol is a type of Symbol for namespaces.
             var namespaceSymbol = new NamespaceSymbol(node.Name.ToString());
             _symbolTable.AddSymbol(namespaceSymbol); // Add the namespace symbol to the current scope
             _symbolTable.EnterScope(namespaceSymbol); // Enter the new namespace scope
@@ -36,41 +33,38 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                 classDeclaration.Accept(this);
             }
 
-            // If there are interface declarations, they would be processed here as well.
+            foreach (var interfaceDeclaration in node.InerfaceDeclarations) {
+                interfaceDeclaration.Accept(this);
+            }
 
-            _symbolTable.ExitScope(); // Exit the namespace scope once all children are processed
+            _symbolTable.ExitScope();
         }
 
         public void Visit(ClassDeclarationNode node) {
-            // Assuming ClassSymbol is a type of Symbol for classes.
             var classSymbol = new ClassSymbol(node.ClassName);
-            _symbolTable.AddSymbol(classSymbol); // Add the class symbol within the current scope (namespace or outer class)
+            _symbolTable.AddSymbol(classSymbol);
             _symbolTable.EnterScope(classSymbol);
 
             foreach (var field in node.Fields) {
                 field.Accept(this);
             }
 
-            foreach(var method in node.Methods) { 
-                method.Accept(this); 
+            foreach (var method in node.Methods) {
+                method.Accept(this);
             }
 
             // TODO NESTED CLASSES
 
-            _symbolTable.ExitScope(); // Exit the class scope once all members are processed
+            _symbolTable.ExitScope();
         }
 
         public void Visit(FieldDeclarationNode node) {
-            // Assuming FieldSymbol is a type of Symbol for fields.
             var fieldSymbol = new FieldSymbol(node.FieldName, node.FieldType.TypeName);
-            _symbolTable.AddSymbol(fieldSymbol); // Add the field symbol within the current class scope
+            _symbolTable.AddSymbol(fieldSymbol);
         }
 
-        // Implementations for other AST node visits would follow a similar pattern.
-
-        // Placeholder methods for the interface, to be implemented as needed.
-        public void Visit(InterfaceDeclarationNode node) { /* Implementation here */ }
-        public void Visit(MethodSignatureNode node) { /* Implementation here */ }
+        public void Visit(InterfaceDeclarationNode node) { }
+        public void Visit(MethodSignatureNode node) { }
 
         public void Visit(ClassModifierNode node) {
             throw new NotImplementedException();
@@ -166,6 +160,5 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(DestructuringAssignmentNode node) {
             throw new NotImplementedException();
         }
-        // Add other visit methods as per the IVisitor interface definition.
     }
 }
