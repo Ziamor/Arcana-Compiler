@@ -1,17 +1,17 @@
 ﻿using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaParser;
+using Arcana_Compiler.ArcanaModule;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.ArcanaSemanticAnalyzer;
-using Arcana_Compiler.ArcanaModule;
 
 public class Compiler {
     private Module _module;
-    // Map each source file to its own symbol table
-    private Dictionary<string, SymbolTable> _fileSymbolTables = new Dictionary<string, SymbolTable>();
+    private SymbolTable _symbolTable;
 
     public Compiler(Module module) {
         _module = module;
+        _symbolTable = new SymbolTable();
     }
 
     public void Compile() {
@@ -20,36 +20,40 @@ public class Compiler {
         Console.WriteLine("~~~~~~~~~~Syntax Analysis~~~~~~~~~~");
         foreach (var filePath in _module.SourceFiles) {
             Console.WriteLine($"Parsing: {filePath}");
+            Console.WriteLine($"Source:");
             string sourceCode = File.ReadAllText(filePath);
-
+            Console.WriteLine(sourceCode);
             Lexer lexer = new Lexer(sourceCode);
             Parser parser = new Parser(lexer);
-            ProgramNode ast = parser.Parse();
+            try {
+                ProgramNode ast = parser.Parse();
 
-            astCache[filePath] = ast;
+                astCache[filePath] = ast;
 
-            ASTPrinter printer = new ASTPrinter();
-            Console.WriteLine(printer.Print(ast));
+                Console.WriteLine("\nAST:");
+                ASTPrinter printer = new ASTPrinter();
+                Console.WriteLine(printer.Print(ast));
 
-            // Create a symbol table for each file
-            SymbolTable fileSymbolTable = new SymbolTable();
-            _fileSymbolTables[filePath] = fileSymbolTable;
+                // Perform Semantic Analysis
+                Console.WriteLine("\n~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
+                BuildSymbolTable(ast);
 
-            // Perform semantic analysis per file
-            SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(ast, fileSymbolTable);
-            symbolTableBuilder.Analyze();
+            } catch (ParsingException ex) {
+                string errorMessage = $"{filePath}: {ex.Message}";
+                Console.WriteLine(errorMessage);
+                throw;
+            }
         }
 
-        Console.WriteLine("~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
-        // Now, each file has its own symbol table, and type checking can proceed with this context.
-        foreach (var entry in astCache) {
-            string filePath = entry.Key;
-            ProgramNode ast = entry.Value;
-            SymbolTable fileSymbolTable = _fileSymbolTables[filePath];
+        Console.WriteLine("\n~~~~~~~~~~Symbol Table~~~~~~~~~~");
+        ScopePrinter scopePrinter = new ScopePrinter(_symbolTable);
+        scopePrinter.Print();
 
-            // Pass the specific symbol table for the file to the type checker
-            TypeChecker typeChecker = new TypeChecker(fileSymbolTable);
-            typeChecker.Check(ast);
-        }
+        Console.WriteLine("Finished");
+    }
+
+    private void BuildSymbolTable(ProgramNode ast) {
+        SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(_symbolTable);
+        ast.Accept(symbolTableBuilder);
     }
 }
