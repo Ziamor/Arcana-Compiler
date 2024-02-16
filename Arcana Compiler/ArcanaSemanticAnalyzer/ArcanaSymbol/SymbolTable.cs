@@ -36,8 +36,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
 
         public Symbol? FindSymbol(string name, bool searchAllScopes = true) {
             foreach (var scope in _scopeStack) {
-                if (scope.Symbols.TryGetValue(name, out var symbol)) {
-                    return symbol;
+                if (scope.Symbols.TryGetValue(name, out var symbolList)) {
+                    if (symbolList.Count == 1 || !(symbolList[0] is MethodSymbol)) {
+                        return symbolList[0];
+                    }
                 }
                 if (!searchAllScopes) {
                     break;
@@ -60,33 +62,61 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
             return null;
         }
 
-        private Symbol? FindSymbolInOwnedScope(Symbol symbol, string name) {
-            if (symbol.OwnedScope != null) {
-                if (symbol.OwnedScope.Symbols.TryGetValue(name, out var foundSymbol)) {
-                    return foundSymbol;
-                }
-                // Recursively search in nested scopes
-                foreach (var nestedSymbol in symbol.OwnedScope.Symbols.Values) {
-                    var recursiveFoundSymbol = FindSymbolInOwnedScope(nestedSymbol, name);
-                    if (recursiveFoundSymbol != null) {
-                        return recursiveFoundSymbol;
+        private Symbol? FindSymbolInOwnedScope(List<Symbol> symbols, string name) {
+            foreach (var symbol in symbols) {
+                // Check if the symbol has an owned scope
+                if (symbol.OwnedScope is not null) {
+                    // Iterate through each entry in the owned scope's symbol dictionary
+                    foreach (var entry in symbol.OwnedScope.Symbols) {
+                        var symbolName = entry.Key;
+                        var symbolList = entry.Value;
+
+                        // If the name matches, we need to decide how to handle multiple symbols with the same name
+                        if (symbolName == name) {
+                            // For simplicity, return the first symbol if multiple are found
+                            // This behavior might need to be adjusted based on specific requirements,
+                            // such as handling method overloads more precisely
+                            return symbolList.FirstOrDefault();
+                        }
+
+                        // Recursively search in nested symbols' scopes
+                        foreach (var nestedSymbol in symbolList) {
+                            var recursiveFoundSymbol = FindSymbolInOwnedScope(new List<Symbol> { nestedSymbol }, name);
+                            if (recursiveFoundSymbol != null) {
+                                return recursiveFoundSymbol;
+                            }
+                        }
                     }
                 }
             }
+            // If we reach this point, the symbol was not found in the provided list or any owned scopes
             return null;
         }
     }
-
     public class Scope {
-        public Dictionary<string, Symbol> Symbols { get; } = new Dictionary<string, Symbol>();
+        // Adjust to map names to a list of symbols
+        public Dictionary<string, List<Symbol>> Symbols { get; } = new Dictionary<string, List<Symbol>>();
 
-        // Adds a symbol to this scope
+        // Adds a symbol to this scope, supporting overloads
         public void AddSymbol(Symbol symbol) {
-            if (Symbols.ContainsKey(symbol.Name)) {
-                throw new ArgumentException($"Symbol '{symbol.Name}' already exists in this scope.");
+            if (!Symbols.TryGetValue(symbol.Name, out var symbolList)) {
+                symbolList = new List<Symbol>();
+                Symbols[symbol.Name] = symbolList;
             }
-            Symbols.Add(symbol.Name, symbol);
+
+            // For methods, check for signature uniqueness
+            if (symbol is MethodSymbol methodSymbol) {
+                if (symbolList.Any(s => s is MethodSymbol ms && ms.Signature.Equals(methodSymbol.Signature))) {
+                    throw new ArgumentException($"A method with the same signature '{methodSymbol.Signature}' already exists in this scope.");
+                }
+            } else {
+                // Non-method symbols should not have duplicates
+                if (symbolList.Any()) {
+                    throw new ArgumentException($"Symbol '{symbol.Name}' already exists in this scope.");
+                }
+            }
+
+            symbolList.Add(symbol);
         }
     }
-
 }
