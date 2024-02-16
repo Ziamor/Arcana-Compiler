@@ -73,9 +73,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
 
                         // If the name matches, we need to decide how to handle multiple symbols with the same name
                         if (symbolName == name) {
-                            // For simplicity, return the first symbol if multiple are found
-                            // This behavior might need to be adjusted based on specific requirements,
-                            // such as handling method overloads more precisely
+                            // For now, return the first symbol if multiple are found, need to change later
                             return symbolList.FirstOrDefault();
                         }
 
@@ -94,7 +92,6 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
         }
     }
     public class Scope {
-        // Adjust to map names to a list of symbols
         public Dictionary<string, List<Symbol>> Symbols { get; } = new Dictionary<string, List<Symbol>>();
 
         // Adds a symbol to this scope, supporting overloads
