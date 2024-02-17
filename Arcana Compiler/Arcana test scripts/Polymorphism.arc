@@ -1,5 +1,5 @@
 
-namespace vehicles {
+namespace vehicle {
     public class Vehicle {
         func drive() {
             // Base drive functionality

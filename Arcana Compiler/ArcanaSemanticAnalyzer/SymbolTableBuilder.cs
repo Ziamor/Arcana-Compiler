@@ -25,8 +25,19 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         public void Visit(NamespaceDeclarationNode node) {
-            var namespaceSymbol = new NamespaceSymbol(node.Name.ToString());
-            _symbolTable.AddSymbol(namespaceSymbol); // Add the namespace symbol to the current scope
+            // Check if the namespace already exists
+            var existingNamespaceSymbol = _symbolTable.FindSymbol(node.Name.ToString(), searchAllScopes: false) as NamespaceSymbol;
+
+            NamespaceSymbol namespaceSymbol;
+            if (existingNamespaceSymbol == null) {
+                // If the namespace does not exist, create a new one and add it to the symbol table
+                namespaceSymbol = new NamespaceSymbol(node.Name.ToString());
+                _symbolTable.AddSymbol(namespaceSymbol);
+            } else {
+                // If the namespace already exists, reuse the existing symbol
+                namespaceSymbol = existingNamespaceSymbol;
+            }
+
             _symbolTable.EnterScope(namespaceSymbol); // Enter the new namespace scope
 
             foreach (var classDeclaration in node.ClassDeclarations) {

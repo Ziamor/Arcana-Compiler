@@ -17,6 +17,8 @@
   <ItemGroup>
     <None Remove="Arcana test scripts\Main.arc" />
     <None Remove="arcana test scripts\MethodDeclarationsWithModifiersExample.arc" />
+    <None Remove="Arcana test scripts\VehicleAssembly.arc" />
+    <None Remove="Arcana test scripts\VehicleComponents.arc" />
   </ItemGroup>
 
 </Project>
