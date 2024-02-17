@@ -343,7 +343,7 @@ namespace Arcana_Compiler.ArcanaParser {
                     returnTypes.Add(ParseType());
                 }
             }
-            // For now, we'll assume the method body is empty and just consume the curly braces
+
             Eat(TokenType.OPEN_BRACE);
             List<ASTNode> methodBody = new List<ASTNode>();
             while (_currentToken.Type != TokenType.CLOSE_BRACE) {

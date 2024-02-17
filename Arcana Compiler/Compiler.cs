@@ -12,6 +12,14 @@ public class Compiler {
     public Compiler(Module module) {
         _module = module;
         _symbolTable = new SymbolTable();
+        AddPrimitiveTypes();
+    }
+
+    private void AddPrimitiveTypes() {
+        var primitiveTypes = new[] { "int", "bool", "float", "string" };
+        foreach (var typeName in primitiveTypes) {
+            _symbolTable.AddSymbol(new PrimitiveTypeSymbol(typeName));
+        }
     }
 
     public void Compile() {
@@ -48,6 +56,12 @@ public class Compiler {
         Console.WriteLine("\n~~~~~~~~~~Symbol Table~~~~~~~~~~");
         ScopePrinter scopePrinter = new ScopePrinter(_symbolTable);
         scopePrinter.Print();
+
+        Console.WriteLine("\n~~~~~~~~~~Type Checking~~~~~~~~~~");
+        TypeChecker typeChecker = new TypeChecker(_symbolTable);
+        foreach (var ast in astCache.Values) {
+            ast.Accept(typeChecker);
+        }
 
         Console.WriteLine("Finished");
     }

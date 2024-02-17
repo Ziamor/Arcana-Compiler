@@ -19,6 +19,14 @@
         public override string ToString() => Name;
     }
 
+    public class PrimitiveTypeSymbol : TypeSymbol {
+        public PrimitiveTypeSymbol(string name) : base(name) { }
+
+        public override string ToString() {
+            return $"PrimitiveTypeSymbol: {Name}";
+        }
+    }
+
     public class NamespaceSymbol : Symbol {
         public NamespaceSymbol(string name) : base(name) { }
 

@@ -10,6 +10,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
         {
             ImportedNamespace = importedNamespace;
         }
+
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }

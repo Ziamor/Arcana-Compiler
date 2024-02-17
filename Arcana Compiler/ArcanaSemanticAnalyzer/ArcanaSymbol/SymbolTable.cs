@@ -64,9 +64,7 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
 
         private Symbol? FindSymbolInOwnedScope(List<Symbol> symbols, string name) {
             foreach (var symbol in symbols) {
-                // Check if the symbol has an owned scope
                 if (symbol.OwnedScope is not null) {
-                    // Iterate through each entry in the owned scope's symbol dictionary
                     foreach (var entry in symbol.OwnedScope.Symbols) {
                         var symbolName = entry.Key;
                         var symbolList = entry.Value;
