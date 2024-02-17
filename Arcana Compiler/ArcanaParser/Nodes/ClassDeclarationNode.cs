@@ -12,13 +12,16 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
         public List<ParentTypeNode> ParentTypes { get; private set; } = new List<ParentTypeNode>();
         public List<FieldDeclarationNode> Fields { get; private set; } = new List<FieldDeclarationNode>();
         public List<MethodDeclarationNode> Methods { get; private set; } = new List<MethodDeclarationNode>();
-        public ClassDeclarationNode(IdentifierName qualifiedClassName, string? accessModifier, List<ClassModifierNode> classModifierNodes, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods) {
+        public List<ClassDeclarationNode> NestedClasses { get; internal set; }
+
+        public ClassDeclarationNode(IdentifierName qualifiedClassName, string? accessModifier, List<ClassModifierNode> classModifierNodes, List<ParentTypeNode> parentTypes, List<FieldDeclarationNode> fields, List<MethodDeclarationNode> methods, List<ClassDeclarationNode> nestedClasses) {
             QualifiedClassName = qualifiedClassName;
             AccessModifier = accessModifier ?? "private";
             ClassModifierNodes = classModifierNodes;
             ParentTypes = parentTypes;
             Fields = fields;
             Methods = methods;
+            NestedClasses = nestedClasses;
         }
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);

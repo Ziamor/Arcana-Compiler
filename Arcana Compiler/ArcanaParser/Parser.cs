@@ -144,7 +144,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
             // Concatenate the class name to the namespace
             currentNamespace += className;
-            return new ClassDeclarationNode(currentNamespace, classAccessModifier, classModifiers, parentTypes, fields, methods);
+            return new ClassDeclarationNode(currentNamespace, classAccessModifier, classModifiers, parentTypes, fields, methods, nestedClasses);
         }
 
         private List<ClassModifierNode> ParseClassModifiers() {

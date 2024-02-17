@@ -15,6 +15,34 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
             _imports = new Dictionary<string, ImportDeclarationNode>();
         }
 
+        private void ValidateType(string typeName, string identifier) {
+            // First, try to find the symbol in the current scopes.
+            Symbol? foundSymbol = _symbolTable.FindSymbol(typeName, searchAllScopes: true);
+
+            if (foundSymbol == null) {
+                // If not found, check if the type might be in an imported namespace.
+                bool foundInImports = false;
+
+                foreach (var import in _imports.Values) {
+                    // Construct the fully qualified name to search for, based on the import.
+                    string qualifiedTypeName = $"{import.ImportedNamespace}.{typeName}";
+
+                    // Attempt to find the symbol using the fully qualified name.
+                    foundSymbol = _symbolTable.FindSymbol(qualifiedTypeName, searchAllScopes: true);
+                    if (foundSymbol != null) {
+                        foundInImports = true;
+                        break;
+                    }
+                }
+
+                // If the symbol is still not found, even after checking imports, then it is undefined.
+                if (!foundInImports) {
+                    throw new TypeCheckingException($"Type '{typeName}' for '{identifier}' is not defined or imported.");
+                }
+            }
+        }
+
+
         public void Visit(ProgramNode node) {
             // Reset imports for this file
             _imports.Clear();
@@ -45,14 +73,16 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                 classDeclaration.Accept(this);
             }
 
-            // Assuming similar pattern for interface declarations
             // foreach (var interfaceDeclaration in node.InterfaceDeclarations) {
             //     interfaceDeclaration.Accept(this);
             // }
         }
 
         public void Visit(ClassDeclarationNode node) {
-            // Check fields and methods in class
+            var classSymbol = new ClassSymbol(node.ClassName);
+            _symbolTable.AddSymbol(classSymbol);
+            _symbolTable.EnterScope(classSymbol); // Enter the class scope
+
             foreach (var field in node.Fields) {
                 field.Accept(this);
             }
@@ -61,9 +91,14 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                 method.Accept(this);
             }
 
-            // If there are nested classes, they should also be visited here
-            // Similar pattern as top-level class declarations
+            // Handling nested classes
+            foreach (var nestedClass in node.NestedClasses) {
+                nestedClass.Accept(this);
+            }
+
+            _symbolTable.ExitScope();
         }
+
 
         public void Visit(FieldDeclarationNode node) {
             // Ensure that the field's type is resolvable and valid
@@ -166,18 +201,6 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(DestructuringAssignmentNode node) {
             throw new NotImplementedException();
         }
-
-        private void ValidateType(string typeName, string identifier) {
-            // This method should check if the type is defined in the symbol table or in the imports
-            // It might be a complex type, so consider namespaces and possibly generics if your language supports them
-
-            Symbol? foundSymbol = _symbolTable.FindSymbol(typeName, searchAllScopes: true);
-            if (foundSymbol == null && !_imports.ContainsKey(typeName)) {
-                throw new TypeCheckingException($"Type '{typeName}' for '{identifier}' is not defined or imported.");
-            }
-        }
-
-        // Implement other Visit methods for different node types as needed, especially for expressions
     }
 
     public class TypeCheckingException : Exception {

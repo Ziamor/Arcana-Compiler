@@ -64,7 +64,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
                 method.Accept(this);
             }
 
-            // TODO NESTED CLASSES
+            foreach (var nestedClass in node.NestedClasses) {
+                nestedClass.Accept(this);
+            }
 
             _symbolTable.ExitScope();
         }
