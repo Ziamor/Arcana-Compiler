@@ -35,57 +35,78 @@ public class Compiler {
     }
 
     public void Compile() {
-        Dictionary<string, ProgramNode> astCache = new Dictionary<string, ProgramNode>();
-
         Console.WriteLine("~~~~~~~~~~Syntax Analysis~~~~~~~~~~");
+        var astCache = ParseSourceFiles();
+        BuildSymbolTables(astCache);
+        PerformTypeChecking(astCache);
+        Console.WriteLine("Finished");
+    }
+
+    private Dictionary<string, ProgramNode> ParseSourceFiles() {
+        var astCache = new Dictionary<string, ProgramNode>();
+
         foreach (var filePath in _module.SourceFiles) {
             Console.WriteLine($"Parsing: {filePath}");
             Console.WriteLine($"Source:");
             string sourceCode = File.ReadAllText(filePath);
             Console.WriteLine(sourceCode);
+
             try {
                 _lexer.Initialize(sourceCode);
                 ErrorReporter reporter;
                 ProgramNode ast = _parser.Parse(_lexer, out reporter);
-
                 astCache[filePath] = ast;
 
-                Console.WriteLine("\nAST:");
-                ASTPrinter printer = new ASTPrinter();
-                Console.WriteLine(printer.Print(ast));
-
-                if (reporter.HasErrors) {
-                    Console.WriteLine("\nErrors encountered during parsing:");
-                    foreach (var error in reporter.Errors) {
-                        Console.WriteLine($"{filePath}: {error.Severity} {error.Message} at line {error.LineNumber}, position {error.Position}");
-                    }
-                }
-
-                // Perform Semantic Analysis
-                Console.WriteLine("\n~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
-                BuildSymbolTable(ast);
+                PrintAST(ast);
+                ReportParsingErrors(filePath, reporter);
 
             } catch (ParsingException ex) {
-                string errorMessage = $"{filePath}: {ex.Message}";
-                Console.WriteLine(errorMessage);
+                Console.WriteLine($"{filePath}: {ex.Message}");
                 throw;
             }
         }
 
+        return astCache;
+    }
+
+    private void PrintAST(ProgramNode ast) {
+        Console.WriteLine("\nAST:");
+        ASTPrinter printer = new ASTPrinter();
+        Console.WriteLine(printer.Print(ast));
+    }
+
+    private void ReportParsingErrors(string filePath, ErrorReporter reporter) {
+        if (reporter.HasErrors) {
+            Console.WriteLine("\nErrors encountered during parsing:");
+            foreach (var error in reporter.Errors) {
+                Console.WriteLine($"{filePath}: {error.Severity} {error.Message} at line {error.LineNumber}, position {error.Position}");
+            }
+        }
+    }
+
+    private void BuildSymbolTables(Dictionary<string, ProgramNode> astCache) {
+        Console.WriteLine("\n~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
+        foreach (var ast in astCache.Values) {
+            BuildSymbolTable(ast);
+        }
+        PrintSymbolTable();
+    }
+
+    private void BuildSymbolTable(ProgramNode ast) {
+        _symbolTableBuilder.BuildSymbolTable(ast, _symbolTable);
+    }
+
+    private void PrintSymbolTable() {
         Console.WriteLine("\n~~~~~~~~~~Symbol Table~~~~~~~~~~");
         ScopePrinter scopePrinter = new ScopePrinter(_symbolTable);
         scopePrinter.Print();
+    }
 
+    private void PerformTypeChecking(Dictionary<string, ProgramNode> astCache) {
         Console.WriteLine("\n~~~~~~~~~~Type Checking~~~~~~~~~~");
         TypeChecker typeChecker = new TypeChecker(_symbolTable);
         foreach (var ast in astCache.Values) {
             ast.Accept(typeChecker);
         }
-
-        Console.WriteLine("Finished");
-    }
-
-    private void BuildSymbolTable(ProgramNode ast) {
-        _symbolTableBuilder.BuildSymbolTable(ast, _symbolTable);
     }
 }
