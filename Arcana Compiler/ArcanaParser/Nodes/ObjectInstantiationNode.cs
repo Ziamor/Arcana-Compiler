@@ -1,7 +1,7 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ObjectInstantiationNode : ASTNode {
+    public class ObjectInstantiationNode : ExpressionNode {
         public IdentifierName ClassName { get; private set; }
         public List<ASTNode> ConstructorArguments { get; private set; }
 

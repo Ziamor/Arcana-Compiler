@@ -2,8 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class LiteralNode : ASTNode
-    {
+    public class LiteralNode : ExpressionNode {
         public object Value { get; private set; }
 
         public LiteralNode(object value)

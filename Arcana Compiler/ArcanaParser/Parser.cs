@@ -609,8 +609,8 @@ namespace Arcana_Compiler.ArcanaParser {
             return imports;
         }
 
-        private ASTNode ParseExpression(int parentPrecedence = 0) {
-            ASTNode node;
+        private ExpressionNode ParseExpression(int parentPrecedence = 0) {
+            ExpressionNode node;
             // Handle prefix unary operations first
             if (IsUnaryOperator(_currentToken)) {
                 node = ParseUnaryOperation();
@@ -640,9 +640,9 @@ namespace Arcana_Compiler.ArcanaParser {
         /// This function serves as the base case for the recursive descent parsing of expressions,
         /// handling the most atomic elements that do not contain other expressions.
         /// </summary>
-        /// <returns>An ASTNode representing the parsed primary expression.</returns>
+        /// <returns>An ExpressionNode representing the parsed primary expression.</returns>
         /// <exception cref="UnexpectedTokenException">Thrown when an unexpected token is encountered.</exception>
-        private ASTNode ParsePrimaryExpression() {
+        private ExpressionNode ParsePrimaryExpression() {
             switch (_currentToken.Type) {
                 case TokenType.NUMBER:
                     return ParseNumberLiteral();
@@ -657,7 +657,7 @@ namespace Arcana_Compiler.ArcanaParser {
                     return ParseIdentifierOrMethodCall();
                 case TokenType.OPEN_PARENTHESIS:
                     Eat(TokenType.OPEN_PARENTHESIS);
-                    ASTNode expression = ParseExpression();
+                    ExpressionNode expression = ParseExpression();
                     Eat(TokenType.CLOSE_PARENTHESIS);
                     return expression;
                 case TokenType.NEW:
@@ -705,9 +705,9 @@ namespace Arcana_Compiler.ArcanaParser {
             return node;
         }
 
-        private ASTNode ParseIdentifierOrMethodCall() {
+        private ExpressionNode ParseIdentifierOrMethodCall() {
             IdentifierName qualifiedName = ParseIdentifierName();
-            ASTNode currentNode;
+            ExpressionNode currentNode;
             if (_currentToken.Type == TokenType.OPEN_PARENTHESIS) {
                 currentNode = ParseMethodCall(qualifiedName);
             } else {
@@ -727,7 +727,7 @@ namespace Arcana_Compiler.ArcanaParser {
             return currentNode;
         }
 
-        private ASTNode ParseChainedCall(ASTNode previousNode) {
+        private ExpressionNode ParseChainedCall(ASTNode previousNode) {
             string nextIdentifier = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
 
@@ -759,7 +759,7 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
 
-        private ASTNode ParseUnaryOperation(ASTNode? operand = null) {
+        private ExpressionNode ParseUnaryOperation(ASTNode? operand = null) {
             Token operatorToken = _currentToken;
             bool isPrefix = operand == null;
             UnaryOperatorPosition position = isPrefix ? UnaryOperatorPosition.Prefix : UnaryOperatorPosition.Postfix;
@@ -809,7 +809,7 @@ namespace Arcana_Compiler.ArcanaParser {
             return left;
         }
 
-        private ASTNode ParseThisExpression() {
+        private ExpressionNode ParseThisExpression() {
             Eat(TokenType.THIS);
             ThisExpressionNode thisNode = new ThisExpressionNode();
 

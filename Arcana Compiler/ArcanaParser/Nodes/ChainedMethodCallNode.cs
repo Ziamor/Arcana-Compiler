@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class ChainedMethodCallNode : ASTNode {
+    public class ChainedMethodCallNode : ExpressionNode {
         public ASTNode PreviousNode { get; private set; }
         public MethodCallNode CurrentCall { get; private set; }
 

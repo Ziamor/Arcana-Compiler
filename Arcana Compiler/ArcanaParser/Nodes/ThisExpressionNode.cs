@@ -1,7 +1,7 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ThisExpressionNode : ASTNode {
+    public class ThisExpressionNode : ExpressionNode {
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }

@@ -7,7 +7,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
         Postfix
     }
 
-    public class UnaryOperationNode : ASTNode {
+    public class UnaryOperationNode : ExpressionNode {
         public Token Operator { get; private set; }
         public ASTNode Operand { get; private set; }
         public UnaryOperatorPosition UnaryOperatorPosition { get; private set; }

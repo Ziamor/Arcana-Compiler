@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class NullLiteralNode : ASTNode {
+    public class NullLiteralNode : ExpressionNode {
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }

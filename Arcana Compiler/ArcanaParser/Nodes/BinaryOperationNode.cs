@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class BinaryOperationNode : ASTNode {
+    public class BinaryOperationNode : ExpressionNode {
         public ASTNode Left { get; private set; }
         public Token Operator { get; private set; }
         public ASTNode Right { get; private set; }

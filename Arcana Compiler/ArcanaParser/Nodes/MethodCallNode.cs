@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class MethodCallNode : ASTNode {
+    public class MethodCallNode : ExpressionNode {
         public IdentifierName MethodName { get; private set; }
         public List<ASTNode> Arguments { get; private set; }
 
