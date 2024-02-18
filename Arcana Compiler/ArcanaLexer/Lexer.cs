@@ -179,7 +179,9 @@ namespace Arcana_Compiler.ArcanaLexer {
                     }
                     return CreateToken(TokenType.ASSIGN, "=");
                 default:
-                    throw new Exception($"Unkown token type '{_currentChar}'");
+                    var errorToken = CreateToken(TokenType.ERROR, _currentChar.ToString());
+                    Advance();
+                    return errorToken;
             }
         }
 

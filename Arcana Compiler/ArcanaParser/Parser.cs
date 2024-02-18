@@ -36,6 +36,9 @@ namespace Arcana_Compiler.ArcanaParser
             if (_currentToken.Type == tokenType) {
                 _currentToken = _lexer.GetNextToken();
                 SkipComments();
+            } else if (_currentToken.Type == TokenType.ERROR) {
+                ReportError($"Invalid token encountered: '{_currentToken.Value}'", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Error);
+                _currentToken = _lexer.GetNextToken();
             } else {
                 ReportError($"Expected token of type {tokenType}, but found '{_currentToken.Value}'", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Error);
                 RecoverOrInsertDummyToken(tokenType);

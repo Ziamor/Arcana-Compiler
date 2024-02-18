@@ -1,6 +1,7 @@
 ﻿namespace Arcana_Compiler.Common {
     public enum TokenType {
         EOF, // End of File
+        ERROR, // For when the lexer fails to tokenize
         NUMBER, // A numeric value
         IDENTIFIER, // Variable names
         DOT, // .
