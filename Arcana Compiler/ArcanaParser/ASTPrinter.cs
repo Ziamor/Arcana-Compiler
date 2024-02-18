@@ -255,4 +255,8 @@ public class ASTPrinter : IVisitor {
     public void Visit(ExpressionStatementNode node) {
         node.Expression.Accept(this);
     }
+
+    public void Visit(ErrorStatementNode node) {
+        result.AppendLine($"{indent}Statement parse error");
+    }
 }

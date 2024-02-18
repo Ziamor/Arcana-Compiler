@@ -4,6 +4,7 @@ using Arcana_Compiler.ArcanaParser;
 using Arcana_Compiler.ArcanaModule;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.ArcanaSemanticAnalyzer;
+using Arcana_Compiler.Common;
 
 public class Compiler {
     private Module _module;
@@ -34,13 +35,21 @@ public class Compiler {
             Lexer lexer = new Lexer(sourceCode);
             Parser parser = new Parser(lexer);
             try {
-                ProgramNode ast = parser.Parse();
+                ErrorReporter reporter;
+                ProgramNode ast = parser.Parse(out reporter);
 
                 astCache[filePath] = ast;
 
                 Console.WriteLine("\nAST:");
                 ASTPrinter printer = new ASTPrinter();
                 Console.WriteLine(printer.Print(ast));
+
+                if (reporter.HasErrors) {
+                    Console.WriteLine("\nErrors encountered during parsing:");
+                    foreach (var error in reporter.Errors) {
+                        Console.WriteLine($"{filePath}: {error.Severity} {error.Message} at line {error.LineNumber}, position {error.Position}");
+                    }
+                }
 
                 // Perform Semantic Analysis
                 Console.WriteLine("\n~~~~~~~~~~Semantic Analysis~~~~~~~~~~");

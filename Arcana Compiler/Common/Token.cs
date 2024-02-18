@@ -56,6 +56,8 @@
         FINAL,
         CONST,
         OVERRIDE,
+        WHILE,
+        DO,
         FOR,
         IN
     }
@@ -83,6 +85,8 @@
             { "final", TokenType.FINAL },
             { "const", TokenType.CONST },
             { "override", TokenType.OVERRIDE },
+            { "while", TokenType.WHILE },
+            { "do", TokenType.DO },
             { "for", TokenType.FOR },
             { "in", TokenType.IN },
         };

@@ -1,8 +1,10 @@
 ﻿using Arcana_Compiler.Common;
 using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
+using static Arcana_Compiler.Common.ErrorReporter;
 
-namespace Arcana_Compiler.ArcanaParser {
+namespace Arcana_Compiler.ArcanaParser
+{
     public class ParsingException : Exception {
         public ParsingException(string message) : base(message) { }
     }
@@ -21,6 +23,7 @@ namespace Arcana_Compiler.ArcanaParser {
 
     public class Parser {
         private readonly ILexer _lexer;
+        private readonly ErrorReporter _errorReporter = new ErrorReporter();
         private Token _currentToken;
 
         public Parser(ILexer lexer) {
@@ -34,9 +37,80 @@ namespace Arcana_Compiler.ArcanaParser {
                 _currentToken = _lexer.GetNextToken();
                 SkipComments();
             } else {
-                throw new SyntaxErrorException(tokenType, _currentToken);
+                ReportError($"Expected token of type {tokenType}, but found '{_currentToken.Value}'", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Error);
+                RecoverOrInsertDummyToken(tokenType);
             }
         }
+
+        private void ReportError(string message, int lineNumber, int position, ErrorSeverity severity) {
+            _errorReporter.ReportError(new ParseError(message, lineNumber, position, severity));
+        }
+
+        private void RecoverOrInsertDummyToken(TokenType expectedTokenType) {
+            if (CanInsertDummyToken(expectedTokenType)) {
+                InsertDummyToken(expectedTokenType);
+                return;
+            }
+
+            if (!Recover()) {
+                throw new ParsingException($"Expected token of type {{tokenType}}, but found '{{_currentToken.Value}}'");
+            }
+        }
+
+        private bool CanInsertDummyToken(TokenType expectedTokenType) {
+            switch (expectedTokenType) {
+                case TokenType.SEMICOLON:
+                case TokenType.OPEN_BRACE:
+                case TokenType.CLOSE_BRACE:
+                case TokenType.OPEN_PARENTHESIS:
+                case TokenType.CLOSE_PARENTHESIS:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void InsertDummyToken(TokenType tokenType) {
+            // Create a dummy token of the expected type
+            Token dummyToken = new Token(tokenType, "", _currentToken.LineNumber, _currentToken.Position, _currentToken.LineText);
+
+            // Report the insertion for clarity
+            ReportError($"Inserted dummy token of type {tokenType} to recover from error.", dummyToken.LineNumber, dummyToken.Position, ErrorSeverity.Error);
+
+            // Adjust the parser state as if the expected token was encountered
+            _currentToken = _lexer.GetNextToken(); // Move past the inserted dummy token
+        }
+
+
+        private bool Recover() {
+            _currentToken = _lexer.GetNextToken();
+            while (_currentToken.Type != TokenType.EOF && !IsRecoveryPoint(_currentToken)) {
+                _currentToken = _lexer.GetNextToken();
+            }
+
+            return _currentToken.Type != TokenType.EOF;
+        }
+
+        private bool IsRecoveryPoint(Token token) {
+            switch (token.Type) {
+                case TokenType.FUNC:
+                case TokenType.CLASS:
+                case TokenType.IF:
+                case TokenType.FOR:
+                case TokenType.WHILE:
+                case TokenType.DO:
+                case TokenType.NAMESPACE:
+                case TokenType.INTERFACE:
+                case TokenType.PUBLIC:
+                case TokenType.PRIVATE:
+                case TokenType.PROTECTED:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+
         private Token PeekNextToken(int depth = 1) {
             return _lexer.PeekToken(depth);
         }
@@ -47,7 +121,7 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
-        public ProgramNode Parse() {
+        public ProgramNode Parse(out ErrorReporter errorReporter) {
             ProgramNode rootNode = new ProgramNode();
             rootNode.Imports = ParseImportDeclarations();
 
@@ -77,6 +151,7 @@ namespace Arcana_Compiler.ArcanaParser {
                 rootNode.NamespaceDeclarations.Add(new NamespaceDeclarationNode(new IdentifierName("default"), defaultNamespaceClasses, defaultNamespaceInterfaces));
             }
 
+            errorReporter = _errorReporter;
             return rootNode;
         }
 
@@ -418,7 +493,9 @@ namespace Arcana_Compiler.ArcanaParser {
                             return new ExpressionStatementNode(expression);
                         }
                     default:
-                        throw new UnexpectedTokenException(nextToken);
+                        ReportError($"Unexpected token '{nextToken.Value}' encountered.", nextToken.LineNumber, nextToken.Position, ErrorSeverity.Error);
+                        Recover(); // Attempt to recover
+                        return new ErrorStatementNode();
                 }
             } else {
                 switch (_currentToken.Type) {
@@ -429,7 +506,9 @@ namespace Arcana_Compiler.ArcanaParser {
                     case TokenType.FOR:
                         return ParseForLoop();
                     default:
-                        throw new UnexpectedTokenException(_currentToken);
+                        ReportError($"Unexpected token '{_currentToken.Value}' encountered.", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Error);
+                        Recover(); // Attempt to recover
+                        return new ErrorStatementNode();
                 }
             }
         }

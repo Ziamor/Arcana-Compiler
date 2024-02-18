@@ -185,5 +185,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(ExpressionStatementNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(ErrorStatementNode node) {
+            throw new NotImplementedException();
+        }
     }
 }
