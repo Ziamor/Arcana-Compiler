@@ -14,7 +14,7 @@ namespace common {
             string words = text.split(" ")
             //string[] capitalizedWords = []
             for(int i = 0; i < 5; i++) {
-                //string capitalizedWord = word[0].toUpperCase() + word.substring(1)
+                string capitalizedWord = word[0].toUpperCase() + word.substring(1)
                 capitalizedWords.append(capitalizedWord)
             }
             return capitalizedWords.join(" ")

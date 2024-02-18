@@ -24,6 +24,8 @@
         GREATER_THAN_OR_EQUAL, // >=
         NULL_COALESCING, // ??
         TYPE_CASTING, // ::
+        INCREMENT, // ++
+        DECREMENT, // --
 
         STRING, // "String data"
         OPEN_PARENTHESIS, // (

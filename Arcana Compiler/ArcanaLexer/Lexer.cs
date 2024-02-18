@@ -88,9 +88,17 @@ namespace Arcana_Compiler.ArcanaLexer {
             switch (_currentChar) {
                 case '+':
                     Advance();
+                    if (_currentChar == '+') {
+                        Advance();
+                        return CreateToken(TokenType.INCREMENT, "++");
+                    }
                     return CreateToken(TokenType.PLUS, "+");
                 case '-':
                     Advance();
+                    if (_currentChar == '-') {
+                        Advance();
+                        return CreateToken(TokenType.DECREMENT, "--");
+                    }
                     return CreateToken(TokenType.MINUS, "-");
                 case '*':
                     Advance();

@@ -463,7 +463,7 @@ namespace Arcana_Compiler.ArcanaParser {
             ASTNode initialization = ParseStatement();
             Eat(TokenType.SEMICOLON);
 
-            ASTNode condition = ParseStatement();
+            ASTNode condition = ParseExpression();
             Eat(TokenType.SEMICOLON);
 
             ASTNode increment = ParseExpression();
@@ -611,8 +611,8 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private ASTNode ParseExpression(int parentPrecedence = 0) {
             ASTNode node;
-            // Handle unary operations first
-            if (_currentToken.Type == TokenType.MINUS || _currentToken.Type == TokenType.NOT) {
+            // Handle prefix unary operations first
+            if (IsUnaryOperator(_currentToken)) {
                 node = ParseUnaryOperation();
             } else {
                 node = ParsePrimaryExpression();
@@ -712,6 +712,13 @@ namespace Arcana_Compiler.ArcanaParser {
                 currentNode = ParseMethodCall(qualifiedName);
             } else {
                 currentNode = new VariableAccessNode(qualifiedName);
+
+                // Check for postfix unary operators immediately after variable access or method call
+                if (_currentToken.Type == TokenType.INCREMENT || _currentToken.Type == TokenType.DECREMENT) {
+                    Token operatorToken = _currentToken;
+                    Eat(_currentToken.Type);
+                    currentNode = new UnaryOperationNode(operatorToken, currentNode);
+                }
             }
 
             // Handle chaining after the initial method call or variable access
@@ -757,10 +764,15 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private UnaryOperationNode ParseUnaryOperation() {
             Token operatorToken = _currentToken;
-            Eat(_currentToken.Type);
-            ASTNode operand = ParseExpression();
-            return new UnaryOperationNode(operatorToken, operand);
+            if (IsUnaryOperator(_currentToken)) {
+                Eat(_currentToken.Type);
+                ASTNode operand = ParsePrimaryExpression();
+                return new UnaryOperationNode(operatorToken, operand);
+            } else {
+                throw new SyntaxErrorException("unary operator", _currentToken);
+            }
         }
+
 
         private ASTNode ParseBinaryExpression(int parentPrecedence = 0) {
             ASTNode left = ParsePrimaryExpression(); // Parse the left-hand side
@@ -797,10 +809,18 @@ namespace Arcana_Compiler.ArcanaParser {
             return thisNode;
         }
 
+        private bool IsUnaryOperator(Token token) {
+            return token.Type == TokenType.INCREMENT || token.Type == TokenType.DECREMENT ||
+                   token.Type == TokenType.MINUS || token.Type == TokenType.NOT;
+        }
+
+
         private bool IsBinaryOperator(Token token) {
             return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
                    token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE ||
-                   token.Type == TokenType.EQUALS;
+                   token.Type == TokenType.EQUALS || token.Type == TokenType.LESS_THAN ||
+                   token.Type == TokenType.GREATER_THAN || token.Type == TokenType.LESS_THAN_OR_EQUAL ||
+                   token.Type == TokenType.GREATER_THAN_OR_EQUAL;
         }
 
         private int GetPrecedence(TokenType tokenType) {
@@ -812,6 +832,10 @@ namespace Arcana_Compiler.ArcanaParser {
                 case TokenType.DIVIDE:
                     return 2;
                 case TokenType.EQUALS:
+                case TokenType.LESS_THAN:
+                case TokenType.GREATER_THAN:
+                case TokenType.LESS_THAN_OR_EQUAL:
+                case TokenType.GREATER_THAN_OR_EQUAL:
                     return 3;
                 default:
                     return 0;
