@@ -4,9 +4,7 @@ using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class SymbolTableBuilder : IVisitor, ISymbolTableBuilder {
-#pragma warning disable CS8618 // _symbolTable won't be null
-        private ISymbolTable _symbolTable;
-#pragma warning restore CS8618
+        private ISymbolTable? _symbolTable;
 
         public void BuildSymbolTable(ProgramNode rootNode, ISymbolTable symbolTable) {
             _symbolTable = symbolTable;
@@ -28,6 +26,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         }
 
         public void Visit(NamespaceDeclarationNode node) {
+            if (_symbolTable == null)
+                throw new InvalidOperationException("SymbolTable has not been built. Call BuildSymbolTable() first.");
             // Check if the namespace already exists
             var existingNamespaceSymbol = _symbolTable.FindSymbol(node.Name.ToString(), searchAllScopes: false) as NamespaceSymbol;
 
@@ -56,6 +56,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
 
         public void Visit(ClassDeclarationNode node) {
             var classSymbol = new ClassSymbol(node.ClassName);
+
+            if (_symbolTable == null)
+                throw new InvalidOperationException("SymbolTable has not been built. Call BuildSymbolTable() first.");
             _symbolTable.AddSymbol(classSymbol);
             _symbolTable.EnterScope(classSymbol);
 
@@ -76,6 +79,9 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
 
         public void Visit(FieldDeclarationNode node) {
             var fieldSymbol = new FieldSymbol(node.FieldName, node.FieldType.TypeName);
+
+            if (_symbolTable == null)
+                throw new InvalidOperationException("SymbolTable has not been built. Call BuildSymbolTable() first.");
             _symbolTable.AddSymbol(fieldSymbol);
         }
 
@@ -141,6 +147,8 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
 
             var methodSymbol = new MethodSymbol(signature);
 
+            if (_symbolTable == null)
+                throw new InvalidOperationException("SymbolTable has not been built. Call BuildSymbolTable() first.");
             _symbolTable.AddSymbol(methodSymbol);
         }
 
