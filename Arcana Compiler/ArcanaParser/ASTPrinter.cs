@@ -259,4 +259,8 @@ public class ASTPrinter : IVisitor {
     public void Visit(ErrorStatementNode node) {
         result.AppendLine($"{indent}Statement parse error");
     }
+
+    public void Visit(ArrayAccessNode node) {
+        throw new NotImplementedException();
+    }
 }

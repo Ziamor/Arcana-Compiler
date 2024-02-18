@@ -752,7 +752,11 @@ namespace Arcana_Compiler.ArcanaParser
                 case TokenType.THIS:
                     return ParseThisExpression();
                 case TokenType.IDENTIFIER:
-                    return ParseIdentifierOrMethodCall();
+                    var identifierOrMethodCall = ParseIdentifierOrMethodCall();
+                    if (_currentToken.Type == TokenType.OPEN_BRACKET) {
+                        return ParseArrayAccess(identifierOrMethodCall);
+                    }
+                    return identifierOrMethodCall;
                 case TokenType.OPEN_PARENTHESIS:
                     Eat(TokenType.OPEN_PARENTHESIS);
                     ExpressionNode expression = ParseExpression();
@@ -801,6 +805,14 @@ namespace Arcana_Compiler.ArcanaParser
             LiteralNode node = new LiteralNode(_currentToken.Value);
             Eat(TokenType.STRING);
             return node;
+        }
+
+        private ExpressionNode ParseArrayAccess(ExpressionNode array) {
+            Eat(TokenType.OPEN_BRACKET);
+            ExpressionNode index = ParseExpression();
+            Eat(TokenType.CLOSE_BRACKET);
+
+            return new ArrayAccessNode(array, index);
         }
 
         private ExpressionNode ParseIdentifierOrMethodCall() {

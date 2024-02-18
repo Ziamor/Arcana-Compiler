@@ -35,5 +35,6 @@ namespace Arcana_Compiler.Common {
         void Visit(ForEachLoopNode node);
         void Visit(ExpressionStatementNode node);
         void Visit(ErrorStatementNode node);
+        void Visit(ArrayAccessNode node);
     }
 }
