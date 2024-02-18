@@ -613,7 +613,7 @@ namespace Arcana_Compiler.ArcanaParser {
             ASTNode node;
             // Handle prefix unary operations first
             if (IsUnaryOperator(_currentToken)) {
-                node = ParseUnaryPrefixOperation();
+                node = ParseUnaryOperation();
             } else {
                 node = ParsePrimaryExpression();
             }
@@ -713,11 +713,8 @@ namespace Arcana_Compiler.ArcanaParser {
             } else {
                 currentNode = new VariableAccessNode(qualifiedName);
 
-                // Check for postfix unary operators immediately after variable access or method call
-                if (_currentToken.Type == TokenType.INCREMENT || _currentToken.Type == TokenType.DECREMENT) {
-                    Token operatorToken = _currentToken;
-                    Eat(_currentToken.Type);
-                    currentNode = new UnaryOperationNode(operatorToken, currentNode, UnaryOperatorPosition.Postfix);
+                if (IsPostfixUnaryOperator(_currentToken)) {
+                    currentNode = ParseUnaryOperation(currentNode);
                 }
             }
 
@@ -762,17 +759,34 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
 
-        private UnaryOperationNode ParseUnaryPrefixOperation() {
+        private ASTNode ParseUnaryOperation(ASTNode? operand = null) {
             Token operatorToken = _currentToken;
-            if (IsUnaryOperator(_currentToken)) {
-                Eat(_currentToken.Type);
-                ASTNode operand = ParsePrimaryExpression();
-                return new UnaryOperationNode(operatorToken, operand, UnaryOperatorPosition.Prefix);
-            } else {
-                throw new SyntaxErrorException("unary operator", _currentToken);
-            }
-        }
+            bool isPrefix = operand == null;
+            UnaryOperatorPosition position = isPrefix ? UnaryOperatorPosition.Prefix : UnaryOperatorPosition.Postfix;
 
+            if (isPrefix) {
+                Eat(operatorToken.Type);
+                operand = ParseExpression();
+
+                if (operand is UnaryOperationNode unaryOperand) {
+                    // e.g --i++
+                    throw new ParsingException($"Chaining unary operators is not allowed at line {operatorToken.LineNumber}, position {operatorToken.Position}.");
+                }
+            } else {
+                // For postfix, since operand is already parsed, simply check if the next token is a unary operator, e.g --i++
+                if (IsPostfixUnaryOperator(PeekNextToken())) {
+                    throw new ParsingException($"Chaining unary operators is not allowed at line {operatorToken.LineNumber}, position {operatorToken.Position}.");
+                }
+
+                Eat(operatorToken.Type);
+            }
+
+            if (operand == null) {
+                throw new InvalidOperationException("Unary operation missing operand.");
+            }
+
+            return new UnaryOperationNode(operatorToken, operand, position);
+        }
 
         private ASTNode ParseBinaryExpression(int parentPrecedence = 0) {
             ASTNode left = ParsePrimaryExpression(); // Parse the left-hand side
@@ -814,6 +828,9 @@ namespace Arcana_Compiler.ArcanaParser {
                    token.Type == TokenType.MINUS || token.Type == TokenType.NOT;
         }
 
+        private bool IsPostfixUnaryOperator(Token token) {
+            return token.Type == TokenType.INCREMENT || token.Type == TokenType.DECREMENT;
+        }
 
         private bool IsBinaryOperator(Token token) {
             return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
