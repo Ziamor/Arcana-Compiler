@@ -165,6 +165,12 @@ namespace Arcana_Compiler.ArcanaLexer {
                 case ')':
                     Advance();
                     return CreateToken(TokenType.CLOSE_PARENTHESIS, ")");
+                case '[':
+                    Advance();
+                    return CreateToken(TokenType.OPEN_BRACKET, "[");
+                case ']':
+                    Advance();
+                    return CreateToken(TokenType.CLOSE_BRACKET, "]");
                 case '!':
                     Advance();
                     if (_currentChar == '=') {
