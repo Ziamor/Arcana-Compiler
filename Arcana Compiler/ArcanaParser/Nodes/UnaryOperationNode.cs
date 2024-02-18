@@ -2,19 +2,33 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
+    public enum UnaryOperatorPosition {
+        Prefix,
+        Postfix
+    }
+
     public class UnaryOperationNode : ASTNode {
         public Token Operator { get; private set; }
         public ASTNode Operand { get; private set; }
+        public UnaryOperatorPosition UnaryOperatorPosition { get; private set; }
 
-        public UnaryOperationNode(Token operatorToken, ASTNode operand) {
+        public UnaryOperationNode(Token operatorToken, ASTNode operand, UnaryOperatorPosition unaryOperatorPosition) {
             Operator = operatorToken;
             Operand = operand;
+            UnaryOperatorPosition = unaryOperatorPosition;
         }
         public override void Accept(IVisitor visitor) {
             visitor.Visit(this);
         }
         public override string ToString() {
-            return $"Unary Operation: {Operator.Value} {Operand}";
+            switch (UnaryOperatorPosition) {
+                case UnaryOperatorPosition.Prefix:
+                    return $"Unary Operation: {Operator.Value} {Operand}";
+                case UnaryOperatorPosition.Postfix:
+                    return $"Unary Operation: {Operand} {Operator.Value}";
+                default:
+                    throw new InvalidOperationException("Unknown unary operator position.");
+            }
         }
 
         public override bool Equals(object? obj) {

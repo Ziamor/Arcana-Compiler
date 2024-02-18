@@ -613,7 +613,7 @@ namespace Arcana_Compiler.ArcanaParser {
             ASTNode node;
             // Handle prefix unary operations first
             if (IsUnaryOperator(_currentToken)) {
-                node = ParseUnaryOperation();
+                node = ParseUnaryPrefixOperation();
             } else {
                 node = ParsePrimaryExpression();
             }
@@ -717,7 +717,7 @@ namespace Arcana_Compiler.ArcanaParser {
                 if (_currentToken.Type == TokenType.INCREMENT || _currentToken.Type == TokenType.DECREMENT) {
                     Token operatorToken = _currentToken;
                     Eat(_currentToken.Type);
-                    currentNode = new UnaryOperationNode(operatorToken, currentNode);
+                    currentNode = new UnaryOperationNode(operatorToken, currentNode, UnaryOperatorPosition.Postfix);
                 }
             }
 
@@ -762,12 +762,12 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
 
-        private UnaryOperationNode ParseUnaryOperation() {
+        private UnaryOperationNode ParseUnaryPrefixOperation() {
             Token operatorToken = _currentToken;
             if (IsUnaryOperator(_currentToken)) {
                 Eat(_currentToken.Type);
                 ASTNode operand = ParsePrimaryExpression();
-                return new UnaryOperationNode(operatorToken, operand);
+                return new UnaryOperationNode(operatorToken, operand, UnaryOperatorPosition.Prefix);
             } else {
                 throw new SyntaxErrorException("unary operator", _currentToken);
             }
