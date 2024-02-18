@@ -1,6 +1,4 @@
-﻿using Arcana_Compiler.ArcanaParser;
-
-namespace Arcana_Compiler.Common {
+﻿namespace Arcana_Compiler.Common {
     public class ErrorReporter {
         public enum ErrorSeverity {
             Warning, // Non-critical issues, code can still compile.

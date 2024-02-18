@@ -1,6 +1,4 @@
-﻿using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
-
-namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
+﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public class SymbolTable {
         internal Scope _globalScope = new Scope();
         private Stack<Scope> _scopeStack = new Stack<Scope>();

@@ -1,8 +1,5 @@
 ﻿using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
-using System;
-using System.Linq;
-using System.Collections.Generic;
 using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {

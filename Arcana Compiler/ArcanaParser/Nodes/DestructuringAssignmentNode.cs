@@ -1,6 +1,4 @@
 ﻿using Arcana_Compiler.Common;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class DestructuringAssignmentNode : StatementNode {

@@ -1,5 +1,4 @@
-﻿using Arcana_Compiler.ArcanaParser.Nodes;
-using Arcana_Compiler.Common;
+﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ThisAssignmentNode : StatementNode {

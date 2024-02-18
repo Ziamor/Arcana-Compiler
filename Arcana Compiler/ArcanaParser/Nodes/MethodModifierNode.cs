@@ -1,5 +1,4 @@
 ﻿using Arcana_Compiler.Common;
-using System;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class MethodModifierNode : ASTNode {
