@@ -141,6 +141,9 @@ namespace Arcana_Compiler.ArcanaLexer {
                         return CreateToken(TokenType.TYPE_CASTING, "::");
                     }
                     return CreateToken(TokenType.COLON, ":");
+                case ';':
+                    Advance();
+                    return CreateToken(TokenType.SEMICOLON, ";");
                 case '{':
                     Advance();
                     return CreateToken(TokenType.OPEN_BRACE, "{");

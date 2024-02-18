@@ -200,4 +200,56 @@ public class ASTPrinter : IVisitor {
     public void Visit(DestructuringAssignmentNode node) {
         result.AppendLine($"{indent}{node}");
     }
+
+    public void Visit(ForLoopNode node) {
+        result.AppendLine($"{indent}For Loop:");
+        IncreaseIndent();
+
+        // Print initialization
+        result.AppendLine($"{indent}Initialization: {PrintExpression(node.Initialization)}");
+
+        // Print condition
+        result.AppendLine($"{indent}Condition: {PrintExpression(node.Condition)}");
+
+        // Print increment
+        result.AppendLine($"{indent}Increment: {PrintExpression(node.Increment)}");
+
+        // Print body
+        result.AppendLine($"{indent}Body:");
+        IncreaseIndent();
+        foreach (var statement in node.Body) {
+            statement.Accept(this);
+        }
+        if (node.Body.Count == 0) {
+            result.AppendLine(indent + "Empty");
+        }
+        DecreaseIndent();
+
+        DecreaseIndent();
+    }
+
+    public void Visit(ForEachLoopNode node) {
+        result.AppendLine($"{indent}ForEach Loop:");
+        IncreaseIndent();
+
+        // Print variable
+        result.AppendLine($"{indent}Variable: {node.Variable.Name} ({node.Variable.Type})");
+
+        // Print collection
+        result.AppendLine($"{indent}Collection: {PrintExpression(node.Collection)}");
+
+        // Print body
+        result.AppendLine($"{indent}Body:");
+        IncreaseIndent();
+        foreach (var statement in node.Body) {
+            statement.Accept(this);
+        }
+        if (node.Body.Count == 0) {
+            result.AppendLine(indent + "Empty");
+        }
+        DecreaseIndent();
+
+        DecreaseIndent();
+    }
+
 }

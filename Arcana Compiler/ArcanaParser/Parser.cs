@@ -422,11 +422,61 @@ namespace Arcana_Compiler.ArcanaParser {
                         return ParseIfStatement();
                     case TokenType.THIS:
                         return ParseThisAssignment();
+                    case TokenType.FOR:
+                        return ParseForLoop();
                     default:
                         throw new UnexpectedTokenException(_currentToken);
                 }
             }
         }
+
+        private ASTNode ParseForLoop() {
+            Eat(TokenType.FOR);
+            Eat(TokenType.OPEN_PARENTHESIS);
+
+            Token nextToken = PeekNextToken();
+            if (nextToken.Type == TokenType.IN) {
+                return ParseForEachLoop();
+            } else {
+                return ParseTraditionalForLoop();
+            }
+        }
+
+        private ForEachLoopNode ParseForEachLoop() {
+            string variableName = _currentToken.Value;
+            Eat(TokenType.IDENTIFIER);
+            Eat(TokenType.IN);
+
+            ASTNode collection = ParseExpression();
+
+            Eat(TokenType.CLOSE_PARENTHESIS);
+
+            Eat(TokenType.OPEN_BRACE);
+            List<ASTNode> body = ParseBlockOrStatement();
+            Eat(TokenType.CLOSE_BRACE);
+
+            VariableDeclarationNode variableDeclaration = new VariableDeclarationNode(new TypeNode("var", false), variableName, null);
+            return new ForEachLoopNode(variableDeclaration, collection, body);
+        }
+
+        private ForLoopNode ParseTraditionalForLoop() {
+            ASTNode initialization = ParseStatement();
+            Eat(TokenType.SEMICOLON);
+
+            ASTNode condition = ParseStatement();
+            Eat(TokenType.SEMICOLON);
+
+            ASTNode increment = ParseExpression();
+
+            Eat(TokenType.CLOSE_PARENTHESIS);
+
+            Eat(TokenType.OPEN_BRACE);
+            List<ASTNode> body = ParseBlockOrStatement();
+            Eat(TokenType.CLOSE_BRACE);
+
+            return new ForLoopNode(initialization, condition, increment, body);
+        }
+
         private ASTNode ParseThisAssignment() {
             Eat(TokenType.THIS);
             Eat(TokenType.DOT);
@@ -749,7 +799,8 @@ namespace Arcana_Compiler.ArcanaParser {
 
         private bool IsBinaryOperator(Token token) {
             return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
-                   token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE;
+                   token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE ||
+                   token.Type == TokenType.EQUALS;
         }
 
         private int GetPrecedence(TokenType tokenType) {
@@ -760,6 +811,8 @@ namespace Arcana_Compiler.ArcanaParser {
                 case TokenType.MULTIPLY:
                 case TokenType.DIVIDE:
                     return 2;
+                case TokenType.EQUALS:
+                    return 3;
                 default:
                     return 0;
             }

@@ -31,6 +31,7 @@ namespace Arcana_Compiler.Common {
         void Visit(IfStatementNode node);
         void Visit(ReturnStatementNode node);
         void Visit(DestructuringAssignmentNode node);
-
+        void Visit(ForLoopNode node);
+        void Visit(ForEachLoopNode node);
     }
 }

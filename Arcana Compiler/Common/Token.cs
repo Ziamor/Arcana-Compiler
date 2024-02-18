@@ -7,6 +7,7 @@
         COMMA, // ,
         QUESTION_MARK, // ?
         COLON, // :
+        SEMICOLON, // ;
 
         /*Operators*/
         NOT, // !
@@ -53,6 +54,8 @@
         FINAL,
         CONST,
         OVERRIDE,
+        FOR,
+        IN
     }
 
     public struct Token {
@@ -78,6 +81,8 @@
             { "final", TokenType.FINAL },
             { "const", TokenType.CONST },
             { "override", TokenType.OVERRIDE },
+            { "for", TokenType.FOR },
+            { "in", TokenType.IN },
         };
 
         public TokenType Type { get; }
