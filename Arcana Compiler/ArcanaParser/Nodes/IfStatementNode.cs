@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class IfStatementNode : ASTNode {
+    public class IfStatementNode : StatementNode {
         public List<(ASTNode Condition, List<ASTNode> Statements)> ConditionsAndStatements { get; }
         public List<ASTNode>? ElseStatements { get; }
 

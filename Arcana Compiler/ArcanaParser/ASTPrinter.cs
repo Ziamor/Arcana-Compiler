@@ -252,4 +252,7 @@ public class ASTPrinter : IVisitor {
         DecreaseIndent();
     }
 
+    public void Visit(ExpressionStatementNode node) {
+        node.Expression.Accept(this);
+    }
 }

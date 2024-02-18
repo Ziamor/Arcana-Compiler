@@ -1,7 +1,7 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ForLoopNode : ASTNode {
+    public class ForLoopNode : StatementNode {
         public ASTNode Initialization { get; private set; }
         public ASTNode Condition { get; private set; }
         public ASTNode Increment { get; private set; }

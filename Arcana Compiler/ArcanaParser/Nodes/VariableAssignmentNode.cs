@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class VariableAssignmentNode : ASTNode {
+    public class VariableAssignmentNode : StatementNode {
         public string VariableName { get; private set; }
         public ASTNode AssignedExpression { get; private set; }
 

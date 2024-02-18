@@ -400,19 +400,23 @@ namespace Arcana_Compiler.ArcanaParser {
 
             return new ReturnStatementNode(returnExpressions);
         }
-        private ASTNode ParseStatement() {
+        private StatementNode ParseStatement() {
             if (_currentToken.Type == TokenType.IDENTIFIER) {
                 // Peek next token to decide between declaration, assignment, or method call
                 Token nextToken = PeekNextToken();
                 switch (nextToken.Type) {
                     case TokenType.IDENTIFIER:
                         return ParseVariableDeclaration();
-                    case TokenType.DOT:
-                        return ParseIdentifierOrMethodCall();
+                    case TokenType.DOT: {
+                            ExpressionNode expression = ParseIdentifierOrMethodCall();
+                            return new ExpressionStatementNode(expression);
+                        }
                     case TokenType.ASSIGN:
                         return ParseVariableAssignment();
-                    case TokenType.OPEN_PARENTHESIS:
-                        return ParseMethodCall(ParseIdentifierName());
+                    case TokenType.OPEN_PARENTHESIS: {
+                            ExpressionNode expression = ParseMethodCall(ParseIdentifierName());
+                            return new ExpressionStatementNode(expression);
+                        }
                     default:
                         throw new UnexpectedTokenException(nextToken);
                 }
@@ -430,7 +434,7 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
-        private ASTNode ParseForLoop() {
+        private StatementNode ParseForLoop() {
             Eat(TokenType.FOR);
             Eat(TokenType.OPEN_PARENTHESIS);
 
@@ -477,7 +481,7 @@ namespace Arcana_Compiler.ArcanaParser {
             return new ForLoopNode(initialization, condition, increment, body);
         }
 
-        private ASTNode ParseThisAssignment() {
+        private StatementNode ParseThisAssignment() {
             Eat(TokenType.THIS);
             Eat(TokenType.DOT);
             IdentifierName identifierName = ParseIdentifierName();
@@ -491,7 +495,7 @@ namespace Arcana_Compiler.ArcanaParser {
                 throw new UnexpectedTokenException(_currentToken);
             }
         }
-        private ASTNode ParseVariableDeclaration() {
+        private StatementNode ParseVariableDeclaration() {
             List<(TypeNode Type, string Name)> tempDeclarations = new List<(TypeNode, string)>();
             bool expectComma;
 
@@ -530,7 +534,7 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
 
-        private ASTNode ParseVariableAssignment() {
+        private StatementNode ParseVariableAssignment() {
             string variableName = _currentToken.Value;
             Eat(TokenType.IDENTIFIER);
             Eat(TokenType.ASSIGN);

@@ -1,7 +1,7 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ForEachLoopNode : ASTNode {
+    public class ForEachLoopNode : StatementNode {
         public VariableDeclarationNode Variable { get; private set; }
         public ASTNode Collection { get; private set; }
         public List<ASTNode> Body { get; private set; }

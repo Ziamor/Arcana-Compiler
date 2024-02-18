@@ -2,7 +2,7 @@
 using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ThisAssignmentNode : ASTNode {
+    public class ThisAssignmentNode : StatementNode {
         public IdentifierName IdentifierName { get; private set; }
         public ASTNode ValueExpression { get; private set; }
 

@@ -33,5 +33,6 @@ namespace Arcana_Compiler.Common {
         void Visit(DestructuringAssignmentNode node);
         void Visit(ForLoopNode node);
         void Visit(ForEachLoopNode node);
+        void Visit(ExpressionStatementNode node);
     }
 }

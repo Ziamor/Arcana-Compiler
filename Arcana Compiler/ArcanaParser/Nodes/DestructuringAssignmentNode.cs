@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class DestructuringAssignmentNode : ASTNode {
+    public class DestructuringAssignmentNode : StatementNode {
         public List<VariableDeclarationNode> VariableDeclarations { get; private set; }
         public ASTNode AssignedExpression { get; private set; }
 
