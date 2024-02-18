@@ -2,7 +2,7 @@
     namespace Arcana_Compiler.ArcanaModule {
         public class SingleFileModuleLoader : IModuleLoader {
 
-            public Module LoadModule(string filePath) {
+            public IModule LoadModule(string filePath) {
                 string path = Path.GetDirectoryName(filePath) ?? throw new ArgumentException("The file path is invalid or not in a recognized format.", nameof(filePath));
                 Module module = new Module(path);
                 AddSourceFileToModule(module, filePath);
@@ -10,7 +10,7 @@
                 return module;
             }
 
-            private void AddSourceFileToModule(Module module, string filePath) {
+            private void AddSourceFileToModule(IModule module, string filePath) {
                 if (File.Exists(filePath)) {
                     module.AddSourceFile(filePath);
                 } else {
@@ -18,11 +18,11 @@
                 }
             }
 
-            public void DiscoverSourceFiles(Module module) {
+            public void DiscoverSourceFiles(IModule module) {
                 throw new NotSupportedException("DiscoverSourceFiles is not supported in SingleFileModuleLoader.");
             }
 
-            public void ResolveDependencies(Module module) {
+            public void ResolveDependencies(IModule module) {
             }
         }
     }

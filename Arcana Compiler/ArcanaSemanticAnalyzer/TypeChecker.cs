@@ -4,10 +4,10 @@ using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
     public class TypeChecker : IVisitor {
-        private readonly SymbolTable _symbolTable;
+        private readonly ISymbolTable _symbolTable;
         private readonly Dictionary<string, ImportDeclarationNode> _imports;
 
-        public TypeChecker(SymbolTable symbolTable) {
+        public TypeChecker(ISymbolTable symbolTable) {
             _symbolTable = symbolTable;
             _imports = new Dictionary<string, ImportDeclarationNode>();
         }

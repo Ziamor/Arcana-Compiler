@@ -3,11 +3,14 @@ using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 
 namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
-    public class SymbolTableBuilder : IVisitor {
-        private readonly SymbolTable _symbolTable;
+    public class SymbolTableBuilder : IVisitor, ISymbolTableBuilder {
+#pragma warning disable CS8618 // _symbolTable won't be null
+        private ISymbolTable _symbolTable;
+#pragma warning restore CS8618
 
-        public SymbolTableBuilder(SymbolTable symbolTable) {
+        public void BuildSymbolTable(ProgramNode rootNode, ISymbolTable symbolTable) {
             _symbolTable = symbolTable;
+            Visit(rootNode);
         }
 
         public void Visit(ProgramNode node) {

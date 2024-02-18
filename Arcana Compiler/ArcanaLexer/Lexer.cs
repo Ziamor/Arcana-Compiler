@@ -3,25 +3,26 @@ using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaLexer {
     public class Lexer : ILexer {
-        private readonly string _input;
-        private readonly string[] _lines;
+        private string _input = "";
+        private string[] _lines = [];
         private int _position;
         private char _currentChar;
         private int _currentLine;
         private int _currentLinePosition;
         private int _currentTokenLength;
-
         private readonly Queue<Token> _tokenCache = new Queue<Token>();
 
-        public Lexer(string input) {
+        public void Initialize(string input) {
             _input = input.Replace("\r\n", "\n");
             _lines = _input.Split('\n');
             _position = 0;
-            _currentChar = _input[_position];
             _currentLine = 1;
             _currentLinePosition = 1;
             _currentTokenLength = 0;
+            _currentChar = _input.Length > 0 ? _input[_position] : '\0';
+            _tokenCache.Clear();
         }
+
         private void Advance() {
             _currentTokenLength++;
 

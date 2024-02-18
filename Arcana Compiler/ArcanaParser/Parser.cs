@@ -21,18 +21,15 @@ namespace Arcana_Compiler.ArcanaParser
            : base($"Expected {expected}, but found '{found.Value}' of type {found.Type} at line {found.LineNumber}, position {found.Position}. Line: '{found.LineText.Trim()}'.") { }
     }
 
-    public class Parser {
-        private readonly ILexer _lexer;
+    public class Parser : IParser {
+        private ILexer? _lexer;
         private readonly ErrorReporter _errorReporter = new ErrorReporter();
         private Token _currentToken;
 
-        public Parser(ILexer lexer) {
-            _lexer = lexer;
-            _currentToken = _lexer.GetNextToken(); // Initialize with the first token
-            SkipComments(); // Skip any comments
-        }
-
         private void Eat(TokenType tokenType) {
+            if (_lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
             if (_currentToken.Type == tokenType) {
                 _currentToken = _lexer.GetNextToken();
                 SkipComments();
@@ -80,12 +77,20 @@ namespace Arcana_Compiler.ArcanaParser
             // Report the insertion for clarity
             ReportError($"Inserted dummy token of type {tokenType} to recover from error.", dummyToken.LineNumber, dummyToken.Position, ErrorSeverity.Error);
 
+            if (_lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
+
             // Adjust the parser state as if the expected token was encountered
             _currentToken = _lexer.GetNextToken(); // Move past the inserted dummy token
         }
 
 
         private bool Recover() {
+            if (_lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
+
             _currentToken = _lexer.GetNextToken();
             while (_currentToken.Type != TokenType.EOF && !IsRecoveryPoint(_currentToken)) {
                 _currentToken = _lexer.GetNextToken();
@@ -115,6 +120,9 @@ namespace Arcana_Compiler.ArcanaParser
 
 
         private Token PeekNextToken(int depth = 1) {
+            if (_lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
             return _lexer.PeekToken(depth);
         }
 
@@ -124,7 +132,11 @@ namespace Arcana_Compiler.ArcanaParser
             }
         }
 
-        public ProgramNode Parse(out ErrorReporter errorReporter) {
+        public ProgramNode Parse(ILexer lexer, out ErrorReporter errorReporter) {
+            _lexer = lexer;
+            _currentToken = _lexer.GetNextToken(); // Initialize with the first token
+            SkipComments(); // Skip any comments
+
             ProgramNode rootNode = new ProgramNode();
             rootNode.Imports = ParseImportDeclarations();
 

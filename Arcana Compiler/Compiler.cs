@@ -7,12 +7,23 @@ using Arcana_Compiler.ArcanaSemanticAnalyzer;
 using Arcana_Compiler.Common;
 
 public class Compiler {
-    private Module _module;
-    private SymbolTable _symbolTable;
+    private IModule _module;
 
-    public Compiler(Module module) {
+    private IParser _parser;
+    private ILexer _lexer;
+
+    private ISymbolTableBuilder _symbolTableBuilder;
+    private ISymbolTable _symbolTable;
+
+    public Compiler(IModule module, IParser parser, ILexer lexer, ISymbolTable symbolTable, ISymbolTableBuilder symbolTableBuilder) {
         _module = module;
-        _symbolTable = new SymbolTable();
+
+        _parser = parser;
+        _lexer = lexer;
+
+        _symbolTable = symbolTable;
+        _symbolTableBuilder = symbolTableBuilder;
+
         AddPrimitiveTypes();
     }
 
@@ -32,11 +43,10 @@ public class Compiler {
             Console.WriteLine($"Source:");
             string sourceCode = File.ReadAllText(filePath);
             Console.WriteLine(sourceCode);
-            Lexer lexer = new Lexer(sourceCode);
-            Parser parser = new Parser(lexer);
             try {
+                _lexer.Initialize(sourceCode);
                 ErrorReporter reporter;
-                ProgramNode ast = parser.Parse(out reporter);
+                ProgramNode ast = _parser.Parse(_lexer, out reporter);
 
                 astCache[filePath] = ast;
 
@@ -76,7 +86,6 @@ public class Compiler {
     }
 
     private void BuildSymbolTable(ProgramNode ast) {
-        SymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder(_symbolTable);
-        ast.Accept(symbolTableBuilder);
+        _symbolTableBuilder.BuildSymbolTable(ast, _symbolTable);
     }
 }

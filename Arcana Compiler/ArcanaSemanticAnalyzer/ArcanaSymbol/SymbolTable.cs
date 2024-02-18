@@ -1,7 +1,19 @@
 ﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
-    public class SymbolTable {
-        internal Scope _globalScope = new Scope();
+    public interface ISymbolTable {
+        Scope GlobalScope { get; }
+        void EnterScope(Symbol symbol);
+        void ExitScope();
+        void AddSymbol(Symbol symbol);
+        Symbol? FindSymbol(string name, bool searchAllScopes = true);
+    }
+
+    public class SymbolTable : ISymbolTable {
+        internal Scope _globalScope { get; } = new Scope();
+
+        public Scope GlobalScope { get { return _globalScope; } }
+
         private Stack<Scope> _scopeStack = new Stack<Scope>();
+
 
         public SymbolTable() {
             // Initialize with the global scope at the base of the stack

@@ -1,29 +1,26 @@
 ﻿namespace Arcana_Compiler.ArcanaModule {
-    public class Module
-    {
+
+    public class Module : IModule {
         public string Name { get; set; }
         public string Path { get; set; }
-        public List<string> SourceFiles { get; set; } = new List<string>();
-        public List<Module> Dependencies { get; set; } = new List<Module>();
+        private List<string> _sourceFiles = new List<string>();
+        public IEnumerable<string> SourceFiles => _sourceFiles.AsReadOnly();
+        public List<IModule> _dependencies { get; set; } = new List<IModule>();
+        public IEnumerable<IModule> Dependencies => _dependencies.AsReadOnly();
 
-        public Module(string path)
-        {
+        public Module(string path) {
             Path = path;
             Name = new DirectoryInfo(path).Name;
         }
 
-        public void AddSourceFile(string filePath)
-        {
-            SourceFiles.Add(filePath);
+        public void AddSourceFile(string filePath) {
+            _sourceFiles.Add(filePath);
         }
 
-        public void AddDependency(Module module)
-        {
-            if (!Dependencies.Contains(module))
-            {
-                Dependencies.Add(module);
+        public void AddDependency(IModule module) {
+            if (!_dependencies.Contains(module)) {
+                _dependencies.Add(module);
             }
         }
     }
-
 }

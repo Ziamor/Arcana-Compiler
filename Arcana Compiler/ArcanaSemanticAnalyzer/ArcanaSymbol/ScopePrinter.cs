@@ -1,13 +1,13 @@
 ﻿namespace Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol {
     public class ScopePrinter {
-        private readonly SymbolTable _symbolTable;
+        private readonly ISymbolTable _symbolTable;
 
-        public ScopePrinter(SymbolTable symbolTable) {
+        public ScopePrinter(ISymbolTable symbolTable) {
             _symbolTable = symbolTable;
         }
 
         public void Print() {
-            PrintScope(_symbolTable._globalScope, 0);
+            PrintScope(_symbolTable.GlobalScope, 0);
         }
 
         private void PrintScope(Scope scope, int level) {

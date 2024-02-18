@@ -1,7 +1,7 @@
 ﻿namespace Arcana_Compiler.ArcanaModule {
     public interface IModuleLoader {
-        Module LoadModule(string rootPath);
-        void DiscoverSourceFiles(Module module);
-        void ResolveDependencies(Module module);
+        IModule LoadModule(string rootPath);
+        void DiscoverSourceFiles(IModule module);
+        void ResolveDependencies(IModule module);
     }
 }
