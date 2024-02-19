@@ -97,13 +97,17 @@ namespace Arcana_Compiler.ArcanaParser
                 throw new InvalidOperationException("Lexer has not been initialized.");
             }
 
+            TokenType originalTokenType = _currentToken.Type;
+            int originalLineNumber = _currentToken.LineNumber;
+            int originalPosition = _currentToken.Position;
+
             _currentToken = _lexer.GetNextToken();
             while (_currentToken.Type != TokenType.EOF && !IsRecoveryPoint(_currentToken)) {
                 _currentToken = _lexer.GetNextToken();
             }
 
             if (_currentToken.Type == TokenType.EOF) {
-                ReportError("Unexpected end of file during recovery.", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Fatal);
+                ReportError($"Unexpected end of file during recovery for token of type {originalTokenType}.", originalLineNumber, originalPosition, ErrorSeverity.Fatal);
             }
 
             return _currentToken.Type != TokenType.EOF;
@@ -719,28 +723,46 @@ namespace Arcana_Compiler.ArcanaParser
 
         private ExpressionNode ParseExpression(int parentPrecedence = 0) {
             ExpressionNode node;
-            // Handle prefix unary operations first
+            // Initial parsing as before
             if (IsUnaryOperator(_currentToken)) {
                 node = ParseUnaryOperation();
             } else {
                 node = ParsePrimaryExpression();
             }
 
-            // Now handle binary operations
+            // Handling binary operations as before
             while (IsBinaryOperator(_currentToken) && GetPrecedence(_currentToken.Type) > parentPrecedence) {
                 Token operatorToken = _currentToken;
-                if (!IsBinaryOperator(_currentToken)) {
-                    throw new SyntaxErrorException("binary operator", _currentToken);
-                }
-
                 Eat(operatorToken.Type);
 
                 int precedence = GetPrecedence(operatorToken.Type);
                 ASTNode right = ParseExpression(precedence);
                 node = new BinaryOperationNode(node, operatorToken, right);
             }
+
+            // New: Handling chained calls (e.g., .method() or .property)
+            while (_currentToken.Type == TokenType.DOT) {
+                Eat(TokenType.DOT); // Consume the dot, move to next token (method name or property name)
+
+                // Now determine if it's a method call or a property access
+                if (_currentToken.Type == TokenType.IDENTIFIER) {
+                    Token nextToken = PeekNextToken();
+                    if (nextToken.Type == TokenType.OPEN_PARENTHESIS) {
+                        // It's a method call
+                        IdentifierName identifierName = ParseIdentifierName();
+                        MethodCallNode methodCallNode = ParseMethodCall(identifierName);
+                        node = new ChainedMethodCallNode(node, methodCallNode);
+                    } else {
+                        // TODO, probably a property
+                    }
+                } else {
+                    throw new SyntaxErrorException("Expected identifier", _currentToken);
+                }
+            }
+
             return node;
         }
+
 
         /// <summary>
         /// Parses a primary expression, which includes literals (numbers and strings), the 'null' keyword,
