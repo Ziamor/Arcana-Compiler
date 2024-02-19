@@ -51,9 +51,10 @@ public class Compiler {
             string sourceCode = File.ReadAllText(filePath);
             Console.WriteLine(sourceCode);
 
+
+            ErrorReporter? reporter = null;
             try {
                 _lexer.Initialize(sourceCode);
-                ErrorReporter reporter;
                 ProgramNode ast = _parser.Parse(_lexer, out reporter);
                 astCache[filePath] = ast;
 
@@ -61,8 +62,10 @@ public class Compiler {
                 ReportParsingErrors(filePath, reporter);
 
             } catch (ParsingException ex) {
+                if (reporter != null) {
+                    ReportParsingErrors(filePath, reporter);
+                }
                 Console.WriteLine($"{filePath}: {ex.Message}");
-                throw;
             }
         }
 

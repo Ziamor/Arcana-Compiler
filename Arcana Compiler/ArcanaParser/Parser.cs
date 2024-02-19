@@ -44,6 +44,10 @@ namespace Arcana_Compiler.ArcanaParser
 
         private void ReportError(string message, int lineNumber, int position, ErrorSeverity severity) {
             _errorReporter.ReportError(new ParseError(message, lineNumber, position, severity));
+
+            if (severity == ErrorSeverity.Fatal) {
+                throw new ParsingException(message);
+            }
         }
 
         private void RecoverOrInsertDummyToken(TokenType expectedTokenType) {
@@ -64,6 +68,8 @@ namespace Arcana_Compiler.ArcanaParser
                 case TokenType.CLOSE_BRACE:
                 case TokenType.OPEN_PARENTHESIS:
                 case TokenType.CLOSE_PARENTHESIS:
+                case TokenType.OPEN_BRACKET: 
+                case TokenType.CLOSE_BRACKET:
                     return true;
                 default:
                     return false;
@@ -94,6 +100,10 @@ namespace Arcana_Compiler.ArcanaParser
             _currentToken = _lexer.GetNextToken();
             while (_currentToken.Type != TokenType.EOF && !IsRecoveryPoint(_currentToken)) {
                 _currentToken = _lexer.GetNextToken();
+            }
+
+            if (_currentToken.Type == TokenType.EOF) {
+                ReportError("Unexpected end of file during recovery.", _currentToken.LineNumber, _currentToken.Position, ErrorSeverity.Fatal);
             }
 
             return _currentToken.Type != TokenType.EOF;
