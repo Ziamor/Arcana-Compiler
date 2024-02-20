@@ -10,6 +10,7 @@ namespace Arcana_Compiler.ArcanaLexer {
         private int _currentLine;
         private int _currentLinePosition;
         private int _currentTokenLength;
+        private Token? _currentToken = null;
         private readonly Queue<Token> _tokenCache = new Queue<Token>();
 
         public void Initialize(string input) {
@@ -79,10 +80,15 @@ namespace Arcana_Compiler.ArcanaLexer {
 
         public Token GetNextToken() {
             if (_tokenCache.Count > 0) {
-                return _tokenCache.Dequeue();
+                _currentToken = _tokenCache.Dequeue();
+            } else {
+                _currentToken = ParseNextToken();
             }
+            return _currentToken ?? throw new InvalidOperationException("No current token exists. Call GetNextToken first.");
+        }
 
-            return ParseNextToken();
+        public Token GetCurrentToken() {
+            return _currentToken ?? GetNextToken();
         }
 
         private Token GetComplexToken() {

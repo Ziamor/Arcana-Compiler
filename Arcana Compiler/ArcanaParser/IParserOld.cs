@@ -2,6 +2,6 @@
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
 
-public interface IParser<T> where T : ASTNode {
-    T Parse();
+public interface IParserOld {
+    ProgramNode Parse(ILexer lexer, out ErrorReporter reporter);
 }

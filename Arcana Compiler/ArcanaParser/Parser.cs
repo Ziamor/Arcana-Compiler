@@ -21,7 +21,7 @@ namespace Arcana_Compiler.ArcanaParser
            : base($"Expected {expected}, but found '{found.Value}' of type {found.Type} at line {found.LineNumber}, position {found.Position}. Line: '{found.LineText.Trim()}'.") { }
     }
 
-    public class Parser : IParser {
+    public class Parser : IParserOld {
         private ILexer? _lexer;
         private readonly ErrorReporter _errorReporter = new ErrorReporter();
         private Token _currentToken;

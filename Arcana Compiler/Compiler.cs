@@ -5,17 +5,21 @@ using Arcana_Compiler.ArcanaModule;
 using Arcana_Compiler.ArcanaSemanticAnalyzer.ArcanaSymbol;
 using Arcana_Compiler.ArcanaSemanticAnalyzer;
 using Arcana_Compiler.Common;
+using Arcana_Compiler.ArcanaParser.Factory;
+using Arcana_Compiler.ArcanaParser.Parsers;
 
 public class Compiler {
     private IModule _module;
 
-    private IParser _parser;
+    private IParserOld _parser;
     private ILexer _lexer;
 
     private ISymbolTableBuilder _symbolTableBuilder;
     private ISymbolTable _symbolTable;
 
-    public Compiler(IModule module, IParser parser, ILexer lexer, ISymbolTable symbolTable, ISymbolTableBuilder symbolTableBuilder) {
+    private ParserFactory _parserFactory;
+
+    public Compiler(IModule module, IParserOld parser, ILexer lexer, ISymbolTable symbolTable, ISymbolTableBuilder symbolTableBuilder) {
         _module = module;
 
         _parser = parser;
@@ -23,8 +27,9 @@ public class Compiler {
 
         _symbolTable = symbolTable;
         _symbolTableBuilder = symbolTableBuilder;
-
         AddPrimitiveTypes();
+
+        _parserFactory = new ParserFactory(lexer, new ErrorReporter());
     }
 
     private void AddPrimitiveTypes() {
@@ -55,11 +60,15 @@ public class Compiler {
             ErrorReporter? reporter = null;
             try {
                 _lexer.Initialize(sourceCode);
-                ProgramNode ast = _parser.Parse(_lexer, out reporter);
-                astCache[filePath] = ast;
 
-                PrintAST(ast);
-                ReportParsingErrors(filePath, reporter);
+                ProgramParser programParser = (ProgramParser)_parserFactory.CreateParser<ProgramNode>();
+                if (programParser != null) {
+                    ProgramNode ast = (programParser.Parse() as ProgramNode) ?? throw new Exception("Parsing did not result in a ProgramNode.");
+                    astCache[filePath] = ast;
+
+                    PrintAST(ast);
+                    ReportParsingErrors(filePath, programParser.ErrorReporter);
+                }
 
             } catch (ParsingException ex) {
                 if (reporter != null) {
