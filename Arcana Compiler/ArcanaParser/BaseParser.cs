@@ -53,6 +53,54 @@ namespace Arcana_Compiler.ArcanaParser {
             return new IdentifierName(parts);
         }
 
+        protected bool IsClassModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.ABSTRACT:
+                case TokenType.FINAL:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        protected List<ClassModifierNode> ParseClassModifiers() {
+            List<ClassModifierNode> modifiers = new List<ClassModifierNode>();
+            while (IsClassModifier(CurrentToken.Type)) {
+                modifiers.Add(new ClassModifierNode(CurrentToken.Value));
+                Eat(CurrentToken.Type);
+            }
+            return modifiers;
+        }
+
+        protected bool IsFieldModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.CONST:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        protected bool IsAccessModifier(TokenType tokenType) {
+            return tokenType == TokenType.PUBLIC || tokenType == TokenType.PRIVATE || tokenType == TokenType.PROTECTED;
+        }
+
+
+        /// <summary>
+        /// Try to parse an access modifer, will return null if none is found.
+        /// </summary>
+        /// <returns>A string if an access modifer is found, null otherwise.</returns>
+        protected string? TryParseAccessModifier() {
+            if (IsAccessModifier(CurrentToken.Type)) {
+                string modifier = CurrentToken.Value;
+                Eat(CurrentToken.Type);
+                return modifier;
+            }
+            return null; // No access modifier present
+        }
+
         public abstract T Parse();
     }
 }

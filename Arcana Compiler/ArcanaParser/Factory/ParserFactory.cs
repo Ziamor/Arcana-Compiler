@@ -10,7 +10,6 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
     public class ParserFactory {
         private readonly ILexer _lexer;
         private readonly ErrorReporter _errorReporter;
-        // Change to store Func returning the base interface directly
         private readonly Dictionary<Type, Func<ILexer, ErrorReporter, object>> _parserCreators = new();
 
         public ParserFactory(ILexer lexer, ErrorReporter errorReporter) {
@@ -26,9 +25,8 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
                 .ToList();
 
             foreach (var type in parserTypes) {
-                // Assuming a single generic interface implementation per parser for simplicity
                 var interfaceType = type.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParser<>));
-                var nodeType = interfaceType.GetGenericArguments().First(); // Get the ASTNode type T
+                var nodeType = interfaceType.GetGenericArguments().First();
 
                 _parserCreators[nodeType] = (lexer, reporter) => {
                     // Find the appropriate constructor
@@ -45,13 +43,11 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
 
         public void RegisterParser<TNode>(Func<ILexer, ErrorReporter, IParser<TNode>> creator)
             where TNode : ASTNode {
-            // Store the creator by casting its return value to object to avoid generic type issues
             _parserCreators[typeof(TNode)] = (lexer, reporter) => creator(lexer, reporter);
         }
 
         public IParser<T> CreateParser<T>() where T : ASTNode {
             if (_parserCreators.TryGetValue(typeof(T), out var creator)) {
-                // Use creator and cast safely to IParser<T>
                 var parserInstance = creator(_lexer, _errorReporter);
                 if (parserInstance is IParser<T> parser) {
                     return parser;

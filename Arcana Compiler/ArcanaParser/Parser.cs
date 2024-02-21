@@ -395,7 +395,7 @@ namespace Arcana_Compiler.ArcanaParser
                 initialValue = ParseExpression();
             }
 
-            return new FieldDeclarationNode(fieldType, fieldName, fieldModifiers, initialValue);
+            return new FieldDeclarationNode(fieldType, fieldName, accessModifier, fieldModifiers, initialValue);
         }
 
         private List<FieldModifierNode> ParseFieldModifiers() {

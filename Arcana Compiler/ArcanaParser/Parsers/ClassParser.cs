@@ -34,8 +34,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 string? accessModifier = TryParseAccessModifier();
 
                 if (CurrentToken.Type == TokenType.CLASS) {
-                    // Assuming ParseClassDeclaration is another method within this or another parser
-                    // For nested classes, you might need to create instances of ClassParser via the _parserFactory
                     var nestedClassParser = _parserFactory.CreateParser<ClassDeclarationNode>();
                     nestedClasses.Add(nestedClassParser.Parse());
                 } else if (IsMethodDeclaration()) {
@@ -47,44 +45,28 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
             Eat(TokenType.CLOSE_BRACE);
 
-            // Assuming IdentifierName is a construct you have for handling namespaced identifiers
-            IdentifierName currentNamespace = IdentifierName.DefaultNameSpace; // Adjust as necessary
+            IdentifierName currentNamespace = IdentifierName.DefaultNameSpace;
 
-            // Adjust namespace appending logic as necessary
             var fullClassName = currentNamespace + className;
 
             return new ClassDeclarationNode(fullClassName, classAccessModifier, classModifiers, parentTypes, fields, methods, nestedClasses);
         }
 
-        // Placeholder for methods that would be implemented similarly to the old parser:
-        private string? TryParseAccessModifier() {
-            // Implement based on your lexer/token logic
-            return null;
-        }
-
-        private List<ClassModifierNode> ParseClassModifiers() {
-            // Implement class modifiers parsing
-            return new List<ClassModifierNode>();
-        }
-
         private List<ParentTypeNode> ParseParentTypes() {
-            // Implement parent types parsing
             return new List<ParentTypeNode>();
         }
 
         private bool IsMethodDeclaration() {
-            // Implement logic to determine if the current token starts a method declaration
             return false;
         }
 
         private MethodDeclarationNode ParseMethodDeclaration(string? accessModifier) {
-            // Implement method declaration parsing
-            return null; // Placeholder
+            return null;
         }
 
         private FieldDeclarationNode ParseFieldDeclaration(string? accessModifier) {
-            // Implement field declaration parsing
-            return null; // Placeholder
+            IParser<FieldDeclarationNode> fieldParser = _parserFactory.CreateParser<FieldDeclarationNode>();
+            return fieldParser.Parse();
         }
     }
 }
