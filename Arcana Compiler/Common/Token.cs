@@ -65,7 +65,7 @@
         IN
     }
 
-    public struct Token {
+    public class Token {
         public readonly static Dictionary<string, TokenType> KeywordMap = new Dictionary<string, TokenType>{
             { "import", TokenType.IMPORT },
             { "namespace", TokenType.NAMESPACE },

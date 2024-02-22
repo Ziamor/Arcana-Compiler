@@ -31,7 +31,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         // TODO recover logic
                         throw new UnexpectedTokenException(CurrentToken);
                 }
-                CurrentToken = Lexer.GetCurrentToken(); // Sync up current token
             }
 
             if (defaultNamespaceClasses.Any() || defaultNamespaceInterfaces.Any()) {

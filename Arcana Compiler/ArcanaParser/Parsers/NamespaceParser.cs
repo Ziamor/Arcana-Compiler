@@ -36,7 +36,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         var interfaceParser = _parserFactory.CreateParser<InterfaceDeclarationNode>();
                         interfaces.Add(interfaceParser.Parse());
                     }
-                    CurrentToken = Lexer.GetCurrentToken(); // Sync up current token
                 } else {
                     Eat(CurrentToken.Type);
                     Error("Expected 'class' or 'interface' declaration.");
