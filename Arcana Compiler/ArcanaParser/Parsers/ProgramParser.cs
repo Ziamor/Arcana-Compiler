@@ -27,18 +27,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                             rootNode.NamespaceDeclarations.Add(namespaceNode);
                         }
                         break;
-                    /*case TokenType.CLASS:
-                        var classParserResult = _parserFactory.CreateParser(ParserType.Class)?.Parse();
-                        if (classParserResult is ClassDeclarationNode classNode) {
-                            defaultNamespaceClasses.Add(classNode);
-                        }
-                        break;
-                    case TokenType.INTERFACE:
-                        var interfaceParserResult = _parserFactory.CreateParser(ParserType.Interface)?.Parse();
-                        if (interfaceParserResult is InterfaceDeclarationNode interfaceNode) {
-                            defaultNamespaceInterfaces.Add(interfaceNode);
-                        }
-                        break;*/
                     default:
                         // TODO recover logic
                         throw new UnexpectedTokenException(CurrentToken);

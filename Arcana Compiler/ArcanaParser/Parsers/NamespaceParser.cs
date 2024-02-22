@@ -26,11 +26,9 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             var interfaces = new List<InterfaceDeclarationNode>();
 
             while (CurrentToken.Type != TokenType.CLOSE_BRACE && CurrentToken.Type != TokenType.EOF) {
-                // Peek next tokens to check for class/interface keyword after optional modifiers
                 bool isClassOrInterfaceAhead = IsClassOrInterfaceAhead();
 
                 if (isClassOrInterfaceAhead) {
-                    // Depending on the token type, create the appropriate parser and parse the node
                     if (PeekNextRelevantToken().Type == TokenType.CLASS) {
                         var classParser = _parserFactory.CreateParser<ClassDeclarationNode>();
                         classes.Add(classParser.Parse());
@@ -40,8 +38,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                     }
                     CurrentToken = Lexer.GetCurrentToken(); // Sync up current token
                 } else {
-                    // If neither a class nor an interface is immediately ahead, consume the current token and report an error
-                    // This is a simple error recovery strategy to prevent infinite loops
                     Eat(CurrentToken.Type);
                     Error("Expected 'class' or 'interface' declaration.");
                 }
@@ -52,7 +48,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private bool IsClassOrInterfaceAhead() {
-            // Check the next few tokens for a class or interface keyword, accounting for optional access and class modifiers
+            // Skip through any possible access or class modifiers
             for (int i = 1; i <= 3; i++) {
                 var token = PeekNextToken(i);
                 if (token.Type == TokenType.CLASS || token.Type == TokenType.INTERFACE) {
@@ -63,14 +59,13 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private Token PeekNextRelevantToken() {
-            // Peek ahead to find the next relevant token (class or interface) skipping modifiers
             for (int i = 1; i <= 3; i++) {
                 var token = PeekNextToken(i);
                 if (token.Type == TokenType.CLASS || token.Type == TokenType.INTERFACE) {
                     return token;
                 }
             }
-            return CurrentToken; // Fallback, should not happen if used after IsClassOrInterfaceAhead returns true
+            return CurrentToken;
         }
     }
 }
