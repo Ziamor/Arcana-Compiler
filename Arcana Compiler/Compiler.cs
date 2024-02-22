@@ -67,7 +67,7 @@ public class Compiler {
                     astCache[filePath] = ast;
 
                     PrintAST(ast);
-                    ReportParsingErrors(filePath, programParser.ErrorReporter);
+                    ReportParsingErrors(filePath, programParser.errorReporter);
                 }
 
             } catch (ParsingException ex) {

@@ -1,4 +1,5 @@
 ﻿using Arcana_Compiler.ArcanaLexer;
+using Arcana_Compiler.ArcanaParser.Factory;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
 using static Arcana_Compiler.Common.ErrorReporter;
@@ -7,11 +8,12 @@ namespace Arcana_Compiler.ArcanaParser {
     public abstract class BaseParser<T> : IParser<T> where T : ASTNode {
         protected ILexer Lexer;
         protected Token CurrentToken;
-        public readonly ErrorReporter ErrorReporter;
-
-        protected BaseParser(ILexer lexer, ErrorReporter errorReporter) {
+        public readonly ErrorReporter errorReporter;
+        protected readonly ParserFactory parserFactory;
+        protected BaseParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory) {
             Lexer = lexer;
-            ErrorReporter = errorReporter;
+            this.errorReporter = errorReporter;
+            this.parserFactory = parserFactory;
             CurrentToken = Lexer.GetCurrentToken();
         }
 
@@ -32,7 +34,7 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         protected void ReportError(string message, int lineNumber, int position, ErrorSeverity severity) {
-            ErrorReporter.ReportError(new ParseError(message, lineNumber, position, severity));
+            errorReporter.ReportError(new ParseError(message, lineNumber, position, severity));
             if (severity == ErrorSeverity.Fatal) {
                 throw new ParsingException(message);
             }
@@ -52,6 +54,18 @@ namespace Arcana_Compiler.ArcanaParser {
 
             return new IdentifierName(parts);
         }
+
+        protected bool IsLiteral(Token token) {
+            switch (token.Type) {
+                case TokenType.NUMBER:
+                case TokenType.STRING:
+                case TokenType.NULL:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
 
         protected bool IsClassModifier(TokenType tokenType) {
             switch (tokenType) {
@@ -101,6 +115,42 @@ namespace Arcana_Compiler.ArcanaParser {
             return null; // No access modifier present
         }
 
+
+        protected bool IsUnaryOperator(Token token) {
+            return token.Type == TokenType.INCREMENT || token.Type == TokenType.DECREMENT ||
+                   token.Type == TokenType.MINUS || token.Type == TokenType.NOT;
+        }
+
+        protected bool IsPostfixUnaryOperator(Token token) {
+            return token.Type == TokenType.INCREMENT || token.Type == TokenType.DECREMENT;
+        }
+
+        protected bool IsBinaryOperator(Token token) {
+            return token.Type == TokenType.PLUS || token.Type == TokenType.MINUS ||
+                   token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE ||
+                   token.Type == TokenType.EQUALS || token.Type == TokenType.LESS_THAN ||
+                   token.Type == TokenType.GREATER_THAN || token.Type == TokenType.LESS_THAN_OR_EQUAL ||
+                   token.Type == TokenType.GREATER_THAN_OR_EQUAL;
+        }
+
+        protected int GetPrecedence(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.PLUS:
+                case TokenType.MINUS:
+                    return 1;
+                case TokenType.MULTIPLY:
+                case TokenType.DIVIDE:
+                    return 2;
+                case TokenType.EQUALS:
+                case TokenType.LESS_THAN:
+                case TokenType.GREATER_THAN:
+                case TokenType.LESS_THAN_OR_EQUAL:
+                case TokenType.GREATER_THAN_OR_EQUAL:
+                    return 3;
+                default:
+                    return 0;
+            }
+        }
         public abstract T Parse();
     }
 }

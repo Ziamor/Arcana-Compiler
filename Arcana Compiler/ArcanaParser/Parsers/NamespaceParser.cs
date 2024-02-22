@@ -6,11 +6,8 @@ using System.Collections.Generic;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
     public class NamespaceParser : BaseParser<NamespaceDeclarationNode> {
-        private readonly ParserFactory _parserFactory;
-
         public NamespaceParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
-            : base(lexer, errorReporter) {
-            _parserFactory = parserFactory;
+            : base(lexer, errorReporter, parserFactory) {
         }
 
         public override NamespaceDeclarationNode Parse() {
@@ -30,10 +27,10 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
                 if (isClassOrInterfaceAhead) {
                     if (PeekNextRelevantToken().Type == TokenType.CLASS) {
-                        var classParser = _parserFactory.CreateParser<ClassDeclarationNode>();
+                        var classParser = parserFactory.CreateParser<ClassDeclarationNode>();
                         classes.Add(classParser.Parse());
                     } else if (PeekNextRelevantToken().Type == TokenType.INTERFACE) {
-                        var interfaceParser = _parserFactory.CreateParser<InterfaceDeclarationNode>();
+                        var interfaceParser = parserFactory.CreateParser<InterfaceDeclarationNode>();
                         interfaces.Add(interfaceParser.Parse());
                     }
                 } else {

@@ -7,11 +7,8 @@ using System.Collections.Generic;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
     public class ClassParser : BaseParser<ClassDeclarationNode> {
-        private readonly ParserFactory _parserFactory;
-
         public ClassParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
-            : base(lexer, errorReporter) {
-            _parserFactory = parserFactory;
+            : base(lexer, errorReporter, parserFactory) {
         }
 
         public override ClassDeclarationNode Parse() {
@@ -34,13 +31,13 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 string? accessModifier = TryParseAccessModifier();
 
                 if (CurrentToken.Type == TokenType.CLASS) {
-                    var nestedClassParser = _parserFactory.CreateParser<ClassDeclarationNode>();
+                    var nestedClassParser = parserFactory.CreateParser<ClassDeclarationNode>();
                     nestedClasses.Add(nestedClassParser.Parse());
                 } else if (IsMethodDeclaration()) {
                     methods.Add(ParseMethodDeclaration(accessModifier));
                 } else {
                     fields.Add(ParseFieldDeclaration(accessModifier));
-                }
+                }                
             }
 
             Eat(TokenType.CLOSE_BRACE);
@@ -65,7 +62,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private FieldDeclarationNode ParseFieldDeclaration(string? accessModifier) {
-            IParser<FieldDeclarationNode> fieldParser = _parserFactory.CreateParser<FieldDeclarationNode>();
+            IParser<FieldDeclarationNode> fieldParser = parserFactory.CreateParser<FieldDeclarationNode>();
             return fieldParser.Parse();
         }
     }

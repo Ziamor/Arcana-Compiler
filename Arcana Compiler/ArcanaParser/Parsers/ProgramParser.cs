@@ -5,11 +5,9 @@ using Arcana_Compiler.ArcanaParser.Factory;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
     public class ProgramParser : BaseParser<ProgramNode> {
-        private readonly ParserFactory _parserFactory;
 
         public ProgramParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
-            : base(lexer, errorReporter) {
-            _parserFactory = parserFactory;            
+            : base(lexer, errorReporter, parserFactory) {
         }
 
         public override ProgramNode Parse() {
@@ -22,7 +20,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             while (CurrentToken.Type != TokenType.EOF) {                
                 switch (CurrentToken.Type) {
                     case TokenType.NAMESPACE:
-                        ASTNode? namespaceParserResult = _parserFactory.CreateParser<NamespaceDeclarationNode>()?.Parse();
+                        ASTNode? namespaceParserResult = parserFactory.CreateParser<NamespaceDeclarationNode>()?.Parse();
                         if (namespaceParserResult is NamespaceDeclarationNode namespaceNode) {
                             rootNode.NamespaceDeclarations.Add(namespaceNode);
                         }
