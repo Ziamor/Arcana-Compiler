@@ -12,9 +12,9 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         public override ExpressionNode Parse() {
             if (IsLiteral(CurrentToken)) {
                 return parserFactory.CreateParser<LiteralNode>().Parse();
-            } else if (IsUnaryOperator(CurrentToken)) {
+            } else if (IsUnaryOperator(CurrentToken) || IsUnaryOperator(PeekNextToken())) {
                 return parserFactory.CreateParser<UnaryOperationNode>().Parse();
-            } else if (IsBinaryOperator(PeekNextToken())) { // Assuming binary operators follow an operand
+            } else if (IsBinaryOperator(PeekNextToken())) {
                 return parserFactory.CreateParser<BinaryOperationNode>().Parse();
             } else if (CurrentToken.Type == TokenType.IDENTIFIER) {
                 return ParseIdentifierOrMethodCall();
@@ -53,9 +53,27 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         public override UnaryOperationNode Parse() {
-            throw new NotImplementedException();
+            Token operatorToken = CurrentToken;
+            UnaryOperatorPosition position;
+            ExpressionNode operand;
+
+            // Determine if it's a prefix unary operation
+            if (IsUnaryOperator(operatorToken)) {
+                position = UnaryOperatorPosition.Prefix;
+                Eat(operatorToken.Type);
+                operand = parserFactory.CreateParser<ExpressionNode>().Parse();
+            } else {
+                throw new ParsingException("Invalid unary operator position.");
+            }
+
+            if (operand is UnaryOperationNode unaryOperand && position == UnaryOperatorPosition.Prefix) {
+                throw new ParsingException($"Chaining unary operators is not allowed at line {operatorToken.LineNumber}, position {operatorToken.Position}.");
+            }
+
+            return new UnaryOperationNode(operatorToken, operand, position);
         }
     }
+
 
     public class BinaryExpressionParser : BaseParser<BinaryOperationNode> {
         public BinaryExpressionParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)

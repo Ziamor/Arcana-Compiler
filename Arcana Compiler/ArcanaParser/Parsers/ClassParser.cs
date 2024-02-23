@@ -37,7 +37,8 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                     methods.Add(ParseMethodDeclaration(accessModifier));
                 } else {
                     fields.Add(ParseFieldDeclaration(accessModifier));
-                }                
+                }
+                CurrentToken = Lexer.GetCurrentToken();
             }
 
             Eat(TokenType.CLOSE_BRACE);

@@ -34,9 +34,9 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         interfaces.Add(interfaceParser.Parse());
                     }
                 } else {
-                    Eat(CurrentToken.Type);
                     Error("Expected 'class' or 'interface' declaration.");
                 }
+                CurrentToken = Lexer.GetCurrentToken();
             }
 
             Eat(TokenType.CLOSE_BRACE);
