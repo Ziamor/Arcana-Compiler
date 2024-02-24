@@ -42,7 +42,8 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             if (methodCallDetected) {
                 return parserFactory.CreateParser<MethodCallNode>().Parse();
             } else {
-                return parserFactory.CreateParser<VariableAccessNode>().Parse();
+                IdentifierName identifierName = ParseIdentifierName();
+                return new VariableAccessNode(identifierName);
             }
         }
     }
@@ -53,21 +54,30 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         public override UnaryOperationNode Parse() {
-            Token operatorToken = CurrentToken;
+            Token operatorToken;
             UnaryOperatorPosition position;
-            ExpressionNode operand;
+            ExpressionNode? operand = null;
 
-            // Determine if it's a prefix unary operation
-            if (IsUnaryOperator(operatorToken)) {
+            if (IsUnaryOperator(CurrentToken)) {
+                operatorToken = CurrentToken;
                 position = UnaryOperatorPosition.Prefix;
-                Eat(operatorToken.Type);
+                Eat(CurrentToken.Type);
                 operand = parserFactory.CreateParser<ExpressionNode>().Parse();
             } else {
-                throw new ParsingException("Invalid unary operator position.");
+                IdentifierName identifierName = ParseIdentifierName();
+                operand = new VariableAccessNode(identifierName);
+
+                if (IsPostfixUnaryOperator(CurrentToken)) {
+                    operatorToken = CurrentToken;
+                    position = UnaryOperatorPosition.Postfix;
+                    Eat(operatorToken.Type);
+                } else {
+                    throw new ParsingException("Expected a unary operator.");
+                }
             }
 
-            if (operand is UnaryOperationNode unaryOperand && position == UnaryOperatorPosition.Prefix) {
-                throw new ParsingException($"Chaining unary operators is not allowed at line {operatorToken.LineNumber}, position {operatorToken.Position}.");
+            if (operand == null) {
+                throw new InvalidOperationException("Unary operation missing operand.");
             }
 
             return new UnaryOperationNode(operatorToken, operand, position);
