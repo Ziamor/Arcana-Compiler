@@ -56,7 +56,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         public override UnaryOperationNode Parse() {
             Token operatorToken;
             UnaryOperatorPosition position;
-            ExpressionNode? operand = null;
+            ExpressionNode operand;
 
             if (IsUnaryOperator(CurrentToken)) {
                 operatorToken = CurrentToken;
