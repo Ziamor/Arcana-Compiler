@@ -75,15 +75,49 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
     }
 
 
-    public class BinaryExpressionParser : BaseParser<BinaryOperationNode> {
-        public BinaryExpressionParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
+    public class BinaryOperationParser : BaseParser<BinaryOperationNode> {
+        public BinaryOperationParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
             : base(lexer, errorReporter, parserFactory) {
         }
 
         public override BinaryOperationNode Parse() {
-            throw new NotImplementedException();
+            ExpressionNode left = parserFactory.CreateParser<ExpressionNode>().Parse();
+
+            BinaryOperationNode? result = null;
+
+            while (IsBinaryOperator(CurrentToken) && GetPrecedence(CurrentToken.Type) > 0) {
+                Token operatorToken = CurrentToken;
+                int operatorPrecedence = GetPrecedence(operatorToken.Type);
+                Eat(operatorToken.Type);
+
+                ExpressionNode right = ParseRightHandSide(operatorPrecedence);
+
+                result = new BinaryOperationNode(left, operatorToken, right);
+
+                left = result;
+            }
+
+            if (result == null) {
+                throw new InvalidOperationException("Expected a binary operation but found none. This may indicate a logic error in parsing.");
+            }
+
+            return result;
+        }
+
+        private ExpressionNode ParseRightHandSide(int leftOperatorPrecedence) {
+            ExpressionNode node = parserFactory.CreateParser<ExpressionNode>().Parse();
+
+            while (IsBinaryOperator(CurrentToken) && GetPrecedence(CurrentToken.Type) > leftOperatorPrecedence) {
+                Token operatorToken = CurrentToken;
+                Eat(operatorToken.Type); // Consume the operator
+                ExpressionNode rightNode = parserFactory.CreateParser<ExpressionNode>().Parse();
+                node = new BinaryOperationNode(node, operatorToken, rightNode);
+            }
+
+            return node;
         }
     }
+
 
     public class LiteralParser : BaseParser<LiteralNode> {
         public LiteralParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
