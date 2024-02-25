@@ -2,6 +2,8 @@
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
 
-public interface IParser<T> where T : ASTNode {
-    T Parse();
+namespace Arcana_Compiler.ArcanaParser {
+    public interface IParser<T> where T : ASTNode {
+        T Parse();
+    }
 }

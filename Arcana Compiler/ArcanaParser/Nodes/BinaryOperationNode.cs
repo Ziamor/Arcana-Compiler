@@ -3,11 +3,11 @@
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class BinaryOperationNode : ExpressionNode {
-        public ASTNode Left { get; private set; }
+        public ExpressionNode Left { get; private set; }
         public Token Operator { get; private set; }
-        public ASTNode Right { get; private set; }
+        public ExpressionNode Right { get; private set; }
 
-        public BinaryOperationNode(ASTNode left, Token operatorToken, ASTNode right) {
+        public BinaryOperationNode(ExpressionNode left, Token operatorToken, ExpressionNode right) {
             Left = left;
             Operator = operatorToken;
             Right = right;
@@ -16,7 +16,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
             visitor.Visit(this);
         }
         public override string ToString() {
-            return $"Binary Operation: {Left} {Operator.Value} {Right}";
+            return $"({Left} {Operator.Value} {Right})";
         }
 
         public override bool Equals(object? obj) {

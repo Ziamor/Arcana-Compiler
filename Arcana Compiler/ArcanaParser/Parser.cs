@@ -736,7 +736,7 @@ namespace Arcana_Compiler.ArcanaParser
                 Eat(operatorToken.Type);
 
                 int precedence = GetPrecedence(operatorToken.Type);
-                ASTNode right = ParseExpression(precedence);
+                ExpressionNode right = ParseExpression(precedence);
                 node = new BinaryOperationNode(node, operatorToken, right);
             }
 
@@ -930,8 +930,8 @@ namespace Arcana_Compiler.ArcanaParser
             return new UnaryOperationNode(operatorToken, operand, position);
         }
 
-        private ASTNode ParseBinaryExpression(int parentPrecedence = 0) {
-            ASTNode left = ParsePrimaryExpression(); // Parse the left-hand side
+        private ExpressionNode ParseBinaryExpression(int parentPrecedence = 0) {
+            ExpressionNode left = ParsePrimaryExpression(); // Parse the left-hand side
 
             while (true) {
                 int precedence = GetPrecedence(_currentToken.Type);
@@ -943,7 +943,7 @@ namespace Arcana_Compiler.ArcanaParser
                 Eat(_currentToken.Type);
 
                 // Parse the right-hand side with higher precedence
-                ASTNode right = ParseBinaryExpression(precedence);
+                ExpressionNode right = ParseBinaryExpression(precedence);
 
                 left = new BinaryOperationNode(left, operatorToken, right);
             }

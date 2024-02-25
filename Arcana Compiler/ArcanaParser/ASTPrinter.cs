@@ -64,7 +64,8 @@ public class ASTPrinter : IVisitor {
     }
 
     public void Visit(FieldDeclarationNode node) {
-        result.AppendLine($"{indent}Field Decl: {node.FieldName} ({node.FieldType})");
+        string initialValueOutput = node.InitialValue != null ? $" = {PrintExpression(node.InitialValue)}" : "";
+        result.AppendLine($"{indent}Field Decl: {node.FieldName} ({node.FieldType}) {initialValueOutput}");
     }
     public void Visit(LiteralNode node) {
         result.AppendLine($"{indent}Literal: {node.Value}");
@@ -174,9 +175,7 @@ public class ASTPrinter : IVisitor {
     }
 
     public void Visit(BinaryOperationNode node) {
-        string left = PrintExpression(node.Left);
-        string right = PrintExpression(node.Right);
-        result.AppendLine($"{indent}Binary Operation: {left} {node.Operator} {right}");
+        throw new NotImplementedException();
     }
 
 
@@ -261,6 +260,10 @@ public class ASTPrinter : IVisitor {
     }
 
     public void Visit(ArrayAccessNode node) {
+        throw new NotImplementedException();
+    }
+
+    public void Visit(PrimaryExpressionNode node) {
         throw new NotImplementedException();
     }
 }

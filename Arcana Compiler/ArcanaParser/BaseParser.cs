@@ -2,24 +2,32 @@
 using Arcana_Compiler.ArcanaParser.Factory;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
+using System.Xml.Linq;
 using static Arcana_Compiler.Common.ErrorReporter;
 
 namespace Arcana_Compiler.ArcanaParser {
-    public abstract class BaseParser<T> : IParser<T> where T : ASTNode {
+    public class DefaultParserContext<TNode> : IParserContext<TNode> where TNode : ASTNode {
+    }
+
+    public abstract class BaseParser<TNode> : IParser<TNode> where TNode : ASTNode {
         protected ILexer Lexer;
         protected Token CurrentToken;
         public readonly ErrorReporter errorReporter;
         protected readonly ParserFactory parserFactory;
+
         protected BaseParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory) {
             Lexer = lexer;
             this.errorReporter = errorReporter;
             this.parserFactory = parserFactory;
+
             CurrentToken = Lexer.GetCurrentToken();
+            SkipComments();
         }
 
         protected void Eat(TokenType tokenType) {
             if (CurrentToken.Type == tokenType) {
                 CurrentToken = Lexer.GetNextToken();
+                SkipComments();
             } else {
                 Error(string.Format("Expected token of type {0}, but found '{1}'", tokenType, CurrentToken.Value));
             }
@@ -31,6 +39,12 @@ namespace Arcana_Compiler.ArcanaParser {
 
         protected Token PeekNextToken(int depth = 1) {
             return Lexer.PeekToken(depth);
+        }
+
+        protected void SkipComments() {
+            while (CurrentToken.Type == TokenType.COMMENT) {
+                Eat(TokenType.COMMENT);
+            }
         }
 
         protected void ReportError(string message, int lineNumber, int position, ErrorSeverity severity) {
@@ -151,6 +165,17 @@ namespace Arcana_Compiler.ArcanaParser {
                     return 0;
             }
         }
-        public abstract T Parse();
+        public abstract TNode Parse();
+    }
+
+    public abstract class BaseParserWithContext<TNode, TContext> : BaseParser<TNode>
+    where TNode : ASTNode
+    where TContext : IParserContext<TNode> {
+        protected readonly TContext context;
+
+        protected BaseParserWithContext(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory, TContext context) 
+            : base(lexer, errorReporter, parserFactory) {
+            this.context = context;
+        }
     }
 }

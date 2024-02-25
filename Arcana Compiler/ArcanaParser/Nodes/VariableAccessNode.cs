@@ -2,7 +2,7 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
-    public class VariableAccessNode : ExpressionNode {
+    public class VariableAccessNode : PrimaryExpressionNode {
         public IdentifierName QualifiedName { get; private set; }
 
         public VariableAccessNode(IdentifierName qualifiedName) {
