@@ -167,15 +167,4 @@ namespace Arcana_Compiler.ArcanaParser {
         }
         public abstract TNode Parse();
     }
-
-    public abstract class BaseParserWithContext<TNode, TContext> : BaseParser<TNode>
-    where TNode : ASTNode
-    where TContext : IParserContext<TNode> {
-        protected readonly TContext context;
-
-        protected BaseParserWithContext(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory, TContext context) 
-            : base(lexer, errorReporter, parserFactory) {
-            this.context = context;
-        }
-    }
 }

@@ -1,7 +1,6 @@
 ﻿using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Factory;
 using Arcana_Compiler.ArcanaParser.Nodes;
-using Arcana_Compiler.ArcanaParser.Parsers.Contexts;
 using Arcana_Compiler.Common;
 using System.Linq.Expressions;
 
@@ -111,28 +110,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             }
         }
     }
-
-    public class UnaryOperationParser : BaseParser<UnaryOperationNode> {
-        public UnaryOperationParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
-            : base(lexer, errorReporter, parserFactory) {
-        }
-
-        public override UnaryOperationNode Parse() {
-            return null;
-        }
-    }
-
-
-    public class BinaryOperationParser : BaseParserWithContext<BinaryOperationNode, BinaryOperationParserContext> {
-        public BinaryOperationParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory, BinaryOperationParserContext context)
-            : base(lexer, errorReporter, parserFactory, context) {
-        }
-
-        public override BinaryOperationNode Parse() {
-            return null;
-        }
-    }
-
 
     public class LiteralParser : BaseParser<LiteralNode> {
         public LiteralParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
