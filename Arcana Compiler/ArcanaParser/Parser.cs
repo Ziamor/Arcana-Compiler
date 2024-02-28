@@ -901,7 +901,7 @@ namespace Arcana_Compiler.ArcanaParser
         }
 
 
-        private ExpressionNode ParseUnaryOperation(ASTNode? operand = null) {
+        private ExpressionNode ParseUnaryOperation(ExpressionNode? operand = null) {
             Token operatorToken = _currentToken;
             bool isPrefix = operand == null;
             UnaryOperatorPosition position = isPrefix ? UnaryOperatorPosition.Prefix : UnaryOperatorPosition.Postfix;

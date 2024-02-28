@@ -9,10 +9,10 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
 
     public class UnaryOperationNode : ExpressionNode {
         public Token Operator { get; private set; }
-        public ASTNode Operand { get; private set; }
+        public ExpressionNode Operand { get; private set; }
         public UnaryOperatorPosition UnaryOperatorPosition { get; private set; }
 
-        public UnaryOperationNode(Token operatorToken, ASTNode operand, UnaryOperatorPosition unaryOperatorPosition) {
+        public UnaryOperationNode(Token operatorToken, ExpressionNode operand, UnaryOperatorPosition unaryOperatorPosition) {
             Operator = operatorToken;
             Operand = operand;
             UnaryOperatorPosition = unaryOperatorPosition;
@@ -23,9 +23,9 @@ namespace Arcana_Compiler.ArcanaParser.Nodes
         public override string ToString() {
             switch (UnaryOperatorPosition) {
                 case UnaryOperatorPosition.Prefix:
-                    return $"Unary Operation: {Operator.Value} {Operand}";
+                    return $"Unary Operation: ({Operator.Value} {Operand})";
                 case UnaryOperatorPosition.Postfix:
-                    return $"Unary Operation: {Operand} {Operator.Value}";
+                    return $"Unary Operation: ({Operand} {Operator.Value})";
                 default:
                     throw new InvalidOperationException("Unknown unary operator position.");
             }

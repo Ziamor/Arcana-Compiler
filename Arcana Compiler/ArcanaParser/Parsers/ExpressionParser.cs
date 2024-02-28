@@ -12,38 +12,62 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         public override ExpressionNode Parse() {
-            /*ExpressionNode left;
+            return ParseExpression();
+        }
 
-            if (IsUnaryOperator(CurrentToken) || (IsUnaryOperator(PeekNextToken()) && IsPostfixUnaryOperator(PeekNextToken()))) {
-                left = parserFactory.CreateParser<UnaryOperationNode>().Parse();
-            } else if (CurrentToken.Type == TokenType.IDENTIFIER) {
-                left = ParseIdentifierOrMethodCall();
-            } else if (IsLiteral(CurrentToken)) {
-                left = parserFactory.CreateParser<LiteralNode>().Parse();
+        private ExpressionNode ParseExpression() {
+            return ParseBinaryOperation();
+        }
+
+        private ExpressionNode ParseBinaryOperation(int parentPrecedence = 0) {
+            ExpressionNode leftHandSide = ParseUnaryOperation();
+
+            while (true) {
+                int precedence = GetPrecedence(CurrentToken.Type);
+                if (precedence <= parentPrecedence) {
+                    return leftHandSide;
+                }
+
+                Token operatorToken = CurrentToken;
+                Eat(operatorToken.Type);
+                ExpressionNode rightHandSide = ParseBinaryOperation(precedence);
+                leftHandSide = new BinaryOperationNode(leftHandSide, operatorToken, rightHandSide);
+            }
+        }
+
+        private ExpressionNode ParseUnaryOperation() {
+            if (IsUnaryOperator(CurrentToken)) {
+                Token operatorToken = CurrentToken;
+                Eat(operatorToken.Type);
+                ExpressionNode operand = ParseUnaryOperation(); // Unary operations have the highest precedence
+                return new UnaryOperationNode(operatorToken, operand, UnaryOperatorPosition.Prefix);
+            }
+
+            // Handle primary expressions, including parentheses
+            return ParsePrimaryExpression();
+        }
+
+        private ExpressionNode ParsePrimaryExpression() {
+            ExpressionNode expression;
+            if (CurrentToken.Type == TokenType.OPEN_PARENTHESIS) {
+                Eat(TokenType.OPEN_PARENTHESIS);
+                expression = ParseExpression();
+                Eat(TokenType.CLOSE_PARENTHESIS);
             } else {
-                throw new UnexpectedTokenException(CurrentToken);
+                // Parse other primary expressions (literals, variables, etc.)
+                expression = parserFactory.CreateParser<PrimaryExpressionNode>().Parse();
             }
             CurrentToken = Lexer.GetCurrentToken();
+            return ParsePostfixUnaryOperation(expression);
+        }
 
-            if (IsBinaryOperator(CurrentToken)) {
-                int precedence = 0;
-                BinaryOperationParserContext binaryOperationParserContext = new BinaryOperationParserContext(precedence, left);
-                IParser<BinaryOperationNode> binaryOperationNodeParser = parserFactory.CreateParser<BinaryOperationNode>(binaryOperationParserContext);
-                return binaryOperationNodeParser.Parse();
-            } else {
-                return left;
-            }*/
-
-            PrimaryExpressionNode expression = parserFactory.CreateParser<PrimaryExpressionNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-            if (IsBinaryOperator(CurrentToken)) {
-                BinaryOperationParserContext binaryOperationParserContext = new BinaryOperationParserContext(0, expression);
-                IParser<BinaryOperationNode> binaryOperationNodeParser = parserFactory.CreateParser<BinaryOperationNode>(binaryOperationParserContext);
-                return binaryOperationNodeParser.Parse();
+        private ExpressionNode ParsePostfixUnaryOperation(ExpressionNode operand) {
+            while (IsPostfixUnaryOperator(CurrentToken)) {
+                Token operatorToken = CurrentToken;
+                Eat(operatorToken.Type);
+                operand = new UnaryOperationNode(operatorToken, operand, UnaryOperatorPosition.Postfix);
             }
-
-            IParser<PrimaryExpressionNode> primaryExpressionParser = parserFactory.CreateParser<PrimaryExpressionNode>();
-            return primaryExpressionParser.Parse();
+            return operand;
         }
     }
     public class PrimaryExpressionParser : BaseParser<PrimaryExpressionNode> {
@@ -52,10 +76,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
         public override PrimaryExpressionNode Parse() {
             PrimaryExpressionNode expression;
-            if (IsUnaryOperator(CurrentToken) || (IsUnaryOperator(PeekNextToken()) && IsPostfixUnaryOperator(PeekNextToken()))) {
-                //expression = parserFactory.CreateParser<UnaryOperationNode>().Parse();
-                expression = null;
-            } else if (CurrentToken.Type == TokenType.IDENTIFIER) {
+            if (CurrentToken.Type == TokenType.IDENTIFIER) {
                 expression = ParseIdentifierOrMethodCall();
             } else if (IsLiteral(CurrentToken)) {
                 expression = parserFactory.CreateParser<LiteralNode>().Parse();
@@ -97,33 +118,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         public override UnaryOperationNode Parse() {
-            Token operatorToken;
-            UnaryOperatorPosition position;
-            ExpressionNode operand;
-
-            if (IsUnaryOperator(CurrentToken)) {
-                operatorToken = CurrentToken;
-                position = UnaryOperatorPosition.Prefix;
-                Eat(CurrentToken.Type);
-                operand = parserFactory.CreateParser<ExpressionNode>().Parse();
-            } else {
-                IdentifierName identifierName = ParseIdentifierName();
-                operand = new VariableAccessNode(identifierName);
-
-                if (IsPostfixUnaryOperator(CurrentToken)) {
-                    operatorToken = CurrentToken;
-                    position = UnaryOperatorPosition.Postfix;
-                    Eat(operatorToken.Type);
-                } else {
-                    throw new ParsingException("Expected a unary operator.");
-                }
-            }
-
-            if (operand == null) {
-                throw new InvalidOperationException("Unary operation missing operand.");
-            }
-
-            return new UnaryOperationNode(operatorToken, operand, position);
+            return null;
         }
     }
 
@@ -134,29 +129,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         public override BinaryOperationNode Parse() {
-            ExpressionNode left = context.Left;
-            Token operatorToken = CurrentToken;
-            Eat(operatorToken.Type);
-            ExpressionNode right = parserFactory.CreateParser<PrimaryExpressionNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            if (IsBinaryOperator(CurrentToken)) {
-                int currentOperatorPrecedence = GetPrecedence(operatorToken.Type);
-                int nextOperatorPrecedence = GetPrecedence(CurrentToken.Type);
-                if (currentOperatorPrecedence > nextOperatorPrecedence) {
-                    BinaryOperationNode binaryOperationNode = new BinaryOperationNode(left, operatorToken, right);
-                    BinaryOperationParserContext binaryOperationParserContext = new BinaryOperationParserContext(0, binaryOperationNode);
-                    IParser<BinaryOperationNode> binaryOperationNodeParser = parserFactory.CreateParser<BinaryOperationNode>(binaryOperationParserContext);
-                    return binaryOperationNodeParser.Parse();
-                } else {
-                    BinaryOperationParserContext binaryOperationParserContext = new BinaryOperationParserContext(0, right);
-                    IParser<BinaryOperationNode> binaryOperationNodeParser = parserFactory.CreateParser<BinaryOperationNode>(binaryOperationParserContext);
-
-
-                    return new BinaryOperationNode(left, operatorToken, binaryOperationNodeParser.Parse());
-                }
-            }
-            return new BinaryOperationNode(left, operatorToken, right);
+            return null;
         }
     }
 
