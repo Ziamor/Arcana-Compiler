@@ -169,8 +169,37 @@ namespace Arcana_Compiler.ArcanaParser {
         }
 
         protected bool IsMethodDeclaration() {
-            // TODO
-            return false;
+            // Check if the current token is 'func'.
+            if (CurrentToken.Type == TokenType.FUNC) {
+                return true;
+            }
+
+            // Check up to the next 3 tokens ahead for a 'func' keyword, allowing for modifiers before it.
+            for (int i = 1; i <= 3; i++) {
+                Token nextToken = PeekNextToken(i);
+                if (nextToken.Type == TokenType.FUNC) {
+                    return true;
+                }
+                // If the token is neither an access modifier nor a method modifier, stop checking further.
+                if (!IsAccessModifier(nextToken.Type) && !IsMethodModifier(nextToken.Type)) {
+                    break;
+                }
+            }
+
+            return false; // If 'func' is not found within the allowed range, it's not a method declaration.
+        }
+
+        protected bool IsMethodModifier(TokenType tokenType) {
+            switch (tokenType) {
+                case TokenType.STATIC:
+                case TokenType.ABSTRACT:
+                case TokenType.VIRTUAL:
+                case TokenType.OVERRIDE:
+                case TokenType.FINAL:
+                    return true;
+                default:
+                    return false;
+            }
         }
 
         public abstract TNode Parse();

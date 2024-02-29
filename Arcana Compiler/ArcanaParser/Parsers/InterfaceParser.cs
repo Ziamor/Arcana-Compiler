@@ -24,10 +24,8 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             List<MethodSignatureNode> methods = new List<MethodSignatureNode>();
 
             while (CurrentToken.Type != TokenType.CLOSE_BRACE) {
-                string? memberAccessModifier = TryParseAccessModifier();
-
                 if (IsMethodDeclaration()) {
-                    methods.Add(ParseMethoSignature(memberAccessModifier));
+                    methods.Add(ParseMethodSignature());
                 }
                 CurrentToken = Lexer.GetCurrentToken();
             }
@@ -44,8 +42,10 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             return new List<ParentTypeNode>();
         }
 
-        private MethodSignatureNode ParseMethoSignature(string? accessModifier) {
-            return null;
+        private MethodSignatureNode ParseMethodSignature() {
+            MethodSignatureNode methodSignatureNode = parserFactory.CreateParser<MethodSignatureNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+            return methodSignatureNode;
         }
     }
 }
