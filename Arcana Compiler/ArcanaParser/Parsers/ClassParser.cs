@@ -29,17 +29,13 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             List<ClassDeclarationNode> nestedClasses = new List<ClassDeclarationNode>();
 
             while (CurrentToken.Type != TokenType.CLOSE_BRACE) {
-                string? accessModifier = TryParseAccessModifier();
-
                 if (CurrentToken.Type == TokenType.CLASS) {
-                    var nestedClassParser = parserFactory.CreateParser<ClassDeclarationNode>();
-                    nestedClasses.Add(nestedClassParser.Parse());
+                    nestedClasses.Add(ParseNestedClass());
                 } else if (IsMethodDeclaration()) {
-                    methods.Add(ParseMethodDeclaration(accessModifier));
+                    methods.Add(ParseMethodDeclaration());
                 } else {
-                    fields.Add(ParseFieldDeclaration(accessModifier));
+                    fields.Add(ParseFieldDeclaration());
                 }
-                CurrentToken = Lexer.GetCurrentToken();
             }
 
             Eat(TokenType.CLOSE_BRACE);
@@ -52,16 +48,36 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private List<ParentTypeNode> ParseParentTypes() {
-            return new List<ParentTypeNode>();
+            List<ParentTypeNode> parentTypes = new List<ParentTypeNode>();
+            if (CurrentToken.Type == TokenType.COLON) {
+                Eat(TokenType.COLON);
+                parentTypes.Add(new ParentTypeNode(CurrentToken.Value));
+                Eat(TokenType.IDENTIFIER);
+                while (CurrentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                    parentTypes.Add(new ParentTypeNode(CurrentToken.Value));
+                    Eat(TokenType.IDENTIFIER);
+                }
+            }
+            return parentTypes;
         }
 
-        private MethodDeclarationNode ParseMethodDeclaration(string? accessModifier) {
-            return null;
+        private ClassDeclarationNode ParseNestedClass() {
+            ClassDeclarationNode classDeclarationNode = parserFactory.CreateParser<ClassDeclarationNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+            return classDeclarationNode;
         }
 
-        private FieldDeclarationNode ParseFieldDeclaration(string? accessModifier) {
-            IParser<FieldDeclarationNode> fieldParser = parserFactory.CreateParser<FieldDeclarationNode>();
-            return fieldParser.Parse();
+        private MethodDeclarationNode ParseMethodDeclaration() {
+            MethodDeclarationNode methodDeclarationNode = parserFactory.CreateParser<MethodDeclarationNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+            return methodDeclarationNode;
         }
-    }    
+
+        private FieldDeclarationNode ParseFieldDeclaration() {
+            FieldDeclarationNode fieldDeclarationNode = parserFactory.CreateParser<FieldDeclarationNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+            return fieldDeclarationNode;
+        }
+    }
 }
