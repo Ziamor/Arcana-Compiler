@@ -953,7 +953,7 @@ namespace Arcana_Compiler.ArcanaParser
 
         private ExpressionNode ParseThisExpression() {
             Eat(TokenType.THIS);
-            ThisExpressionNode thisNode = new ThisExpressionNode();
+            ThisExpressionNode thisNode = new ThisExpressionNode(null);
 
             // Handle property or method access after 'this', similar to how you handle chained calls.
             while (_currentToken.Type == TokenType.DOT) {

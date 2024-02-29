@@ -29,7 +29,7 @@ namespace Arcana_Compiler.ArcanaParser {
                 CurrentToken = Lexer.GetNextToken();
                 SkipComments();
             } else {
-                Error(string.Format("Expected token of type {0}, but found '{1}'", tokenType, CurrentToken.Value));
+                Error(string.Format("Expected token of type {0}, but found '{1}' at Line:{2} Position:{3} {4}", tokenType, CurrentToken.Value, CurrentToken.LineNumber, CurrentToken.Position, CurrentToken.LineText));
             }
         }
 
@@ -144,23 +144,25 @@ namespace Arcana_Compiler.ArcanaParser {
                    token.Type == TokenType.MULTIPLY || token.Type == TokenType.DIVIDE ||
                    token.Type == TokenType.EQUALS || token.Type == TokenType.LESS_THAN ||
                    token.Type == TokenType.GREATER_THAN || token.Type == TokenType.LESS_THAN_OR_EQUAL ||
-                   token.Type == TokenType.GREATER_THAN_OR_EQUAL;
+                   token.Type == TokenType.GREATER_THAN_OR_EQUAL || token.Type ==  TokenType.NULL_COALESCING;
         }
 
         protected int GetPrecedence(TokenType tokenType) {
             switch (tokenType) {
+                case TokenType.NULL_COALESCING: 
+                    return 1;
                 case TokenType.PLUS:
                 case TokenType.MINUS:
-                    return 1;
+                    return 2;
                 case TokenType.MULTIPLY:
                 case TokenType.DIVIDE:
-                    return 2;
+                    return 3;
                 case TokenType.EQUALS:
                 case TokenType.LESS_THAN:
                 case TokenType.GREATER_THAN:
                 case TokenType.LESS_THAN_OR_EQUAL:
                 case TokenType.GREATER_THAN_OR_EQUAL:
-                    return 3;
+                    return 4;
                 default:
                     return 0;
             }

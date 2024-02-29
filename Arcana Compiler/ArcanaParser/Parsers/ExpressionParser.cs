@@ -2,6 +2,7 @@
 using Arcana_Compiler.ArcanaParser.Factory;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
+using System.Data.Common;
 using System.Linq.Expressions;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
@@ -77,8 +78,18 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             PrimaryExpressionNode expression;
             if (CurrentToken.Type == TokenType.IDENTIFIER) {
                 expression = ParseIdentifierOrMethodCall();
+            } else if (CurrentToken.Type == TokenType.THIS) {
+                expression = ParseThisExpression();
             } else if (IsLiteral(CurrentToken)) {
                 expression = parserFactory.CreateParser<LiteralNode>().Parse();
+            } else if (CurrentToken.Type == TokenType.NEW) {
+                Eat(TokenType.NEW);
+                IdentifierName className = ParseIdentifierName();
+                List<ASTNode> constructorArguments = new List<ASTNode>();
+                if (CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                    constructorArguments = ParseArguments();
+                }
+                return new ObjectInstantiationNode(className, constructorArguments);
             } else {
                 throw new UnexpectedTokenException(CurrentToken);
             }
@@ -108,6 +119,74 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 IdentifierName identifierName = ParseIdentifierName();
                 return new VariableAccessNode(identifierName);
             }
+        }
+
+        private PrimaryExpressionNode ParseThisExpression() {
+            Eat(TokenType.THIS);
+            Eat(TokenType.DOT);
+
+
+            ExpressionNode expression =  parserFactory.CreateParser<ExpressionNode>().Parse();
+
+            ThisExpressionNode thisNode = new ThisExpressionNode(expression);
+
+            return thisNode;
+        }
+
+        private List<ASTNode> ParseArguments() {
+            // Initialize the list to hold argument AST nodes
+            List<ASTNode> arguments = new List<ASTNode>();
+
+            // Expect an opening parenthesis
+            Eat(TokenType.OPEN_PARENTHESIS);
+
+            // Loop until a closing parenthesis is encountered
+            while (CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                ExpressionNode expression = parserFactory.CreateParser<ExpressionNode>().Parse();
+                CurrentToken = Lexer.GetCurrentToken();
+                arguments.Add(expression);
+                if (CurrentToken.Type != TokenType.COMMA) {
+                    break;
+                }
+                Eat(TokenType.COMMA);
+            }
+
+            Eat(TokenType.CLOSE_PARENTHESIS);
+
+            return arguments;
+        }
+
+    }
+
+    public class MethodCallParser : BaseParser<MethodCallNode> {
+        public MethodCallParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
+            : base(lexer, errorReporter, parserFactory) {
+        }
+
+        public override MethodCallNode Parse() {
+            IdentifierName identifierName = ParseIdentifierName();
+
+            Eat(TokenType.OPEN_PARENTHESIS);
+            List<ASTNode> arguments = new List<ASTNode>();
+
+            if (CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                arguments.Add(ParseExpression());
+                while (CurrentToken.Type == TokenType.COMMA) {
+                    Eat(TokenType.COMMA);
+                    arguments.Add(ParseExpression());
+                }
+            }
+            if (CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) {
+                throw new SyntaxErrorException(TokenType.CLOSE_PARENTHESIS, CurrentToken);
+            }
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            return new MethodCallNode(identifierName, arguments);
+        }
+
+        private ExpressionNode ParseExpression() {
+            ExpressionNode expressionNode = parserFactory.CreateParser<ExpressionNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+            return expressionNode;
         }
     }
 
