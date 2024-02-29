@@ -17,17 +17,18 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             var defaultNamespaceClasses = new List<ClassDeclarationNode>();
             var defaultNamespaceInterfaces = new List<InterfaceDeclarationNode>();
 
-            while (CurrentToken.Type != TokenType.EOF) {                
+            while (CurrentToken.Type != TokenType.EOF) {
                 switch (CurrentToken.Type) {
                     case TokenType.NAMESPACE:
-                        ASTNode? namespaceParserResult = parserFactory.CreateParser<NamespaceDeclarationNode>()?.Parse();
-                        if (namespaceParserResult is NamespaceDeclarationNode namespaceNode) {
-                            rootNode.NamespaceDeclarations.Add(namespaceNode);
-                        }
+                        rootNode.NamespaceDeclarations.Add(ParseNamespace());
                         break;
                     default:
-                        // TODO recover logic
-                        throw new UnexpectedTokenException(CurrentToken);
+                        if (!IsClassOrInterfaceAhead()) {
+                            throw new UnexpectedTokenException(CurrentToken);
+                        }
+                        ParseClassOrInterfaceInDefaultNamespace(defaultNamespaceClasses, defaultNamespaceInterfaces);
+                        break;
+
                 }
                 CurrentToken = Lexer.GetCurrentToken();
             }
@@ -47,6 +48,84 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 imports.Add(new ImportDeclarationNode(qualifiedName));
             }
             return imports;
+        }
+
+        private void ParseClassOrInterfaceInDefaultNamespace(List<ClassDeclarationNode> defaultNamespaceClasses, List<InterfaceDeclarationNode> defaultNamespaceInterfaces) {
+            var nextToken = PeekNextRelevantToken();
+            if (nextToken.Type == TokenType.CLASS) {
+                var classParser = parserFactory.CreateParser<ClassDeclarationNode>();
+                defaultNamespaceClasses.Add(classParser.Parse());
+            } else if (nextToken.Type == TokenType.INTERFACE) {
+                var interfaceParser = parserFactory.CreateParser<InterfaceDeclarationNode>();
+                defaultNamespaceInterfaces.Add(interfaceParser.Parse());
+            } else {
+                throw new UnexpectedTokenException(CurrentToken);
+            }
+        }
+
+        private NamespaceDeclarationNode ParseNamespace() {
+            if (CurrentToken.Type != TokenType.NAMESPACE) {
+                Error("Expected 'namespace' declaration.");
+            }
+
+            Eat(TokenType.NAMESPACE);
+            var namespaceName = ParseIdentifierName();
+            Eat(TokenType.OPEN_BRACE);
+
+
+            List<ClassDeclarationNode> classes;
+            List<InterfaceDeclarationNode> interfaces;
+
+            ParseClassOrInterfaces(out classes, out interfaces);
+            Eat(TokenType.CLOSE_BRACE);
+            return new NamespaceDeclarationNode(namespaceName, classes, interfaces);
+        }
+
+        private void ParseClassOrInterfaces(out List<ClassDeclarationNode> classes, out List<InterfaceDeclarationNode> interfaces) {
+            classes = new List<ClassDeclarationNode>();
+            interfaces = new List<InterfaceDeclarationNode>();
+
+            while (CurrentToken.Type != TokenType.CLOSE_BRACE && CurrentToken.Type != TokenType.EOF) {
+                bool isClassOrInterfaceAhead = IsClassOrInterfaceAhead();
+
+                if (isClassOrInterfaceAhead) {
+                    if (PeekNextRelevantToken().Type == TokenType.CLASS) {
+                        var classParser = parserFactory.CreateParser<ClassDeclarationNode>();
+                        classes.Add(classParser.Parse());
+                    } else if (PeekNextRelevantToken().Type == TokenType.INTERFACE) {
+                        var interfaceParser = parserFactory.CreateParser<InterfaceDeclarationNode>();
+                        interfaces.Add(interfaceParser.Parse());
+                    }
+                } else {
+                    Error("Expected 'class' or 'interface' declaration.");
+                }
+                CurrentToken = Lexer.GetCurrentToken();
+            }
+        }
+
+        private bool IsClassOrInterfaceAhead() {
+            if (CurrentToken.Type == TokenType.CLASS || CurrentToken.Type == TokenType.INTERFACE) {
+                return true;
+            }
+
+            // Skip through any possible access or class modifiers
+            for (int i = 1; i <= 3; i++) {
+                var token = PeekNextToken(i);
+                if (token.Type == TokenType.CLASS || token.Type == TokenType.INTERFACE) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Token PeekNextRelevantToken() {
+            for (int i = 1; i <= 3; i++) {
+                var token = PeekNextToken(i);
+                if (token.Type == TokenType.CLASS || token.Type == TokenType.INTERFACE) {
+                    return token;
+                }
+            }
+            return CurrentToken;
         }
     }
 }
