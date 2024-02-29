@@ -22,6 +22,8 @@ namespace Arcana_Compiler.ArcanaLexer {
             _currentTokenLength = 0;
             _currentChar = _input.Length > 0 ? _input[_position] : '\0';
             _tokenCache.Clear();
+
+            _currentToken = null;
         }
 
         private void Advance() {
