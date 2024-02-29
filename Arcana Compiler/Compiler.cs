@@ -74,7 +74,9 @@ public class Compiler {
                 if (reporter != null) {
                     ReportParsingErrors(filePath, reporter);
                 }
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"{filePath}: {ex.Message}");
+                Console.ResetColor();
             }
         }
 
@@ -90,11 +92,16 @@ public class Compiler {
     private void ReportParsingErrors(string filePath, ErrorReporter reporter) {
         if (reporter.HasErrors) {
             Console.WriteLine("\nErrors encountered during parsing:");
+            Console.ForegroundColor = ConsoleColor.Red;
+
             foreach (var error in reporter.Errors) {
                 Console.WriteLine($"{filePath}: {error.Severity} {error.Message} at line {error.LineNumber}, position {error.Position}");
             }
+
+            Console.ResetColor();
         }
     }
+
 
     private void BuildSymbolTables(Dictionary<string, ProgramNode> astCache) {
         Console.WriteLine("\n~~~~~~~~~~Semantic Analysis~~~~~~~~~~");
