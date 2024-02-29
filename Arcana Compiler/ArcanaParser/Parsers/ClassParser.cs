@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
+
     public class ClassParser : BaseParser<ClassDeclarationNode> {
         public ClassParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory)
             : base(lexer, errorReporter, parserFactory) {
@@ -54,10 +55,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             return new List<ParentTypeNode>();
         }
 
-        private bool IsMethodDeclaration() {
-            return false;
-        }
-
         private MethodDeclarationNode ParseMethodDeclaration(string? accessModifier) {
             return null;
         }
@@ -66,5 +63,5 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             IParser<FieldDeclarationNode> fieldParser = parserFactory.CreateParser<FieldDeclarationNode>();
             return fieldParser.Parse();
         }
-    }
+    }    
 }

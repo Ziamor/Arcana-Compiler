@@ -5,7 +5,7 @@ namespace Arcana_Compiler.ArcanaParser.Nodes {
         public IdentifierName Name { get; }
         public List<MethodSignatureNode> Methods { get; }
 
-        public InterfaceDeclarationNode(IdentifierName name, List<MethodSignatureNode> methods) {
+        public InterfaceDeclarationNode(IdentifierName name, string? accessModifier, List<ClassModifierNode> classModifierNodes, List<MethodSignatureNode> methods) {
             Name = name;
             Methods = methods;
         }

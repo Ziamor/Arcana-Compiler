@@ -3,8 +3,7 @@ using Arcana_Compiler.ArcanaLexer;
 using Arcana_Compiler.ArcanaParser.Nodes;
 using static Arcana_Compiler.Common.ErrorReporter;
 
-namespace Arcana_Compiler.ArcanaParser
-{
+namespace Arcana_Compiler.ArcanaParser {
     public class ParsingException : Exception {
         public ParsingException(string message) : base(message) { }
     }
@@ -68,7 +67,7 @@ namespace Arcana_Compiler.ArcanaParser
                 case TokenType.CLOSE_BRACE:
                 case TokenType.OPEN_PARENTHESIS:
                 case TokenType.CLOSE_PARENTHESIS:
-                case TokenType.OPEN_BRACKET: 
+                case TokenType.OPEN_BRACKET:
                 case TokenType.CLOSE_BRACKET:
                     return true;
                 default:
@@ -335,7 +334,7 @@ namespace Arcana_Compiler.ArcanaParser
             }
             Eat(TokenType.CLOSE_BRACE);
 
-            return new InterfaceDeclarationNode(new IdentifierName(interfaceName), methods);
+            return new InterfaceDeclarationNode(new IdentifierName(interfaceName), null, null, methods);
         }
 
         private MethodSignatureNode ParseMethodSignature() {

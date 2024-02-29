@@ -167,6 +167,12 @@ namespace Arcana_Compiler.ArcanaParser {
                     return 0;
             }
         }
+
+        protected bool IsMethodDeclaration() {
+            // TODO
+            return false;
+        }
+
         public abstract TNode Parse();
     }
 }

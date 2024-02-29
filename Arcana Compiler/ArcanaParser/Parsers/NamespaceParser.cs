@@ -44,6 +44,10 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private bool IsClassOrInterfaceAhead() {
+            if (CurrentToken.Type == TokenType.CLASS || CurrentToken.Type == TokenType.INTERFACE) {
+                return true;
+            }
+
             // Skip through any possible access or class modifiers
             for (int i = 1; i <= 3; i++) {
                 var token = PeekNextToken(i);
