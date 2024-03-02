@@ -45,17 +45,37 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             Eat(TokenType.OPEN_BRACE);
             List<ASTNode> methodBody = new List<ASTNode>();
             while (CurrentToken.Type != TokenType.CLOSE_BRACE) {
-                /*if (CurrentToken.Type == TokenType.RETURN) {
+                if (CurrentToken.Type == TokenType.RETURN) {
                     methodBody.Add(ParseReturnStatement());
                     break;
                 }
-                methodBody.Add(ParseStatement());*/
-                Eat(CurrentToken.Type);
+                methodBody.Add(ParseStatement());
             }
             Eat(TokenType.CLOSE_BRACE);
 
             // Return the method declaration node
             return new MethodDeclarationNode(methodName, accessModifier, methodModifiers, returnTypes, parameters, methodBody);
+        }
+
+        private StatementNode ParseStatement() {
+            StatementNode statementNode = parserFactory.CreateParser<StatementNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+
+            return statementNode;
+        }
+
+        private ReturnStatementNode ParseReturnStatement() {
+            Eat(TokenType.RETURN);
+            List<ASTNode> returnExpressions =
+            [
+                ParseExpression(), // Parse the first expression
+            ];
+            while (CurrentToken.Type == TokenType.COMMA) {
+                Eat(TokenType.COMMA); // Eat the comma to move to the next expression
+                returnExpressions.Add(ParseExpression()); // Parse subsequent expressions
+            }
+
+            return new ReturnStatementNode(returnExpressions);
         }
 
         private List<MethodModifierNode> ParseMethodModifiers() {
@@ -88,12 +108,17 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
             return new ParameterNode(parameterType, parameterName);
         }
-
         private TypeNode ParseType() {
             TypeNode typeNode = parserFactory.CreateParser<TypeNode>().Parse();
             CurrentToken = Lexer.GetCurrentToken();
 
             return typeNode;
+        }
+        private ExpressionNode ParseExpression() {
+            ExpressionNode expressionNode = parserFactory.CreateParser<ExpressionNode>().Parse();
+            CurrentToken = Lexer.GetCurrentToken();
+
+            return expressionNode;
         }
     }
 }

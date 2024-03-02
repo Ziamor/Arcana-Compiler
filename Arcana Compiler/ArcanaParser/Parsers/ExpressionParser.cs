@@ -56,7 +56,16 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             } else {
                 // Parse other primary expressions (literals, variables, etc.)
                 expression = parserFactory.CreateParser<PrimaryExpressionNode>().Parse();
+                CurrentToken = Lexer.GetCurrentToken();
             }
+
+            while (CurrentToken.Type == TokenType.OPEN_BRACKET) {
+                Eat(TokenType.OPEN_BRACKET);
+                ExpressionNode index = ParseExpression();
+                Eat(TokenType.CLOSE_BRACKET);
+                expression = new ArrayAccessNode(expression, index);
+            }
+
             CurrentToken = Lexer.GetCurrentToken();
             return ParsePostfixUnaryOperation(expression);
         }
