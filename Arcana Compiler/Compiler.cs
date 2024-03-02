@@ -54,7 +54,11 @@ public class Compiler {
             Console.WriteLine($"Parsing: {filePath}");
             Console.WriteLine($"Source:");
             string sourceCode = File.ReadAllText(filePath);
-            Console.WriteLine(sourceCode);
+            string[] lines = sourceCode.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+
+            for (int i = 0; i < lines.Length; i++) {
+                Console.WriteLine($"{i + 1,4}: {lines[i]}");
+            }
 
 
             ErrorReporter? reporter = null;
