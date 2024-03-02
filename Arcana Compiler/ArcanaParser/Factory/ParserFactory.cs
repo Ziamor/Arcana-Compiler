@@ -10,7 +10,7 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
     public class ParserFactory {
         private readonly ILexer _lexer;
         private readonly ErrorReporter _errorReporter;
-        private readonly Dictionary<Type, Func<ILexer, ErrorReporter, IParserBaseContext, object>> _parserCreators = new();
+        private readonly Dictionary<Type, Func<ILexer, ErrorReporter, object>> _parserCreators = new();
 
         public ParserFactory(ILexer lexer, ErrorReporter errorReporter) {
             _lexer = lexer;
@@ -27,11 +27,9 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
                 var interfaceType = type.GetInterfaces().First(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IParser<>));
                 var nodeType = interfaceType.GetGenericArguments().First();
 
-                _parserCreators[nodeType] = (lexer, reporter, baseContext) =>
+                _parserCreators[nodeType] = (lexer, reporter) =>
                 {
-                    object[] constructorParams = baseContext != null
-                        ? new object[] { lexer, reporter, this, baseContext }
-                        : new object[] { lexer, reporter, this };
+                    object[] constructorParams = [lexer, reporter, this];
 
                     var constructor = type.GetConstructors()
                         .FirstOrDefault(c => c.GetParameters().Length == constructorParams.Length);
@@ -44,9 +42,9 @@ namespace Arcana_Compiler.ArcanaParser.Factory {
             }
         }
 
-        public IParser<T> CreateParser<T>(IParserBaseContext context = null) where T : ASTNode {
+        public IParser<T> CreateParser<T>() where T : ASTNode {
             if (_parserCreators.TryGetValue(typeof(T), out var creator)) {
-                var parserInstance = creator(_lexer, _errorReporter, context);
+                var parserInstance = creator(_lexer, _errorReporter);
                 if (parserInstance is IParser<T> parser)
                     return parser;
 

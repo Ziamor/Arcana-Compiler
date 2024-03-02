@@ -63,21 +63,15 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private ClassDeclarationNode ParseNestedClass() {
-            ClassDeclarationNode classDeclarationNode = parserFactory.CreateParser<ClassDeclarationNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-            return classDeclarationNode;
+            return ParseNode<ClassDeclarationNode>();
         }
 
         private MethodDeclarationNode ParseMethodDeclaration() {
-            MethodDeclarationNode methodDeclarationNode = parserFactory.CreateParser<MethodDeclarationNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-            return methodDeclarationNode;
+            return ParseNode<MethodDeclarationNode>();
         }
 
         private FieldDeclarationNode ParseFieldDeclaration() {
-            FieldDeclarationNode fieldDeclarationNode = parserFactory.CreateParser<FieldDeclarationNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-            return fieldDeclarationNode;
+            return ParseNode<FieldDeclarationNode>();
         }
     }
 }

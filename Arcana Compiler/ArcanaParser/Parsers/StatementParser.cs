@@ -55,16 +55,10 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private ExpressionNode ParseExpression() {
-            ExpressionNode expressionNode = parserFactory.CreateParser<ExpressionNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            return expressionNode;
+            return ParseNode<ExpressionNode>();
         }
         private StatementNode ParseStatement() {
-            StatementNode statementNode = parserFactory.CreateParser<StatementNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            return statementNode;
+            return ParseNode<StatementNode>();
         }
 
         private StatementNode ParseThisAssignment() {
@@ -237,10 +231,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
          }*/
 
         private TypeNode ParseType() {
-            TypeNode typeNode = parserFactory.CreateParser<TypeNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            return typeNode;
+            return ParseNode<TypeNode>();
         }
     }
 }

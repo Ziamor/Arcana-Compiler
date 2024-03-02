@@ -6,14 +6,11 @@ using System.Xml.Linq;
 using static Arcana_Compiler.Common.ErrorReporter;
 
 namespace Arcana_Compiler.ArcanaParser {
-    public class DefaultParserContext<TNode> : IParserContext<TNode> where TNode : ASTNode {
-    }
-
     public abstract class BaseParser<TNode> : IParser<TNode> where TNode : ASTNode {
         protected ILexer Lexer;
         protected Token CurrentToken;
         public readonly ErrorReporter errorReporter;
-        protected readonly ParserFactory parserFactory;
+        private readonly ParserFactory parserFactory;
 
         protected BaseParser(ILexer lexer, ErrorReporter errorReporter, ParserFactory parserFactory) {
             Lexer = lexer;
@@ -200,6 +197,19 @@ namespace Arcana_Compiler.ArcanaParser {
                 default:
                     return false;
             }
+        }
+
+        protected TResult ParseNode<TResult>() where TResult : ASTNode {
+            var parser = parserFactory.CreateParser<TResult>();
+            if (parser == null) {
+                throw new InvalidOperationException($"No parser found for type {typeof(TResult).Name}.");
+            }
+
+            TResult result = parser.Parse();
+
+            CurrentToken = Lexer.GetCurrentToken();
+
+            return result;
         }
 
         public abstract TNode Parse();

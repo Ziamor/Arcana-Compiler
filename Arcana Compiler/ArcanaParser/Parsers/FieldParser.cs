@@ -35,14 +35,11 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private TypeNode ParseType() {
-            TypeNode typeNode = parserFactory.CreateParser<TypeNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            return typeNode;
+            return ParseNode<TypeNode>();
         }
 
-        private ExpressionNode? ParseExpression() {
-            return parserFactory.CreateParser<ExpressionNode>()?.Parse();
+        private ExpressionNode ParseExpression() {
+            return ParseNode<ExpressionNode>();
         }
     }
 }

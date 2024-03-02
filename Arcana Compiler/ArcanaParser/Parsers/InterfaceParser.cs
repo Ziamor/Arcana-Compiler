@@ -27,7 +27,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 if (IsMethodDeclaration()) {
                     methods.Add(ParseMethodSignature());
                 }
-                CurrentToken = Lexer.GetCurrentToken();
             }
 
             Eat(TokenType.CLOSE_BRACE);
@@ -43,9 +42,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private MethodSignatureNode ParseMethodSignature() {
-            MethodSignatureNode methodSignatureNode = parserFactory.CreateParser<MethodSignatureNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-            return methodSignatureNode;
+            return ParseNode<MethodSignatureNode>();
         }
     }
 }

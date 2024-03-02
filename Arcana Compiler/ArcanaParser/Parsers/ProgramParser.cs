@@ -31,7 +31,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         break;
 
                 }
-                CurrentToken = Lexer.GetCurrentToken();
             }
 
             if (defaultNamespaceClasses.Any() || defaultNamespaceInterfaces.Any()) {
@@ -54,11 +53,9 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         private void ParseClassOrInterfaceInDefaultNamespace(List<ClassDeclarationNode> defaultNamespaceClasses, List<InterfaceDeclarationNode> defaultNamespaceInterfaces) {
             var nextToken = PeekNextRelevantToken();
             if (nextToken.Type == TokenType.CLASS) {
-                var classParser = parserFactory.CreateParser<ClassDeclarationNode>();
-                defaultNamespaceClasses.Add(classParser.Parse());
+                defaultNamespaceClasses.Add(ParseNode<ClassDeclarationNode>());
             } else if (nextToken.Type == TokenType.INTERFACE) {
-                var interfaceParser = parserFactory.CreateParser<InterfaceDeclarationNode>();
-                defaultNamespaceInterfaces.Add(interfaceParser.Parse());
+                defaultNamespaceInterfaces.Add(ParseNode<InterfaceDeclarationNode>());
             } else {
                 throw new UnexpectedTokenException(CurrentToken);
             }
@@ -91,16 +88,13 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
                 if (isClassOrInterfaceAhead) {
                     if (PeekNextRelevantToken().Type == TokenType.CLASS) {
-                        var classParser = parserFactory.CreateParser<ClassDeclarationNode>();
-                        classes.Add(classParser.Parse());
+                        classes.Add(ParseNode<ClassDeclarationNode>());
                     } else if (PeekNextRelevantToken().Type == TokenType.INTERFACE) {
-                        var interfaceParser = parserFactory.CreateParser<InterfaceDeclarationNode>();
-                        interfaces.Add(interfaceParser.Parse());
+                        interfaces.Add(ParseNode<InterfaceDeclarationNode>());
                     }
                 } else {
                     ReportError("Expected 'class' or 'interface' declaration.", CurrentToken, ErrorReporter.ErrorSeverity.Error);
                 }
-                CurrentToken = Lexer.GetCurrentToken();
             }
         }
 

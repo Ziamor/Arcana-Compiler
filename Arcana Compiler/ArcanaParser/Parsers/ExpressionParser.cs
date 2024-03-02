@@ -55,8 +55,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 Eat(TokenType.CLOSE_PARENTHESIS);
             } else {
                 // Parse other primary expressions (literals, variables, etc.)
-                expression = parserFactory.CreateParser<PrimaryExpressionNode>().Parse();
-                CurrentToken = Lexer.GetCurrentToken();
+                expression = ParseNode<PrimaryExpressionNode>();
             }
 
             while (CurrentToken.Type == TokenType.OPEN_BRACKET) {
@@ -66,7 +65,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 expression = new ArrayAccessNode(expression, index);
             }
 
-            CurrentToken = Lexer.GetCurrentToken();
             return ParsePostfixUnaryOperation(expression);
         }
 
@@ -90,7 +88,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             } else if (CurrentToken.Type == TokenType.THIS) {
                 expression = ParseThisExpression();
             } else if (IsLiteral(CurrentToken)) {
-                expression = parserFactory.CreateParser<LiteralNode>().Parse();
+                expression = ParseNode<LiteralNode>();
             } else if (CurrentToken.Type == TokenType.NEW) {
                 Eat(TokenType.NEW);
                 IdentifierName className = ParseIdentifierName();
@@ -123,7 +121,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             }
 
             if (methodCallDetected) {
-                return parserFactory.CreateParser<MethodCallNode>().Parse();
+                return ParseNode<MethodCallNode>();
             } else {
                 IdentifierName identifierName = ParseIdentifierName();
                 return new VariableAccessNode(identifierName);
@@ -135,7 +133,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             Eat(TokenType.DOT);
 
 
-            ExpressionNode expression =  parserFactory.CreateParser<ExpressionNode>().Parse();
+            ExpressionNode expression =  ParseNode<ExpressionNode>();
 
             ThisExpressionNode thisNode = new ThisExpressionNode(expression);
 
@@ -151,8 +149,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
             // Loop until a closing parenthesis is encountered
             while (CurrentToken.Type != TokenType.CLOSE_PARENTHESIS) {
-                ExpressionNode expression = parserFactory.CreateParser<ExpressionNode>().Parse();
-                CurrentToken = Lexer.GetCurrentToken();
+                ExpressionNode expression = ParseNode<ExpressionNode>();
                 arguments.Add(expression);
                 if (CurrentToken.Type != TokenType.COMMA) {
                     break;
@@ -193,8 +190,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private ExpressionNode ParseExpression() {
-            ExpressionNode expressionNode = parserFactory.CreateParser<ExpressionNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
+            ExpressionNode expressionNode = ParseNode<ExpressionNode>();
             return expressionNode;
         }
     }

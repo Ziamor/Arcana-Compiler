@@ -63,10 +63,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private TypeNode ParseType() {
-            TypeNode typeNode = parserFactory.CreateParser<TypeNode>().Parse();
-            CurrentToken = Lexer.GetCurrentToken();
-
-            return typeNode;
+            return ParseNode<TypeNode>();
         }
     }
 }
