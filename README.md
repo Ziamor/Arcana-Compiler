@@ -547,6 +547,7 @@ terms used in the spec to use as a quick reference:
 - Standarized doc conventions, have documention built into the spec
 - Standardized code conventions
 - Standardized project structure
+- Stray away from traditional array syntax, instead define a special genric for array: Arr<T>
 
 ## Code Examples
 
