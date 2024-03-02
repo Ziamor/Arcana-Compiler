@@ -51,6 +51,88 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
+        private void RecoverOrInsertDummyToken(TokenType expectedTokenType) {
+            if (CanInsertDummyToken(expectedTokenType)) {
+                InsertDummyToken(expectedTokenType);
+                return;
+            }
+
+            if (!Recover()) {
+                throw new ParsingException($"Expected token of type {{tokenType}}, but found '{{CurrentToken.Value}}'");
+            }
+        }
+
+        private bool CanInsertDummyToken(TokenType expectedTokenType) {
+            switch (expectedTokenType) {
+                case TokenType.SEMICOLON:
+                case TokenType.OPEN_BRACE:
+                case TokenType.CLOSE_BRACE:
+                case TokenType.OPEN_PARENTHESIS:
+                case TokenType.CLOSE_PARENTHESIS:
+                case TokenType.OPEN_BRACKET:
+                case TokenType.CLOSE_BRACKET:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
+        private void InsertDummyToken(TokenType tokenType) {
+            // Create a dummy token of the expected type
+            Token dummyToken = new Token(tokenType, "", CurrentToken.LineNumber, CurrentToken.Position, CurrentToken.LineText);
+
+            // Report the insertion for clarity
+            ReportError($"Inserted dummy token of type {tokenType} to recover from error.", dummyToken.LineNumber, dummyToken.Position, ErrorSeverity.Error);
+
+            if (Lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
+
+            // Adjust the parser state as if the expected token was encountered
+            CurrentToken = Lexer.GetNextToken(); // Move past the inserted dummy token
+        }
+
+
+        protected bool Recover() {
+            if (Lexer == null) {
+                throw new InvalidOperationException("Lexer has not been initialized.");
+            }
+
+            TokenType originalTokenType = CurrentToken.Type;
+            int originalLineNumber = CurrentToken.LineNumber;
+            int originalPosition = CurrentToken.Position;
+
+            CurrentToken = Lexer.GetNextToken();
+            while (CurrentToken.Type != TokenType.EOF && !IsRecoveryPoint(CurrentToken)) {
+                CurrentToken = Lexer.GetNextToken();
+            }
+
+            if (CurrentToken.Type == TokenType.EOF) {
+                ReportError($"Unexpected end of file during recovery for token of type {originalTokenType}.", originalLineNumber, originalPosition, ErrorSeverity.Fatal);
+            }
+
+            return CurrentToken.Type != TokenType.EOF;
+        }
+
+        private bool IsRecoveryPoint(Token token) {
+            switch (token.Type) {
+                case TokenType.FUNC:
+                case TokenType.CLASS:
+                case TokenType.IF:
+                case TokenType.FOR:
+                case TokenType.WHILE:
+                case TokenType.DO:
+                case TokenType.NAMESPACE:
+                case TokenType.INTERFACE:
+                case TokenType.PUBLIC:
+                case TokenType.PRIVATE:
+                case TokenType.PROTECTED:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+
         protected IdentifierName ParseIdentifierName() {
             List<string> parts = [CurrentToken.Value];
             Eat(TokenType.IDENTIFIER);
