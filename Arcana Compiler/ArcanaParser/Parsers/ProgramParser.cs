@@ -2,6 +2,7 @@
 using Arcana_Compiler.ArcanaParser.Nodes;
 using Arcana_Compiler.Common;
 using Arcana_Compiler.ArcanaParser.Factory;
+using static Arcana_Compiler.Common.ErrorReporter;
 
 namespace Arcana_Compiler.ArcanaParser.Parsers {
     public class ProgramParser : BaseParser<ProgramNode> {
@@ -65,7 +66,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
 
         private NamespaceDeclarationNode ParseNamespace() {
             if (CurrentToken.Type != TokenType.NAMESPACE) {
-                Error("Expected 'namespace' declaration.");
+                ReportError("Expected 'namespace' declaration.", CurrentToken, ErrorSeverity.Error);
             }
 
             Eat(TokenType.NAMESPACE);
@@ -97,7 +98,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         interfaces.Add(interfaceParser.Parse());
                     }
                 } else {
-                    Error("Expected 'class' or 'interface' declaration.");
+                    ReportError("Expected 'class' or 'interface' declaration.", CurrentToken, ErrorReporter.ErrorSeverity.Error);
                 }
                 CurrentToken = Lexer.GetCurrentToken();
             }
