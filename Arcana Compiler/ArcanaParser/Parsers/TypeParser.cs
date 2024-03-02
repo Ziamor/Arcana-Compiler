@@ -25,7 +25,19 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 isNullable = true;
             }
 
-            return new TypeNode(typeName, isNullable);
+            bool isArray = false;
+            int arrayDimensions = 0;
+            while (CurrentToken.Type == TokenType.OPEN_BRACKET) {
+                Eat(TokenType.OPEN_BRACKET);
+                if (CurrentToken.Type != TokenType.CLOSE_BRACKET) {
+                    ReportError("Missing close bracket ']'", CurrentToken, ErrorReporter.ErrorSeverity.Error);
+                }
+                Eat(TokenType.CLOSE_BRACKET);
+                isArray = true;
+                arrayDimensions++;
+            }
+
+            return new TypeNode(typeName, isNullable, isArray, arrayDimensions);
         }
     }
 }

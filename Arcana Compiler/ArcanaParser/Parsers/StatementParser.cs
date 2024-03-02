@@ -22,6 +22,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 Token nextToken = PeekNextToken();
                 switch (nextToken.Type) {
                     case TokenType.IDENTIFIER:
+                    case TokenType.OPEN_BRACKET:
                         return ParseVariableDeclaration();
                     /*case TokenType.DOT: {
                             ExpressionNode expression = ParseIdentifierOrMethodCall();
@@ -35,7 +36,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         }*/
                     default:
                         ReportError($"Unexpected token '{nextToken.Value}' encountered.", nextToken.LineNumber, nextToken.Position, ErrorSeverity.Error);
-                        //Recover(); // Attempt to recover
+                        Recover(); // Attempt to recover
                         return new ErrorStatementNode();
                 }
             } else {
@@ -48,7 +49,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                         return ParseForLoop();
                     default:
                         ReportError($"Unexpected token '{CurrentToken.Value}' encountered.", CurrentToken.LineNumber, CurrentToken.Position, ErrorSeverity.Error);
-                        //Recover(); // Attempt to recover
+                        Recover(); // Attempt to recover
                         return new ErrorStatementNode();
                 }
             }
@@ -146,7 +147,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             List<ASTNode> body = ParseBlockOrStatement();
             Eat(TokenType.CLOSE_BRACE);
 
-            VariableDeclarationNode variableDeclaration = new VariableDeclarationNode(new TypeNode("var", false), variableName, null);
+            VariableDeclarationNode variableDeclaration = ParseNode<VariableDeclarationNode>();
             return new ForEachLoopNode(variableDeclaration, collection, body);
         }
 

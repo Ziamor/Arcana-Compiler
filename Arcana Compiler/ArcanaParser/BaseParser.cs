@@ -51,7 +51,7 @@ namespace Arcana_Compiler.ArcanaParser {
             }
         }
 
-        private void RecoverOrInsertDummyToken(TokenType expectedTokenType) {
+        protected void RecoverOrInsertDummyToken(TokenType expectedTokenType) {
             if (CanInsertDummyToken(expectedTokenType)) {
                 InsertDummyToken(expectedTokenType);
                 return;
