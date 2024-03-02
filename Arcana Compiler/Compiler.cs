@@ -10,8 +10,6 @@ using Arcana_Compiler.ArcanaParser.Parsers;
 
 public class Compiler {
     private IModule _module;
-
-    private IParserOld _parser;
     private ILexer _lexer;
 
     private ISymbolTableBuilder _symbolTableBuilder;
@@ -19,10 +17,8 @@ public class Compiler {
 
     private ParserFactory _parserFactory;
 
-    public Compiler(IModule module, IParserOld parser, ILexer lexer, ISymbolTable symbolTable, ISymbolTableBuilder symbolTableBuilder) {
+    public Compiler(IModule module, ILexer lexer, ISymbolTable symbolTable, ISymbolTableBuilder symbolTableBuilder) {
         _module = module;
-
-        _parser = parser;
         _lexer = lexer;
 
         _symbolTable = symbolTable;

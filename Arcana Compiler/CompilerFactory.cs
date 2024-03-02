@@ -53,11 +53,10 @@ public static class CompilerFactory {
     }
 
     private static Compiler BuildCompiler(IModule rootModule) {
-        IParserOld parser = new Parser();
         ILexer lexer = new Lexer();
         ISymbolTable symbolTable = new SymbolTable();
         ISymbolTableBuilder symbolTableBuilder = new SymbolTableBuilder();
 
-        return new Compiler(rootModule, parser, lexer, symbolTable, symbolTableBuilder);
+        return new Compiler(rootModule, lexer, symbolTable, symbolTableBuilder);
     }
 }
