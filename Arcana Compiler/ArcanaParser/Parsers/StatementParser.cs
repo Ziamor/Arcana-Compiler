@@ -126,7 +126,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             Eat(TokenType.FOR);
             Eat(TokenType.OPEN_PARENTHESIS);
 
-            Token nextToken = PeekNextToken();
+            Token nextToken = PeekNextToken(2);
             if (nextToken.Type == TokenType.IN) {
                 return ParseForEachLoop();
             } else {
@@ -135,7 +135,9 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
         }
 
         private ForEachLoopNode ParseForEachLoop() {
+            TypeNode type = ParseType();
             string variableName = CurrentToken.Value;
+            VariableDeclarationNode variableDeclaration = new VariableDeclarationNode(type, variableName);
             Eat(TokenType.IDENTIFIER);
             Eat(TokenType.IN);
 
@@ -147,7 +149,6 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             List<ASTNode> body = ParseBlockOrStatement();
             Eat(TokenType.CLOSE_BRACE);
 
-            VariableDeclarationNode variableDeclaration = ParseNode<VariableDeclarationNode>();
             return new ForEachLoopNode(variableDeclaration, collection, body);
         }
 
