@@ -53,6 +53,26 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 Eat(TokenType.OPEN_PARENTHESIS);
                 expression = ParseExpression();
                 Eat(TokenType.CLOSE_PARENTHESIS);
+            } else if (CurrentToken.Type == TokenType.NEW) {
+                // Handle array initialization with size
+                Eat(TokenType.NEW);
+                var typeIdentifier = ParseIdentifierName();
+                Eat(TokenType.OPEN_BRACKET);
+                ExpressionNode size = ParseExpression();
+                Eat(TokenType.CLOSE_BRACKET);
+                expression = new ArrayInitializationNode(size);
+            } else if (CurrentToken.Type == TokenType.OPEN_BRACKET) {
+                Eat(TokenType.OPEN_BRACKET);
+                List<ExpressionNode> values = new List<ExpressionNode>();
+                if (CurrentToken.Type != TokenType.CLOSE_BRACKET) {
+                    values.Add(ParseExpression());
+                    while (CurrentToken.Type == TokenType.COMMA) {
+                        Eat(TokenType.COMMA);
+                        values.Add(ParseExpression());
+                    }
+                }
+                Eat(TokenType.CLOSE_BRACKET);
+                expression = new ArrayInitializationNode(values);
             } else {
                 // Parse other primary expressions (literals, variables, etc.)
                 expression = ParseNode<PrimaryExpressionNode>();

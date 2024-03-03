@@ -222,6 +222,10 @@ namespace Arcana_Compiler.ArcanaSemanticAnalyzer {
         public void Visit(PrimaryExpressionNode node) {
             throw new NotImplementedException();
         }
+
+        public void Visit(ArrayInitializationNode node) {
+            throw new NotImplementedException();
+        }
     }
 
     public class TypeCheckingException : Exception {
