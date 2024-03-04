@@ -2,12 +2,12 @@
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ForLoopNode : StatementNode {
-        public ASTNode Initialization { get; private set; }
-        public ASTNode Condition { get; private set; }
-        public ASTNode Increment { get; private set; }
-        public List<ASTNode> Body { get; private set; }
+        public StatementNode Initialization { get; private set; }
+        public ExpressionNode Condition { get; private set; }
+        public ExpressionNode Increment { get; private set; }
+        public List<StatementNode> Body { get; private set; }
 
-        public ForLoopNode(ASTNode initialization, ASTNode condition, ASTNode increment, List<ASTNode> body) {
+        public ForLoopNode(StatementNode initialization, ExpressionNode condition, ExpressionNode increment, List<StatementNode> body) {
             Initialization = initialization;
             Condition = condition;
             Increment = increment;

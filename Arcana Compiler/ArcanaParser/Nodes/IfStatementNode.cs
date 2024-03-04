@@ -3,14 +3,14 @@
 namespace Arcana_Compiler.ArcanaParser.Nodes
 {
     public class IfStatementNode : StatementNode {
-        public List<(ASTNode Condition, List<ASTNode> Statements)> ConditionsAndStatements { get; }
-        public List<ASTNode>? ElseStatements { get; }
+        public List<(ExpressionNode Condition, List<StatementNode> Statements)> ConditionsAndStatements { get; }
+        public List<StatementNode>? ElseStatements { get; }
 
         public IfStatementNode() {
-            ConditionsAndStatements = new List<(ASTNode Condition, List<ASTNode> Statements)>();
+            ConditionsAndStatements = new List<(ExpressionNode Condition, List<StatementNode> Statements)>();
         }
 
-        public IfStatementNode(List<(ASTNode Condition, List<ASTNode> Statements)> conditionsAndStatements, List<ASTNode>? elseStatements = null) {
+        public IfStatementNode(List<(ExpressionNode Condition, List<StatementNode> Statements)> conditionsAndStatements, List<StatementNode>? elseStatements = null) {
             ConditionsAndStatements = conditionsAndStatements;
             ElseStatements = elseStatements;
         }

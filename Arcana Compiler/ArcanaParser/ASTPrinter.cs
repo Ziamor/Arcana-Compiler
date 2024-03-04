@@ -112,7 +112,7 @@ public class ASTPrinter : IVisitor {
         foreach (var (Condition, Statements) in node.ConditionsAndStatements) {
             result.AppendLine(indent + "If Condition:");
             IncreaseIndent();
-            Condition.Accept(this);
+            PrintExpression(Condition);
             foreach (var statement in Statements) {
                 statement.Accept(this);
             }

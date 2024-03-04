@@ -1,10 +1,10 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ReturnStatementNode : ASTNode {
-        public List<ASTNode> Expressions { get; private set; }
+    public class ReturnStatementNode : StatementNode {
+        public List<ExpressionNode> Expressions { get; private set; }
 
-        public ReturnStatementNode(List<ASTNode> expressions) {
+        public ReturnStatementNode(List<ExpressionNode> expressions) {
             Expressions = expressions ?? throw new ArgumentNullException(nameof(expressions));
         }
 

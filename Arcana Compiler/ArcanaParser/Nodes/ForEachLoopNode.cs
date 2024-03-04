@@ -3,10 +3,10 @@
 namespace Arcana_Compiler.ArcanaParser.Nodes {
     public class ForEachLoopNode : StatementNode {
         public VariableDeclarationNode Variable { get; private set; }
-        public ASTNode Collection { get; private set; }
-        public List<ASTNode> Body { get; private set; }
+        public ExpressionNode Collection { get; private set; }
+        public List<StatementNode> Body { get; private set; }
 
-        public ForEachLoopNode(VariableDeclarationNode variable, ASTNode collection, List<ASTNode> body) {
+        public ForEachLoopNode(VariableDeclarationNode variable, ExpressionNode collection, List<StatementNode> body) {
             Variable = variable;
             Collection = collection;
             Body = body;

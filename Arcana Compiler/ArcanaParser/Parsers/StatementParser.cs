@@ -41,12 +41,14 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 }
             } else {
                 switch (CurrentToken.Type) {
-                    /*case TokenType.IF:
-                        return ParseIfStatement();*/
+                    case TokenType.IF:
+                        return ParseIfStatement();
                     case TokenType.THIS:
                         return ParseThisAssignment();
                     case TokenType.FOR:
                         return ParseForLoop();
+                    case TokenType.RETURN:
+                        return ParseReturnStatement();
                     default:
                         ReportError($"Unexpected token '{CurrentToken.Value}' encountered.", CurrentToken.LineNumber, CurrentToken.Position, ErrorSeverity.Error);
                         Recover(); // Attempt to recover
@@ -76,6 +78,20 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 throw new UnexpectedTokenException(CurrentToken);
             }
         }
+        private ReturnStatementNode ParseReturnStatement() {
+            Eat(TokenType.RETURN);
+            List<ExpressionNode> returnExpressions =
+            [
+                ParseExpression(), // Parse the first expression
+            ];
+            while (CurrentToken.Type == TokenType.COMMA) {
+                Eat(TokenType.COMMA);
+                returnExpressions.Add(ParseExpression()); // Parse subsequent expressions
+            }
+
+            return new ReturnStatementNode(returnExpressions);
+        }
+
         private StatementNode ParseVariableDeclaration() {
             List<(TypeNode Type, string Name)> tempDeclarations = new List<(TypeNode, string)>();
             bool expectComma;
@@ -141,39 +157,39 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             Eat(TokenType.IDENTIFIER);
             Eat(TokenType.IN);
 
-            ASTNode collection = ParseExpression();
+            ExpressionNode collection = ParseExpression();
 
             Eat(TokenType.CLOSE_PARENTHESIS);
 
             Eat(TokenType.OPEN_BRACE);
-            List<ASTNode> body = ParseBlockOrStatement();
+            List<StatementNode> body = ParseBlockOrStatement();
             Eat(TokenType.CLOSE_BRACE);
 
             return new ForEachLoopNode(variableDeclaration, collection, body);
         }
 
         private ForLoopNode ParseTraditionalForLoop() {
-            ASTNode initialization = ParseStatement();
+            StatementNode initialization = ParseStatement();
             Eat(TokenType.SEMICOLON);
 
-            ASTNode condition = ParseExpression();
+            ExpressionNode condition = ParseExpression();
             Eat(TokenType.SEMICOLON);
 
-            ASTNode increment = ParseExpression();
+            ExpressionNode increment = ParseExpression();
 
             Eat(TokenType.CLOSE_PARENTHESIS);
 
             Eat(TokenType.OPEN_BRACE);
-            List<ASTNode> body = ParseBlockOrStatement();
+            List<StatementNode> body = ParseBlockOrStatement();
             Eat(TokenType.CLOSE_BRACE);
 
             return new ForLoopNode(initialization, condition, increment, body);
         }
 
-        private List<ASTNode> ParseBlockOrStatement() {
+        private List<StatementNode> ParseBlockOrStatement() {
             if (CurrentToken.Type == TokenType.OPEN_BRACE) {
                 Eat(TokenType.OPEN_BRACE);
-                List<ASTNode> statements = new List<ASTNode>();
+                List<StatementNode> statements = new List<StatementNode>();
                 while (CurrentToken.Type != TokenType.CLOSE_BRACE) {
                     statements.Add(ParseStatement());
                 }
@@ -181,56 +197,42 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 return statements;
             } else {
                 // If not a block, parse a single statement
-                return new List<ASTNode> { ParseStatement() };
+                return new List<StatementNode> { ParseStatement() };
             }
         }
-        /* private IfStatementNode ParseIfStatement() {
-             List<(ASTNode Condition, List<ASTNode> Statements)> conditionsAndStatements = new List<(ASTNode Condition, List<ASTNode> Statements)>();
-             List<ASTNode>? elseStatements = null;
 
-             // Parse the initial 'if' condition and its block
-             Eat(TokenType.IF);
-             Eat(TokenType.OPEN_PARENTHESIS);
-             ASTNode initialCondition = ParseExpression();
-             Eat(TokenType.CLOSE_PARENTHESIS);
-             List<ASTNode> initialThenStatements = ParseBlockOrStatement();
+        private IfStatementNode ParseIfStatement() {
+            List<(ExpressionNode Condition, List<StatementNode> Statements)> conditionsAndStatements = new List<(ExpressionNode Condition, List<StatementNode> Statements)>();
+            List<StatementNode>? elseStatements = null;
 
-             conditionsAndStatements.Add((initialCondition, initialThenStatements));
+            // Parse the initial 'if' condition and its block
+            Eat(TokenType.IF);
+            Eat(TokenType.OPEN_PARENTHESIS);
+            ExpressionNode initialCondition = ParseExpression();
+            Eat(TokenType.CLOSE_PARENTHESIS);
+            List<StatementNode> initialThenStatements = ParseBlockOrStatement();
 
-             // Parse any 'else if' branches
-             while (CurrentToken.Type == TokenType.ELSE) {
-                 Eat(TokenType.ELSE);
-                 if (CurrentToken.Type == TokenType.IF) {
-                     Eat(TokenType.IF);
-                     Eat(TokenType.OPEN_PARENTHESIS);
-                     ASTNode elseIfCondition = ParseExpression();
-                     Eat(TokenType.CLOSE_PARENTHESIS);
-                     List<ASTNode> elseIfStatements = ParseBlockOrStatement();
+            conditionsAndStatements.Add((initialCondition, initialThenStatements));
 
-                     conditionsAndStatements.Add((elseIfCondition, elseIfStatements));
-                 } else {
-                     elseStatements = ParseBlockOrStatement();
-                     break; // After 'else', no more 'else if' or 'else' should be parsed
-                 }
-             }
+            // Parse any 'else if' branches
+            while (CurrentToken.Type == TokenType.ELSE) {
+                Eat(TokenType.ELSE);
+                if (CurrentToken.Type == TokenType.IF) {
+                    Eat(TokenType.IF);
+                    Eat(TokenType.OPEN_PARENTHESIS);
+                    ExpressionNode elseIfCondition = ParseExpression();
+                    Eat(TokenType.CLOSE_PARENTHESIS);
+                    List<StatementNode> elseIfStatements = ParseBlockOrStatement();
 
-             return new IfStatementNode(conditionsAndStatements, elseStatements);
-         }
+                    conditionsAndStatements.Add((elseIfCondition, elseIfStatements));
+                } else {
+                    elseStatements = ParseBlockOrStatement();
+                    break; // After 'else', no more 'else if' or 'else' should be parsed
+                }
+            }
 
-         private List<ASTNode> ParseBlockOrStatement() {
-             if (CurrentToken.Type == TokenType.OPEN_BRACE) {
-                 Eat(TokenType.OPEN_BRACE);
-                 List<ASTNode> statements = new List<ASTNode>();
-                 while (CurrentToken.Type != TokenType.CLOSE_BRACE) {
-                     statements.Add(ParseStatement());
-                 }
-                 Eat(TokenType.CLOSE_BRACE);
-                 return statements;
-             } else {
-                 // If not a block, parse a single statement
-                 return new List<ASTNode> { ParseStatement() };
-             }
-         }*/
+            return new IfStatementNode(conditionsAndStatements, elseStatements);
+        }
 
         private TypeNode ParseType() {
             return ParseNode<TypeNode>();
