@@ -84,7 +84,21 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 Eat(TokenType.CLOSE_BRACKET);
                 expression = new ArrayAccessNode(expression, index);
             }
-
+            if (CurrentToken.Type == TokenType.DOT) {
+                Eat(TokenType.DOT);
+                PrimaryExpressionNode chainedExpression = ParseNode<PrimaryExpressionNode>();
+                switch (chainedExpression) {
+                    case MethodCallNode methodCallNode:
+                        expression = new ChainedMethodCallNode(expression, methodCallNode);
+                        break;
+                    case ChainedPropertyAccessNode propertyAccessNode:
+                        // TODO
+                        break;
+                    default:
+                        ReportError("Expected a mathod call or property access.", CurrentToken, ErrorReporter.ErrorSeverity.Error);
+                        break;
+                }
+            }
             return ParsePostfixUnaryOperation(expression);
         }
 
@@ -153,7 +167,7 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
             Eat(TokenType.DOT);
 
 
-            ExpressionNode expression =  ParseNode<ExpressionNode>();
+            ExpressionNode expression = ParseNode<ExpressionNode>();
 
             ThisExpressionNode thisNode = new ThisExpressionNode(expression);
 

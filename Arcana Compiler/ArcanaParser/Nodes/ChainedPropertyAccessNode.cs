@@ -1,7 +1,7 @@
 ﻿using Arcana_Compiler.Common;
 
 namespace Arcana_Compiler.ArcanaParser.Nodes {
-    public class ChainedPropertyAccessNode : ExpressionNode {
+    public class ChainedPropertyAccessNode : PrimaryExpressionNode {
         public ASTNode PreviousNode { get; private set; }
         public string PropertyName { get; private set; }
 
