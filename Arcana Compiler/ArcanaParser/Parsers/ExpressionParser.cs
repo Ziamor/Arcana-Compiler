@@ -84,7 +84,8 @@ namespace Arcana_Compiler.ArcanaParser.Parsers {
                 Eat(TokenType.CLOSE_BRACKET);
                 expression = new ArrayAccessNode(expression, index);
             }
-            if (CurrentToken.Type == TokenType.DOT) {
+
+            while (CurrentToken.Type == TokenType.DOT) {
                 Eat(TokenType.DOT);
                 PrimaryExpressionNode chainedExpression = ParseNode<PrimaryExpressionNode>();
                 switch (chainedExpression) {
